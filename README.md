@@ -20,6 +20,7 @@ flowchart
 	end
 	n1 -->|"Small -> Medium: Projectile Turret rate of fire, Projectile Turret falloff"| n2
 	subgraph s3["Battlecruiser"]
+		n13["Cyclone"]
 		n8["Hurricane"]
 		n3["Tornado"]
 	end
@@ -39,4 +40,5 @@ flowchart
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
 	n10 -->|"Explosive Light Missile and Rocket DPS"| n11
 	n11 -->|"RL, LML -> RLML, HML, HAML DPS"| n12
+	n12 -->|"HML and HAML rate of fire"| n13
 ```
