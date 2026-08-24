@@ -11,6 +11,7 @@ flowchart
 	end
 	n1
 	subgraph s2["Cruiser"]
+		n7["Rupture"]
 		n2["Stabber"]
 	end
 	n1 -->|"Projectile Turret rate of fire, Projectile Turret falloff"| n2
@@ -26,4 +27,5 @@ flowchart
 		n6["Thrasher"]
 	end
 	n5 -->|"Projectile Turret damage, Projectile Turret tracking speed"| n6
+	n6 -->|"Projectile Turret damage, Projectile Turret tracking speed"| n7
 ```
