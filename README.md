@@ -8,6 +8,7 @@ flowchart
 	
 	
 	subgraph s1["Frigate"]
+		n10["Breacher"]
 		n5["Slasher"]
 		n1["Rifter"]
 	end
@@ -28,10 +29,12 @@ flowchart
 	end
 	n3 -->|"Projectile Turret rate of fire"| n4
 	subgraph s5["Destroyer"]
+		n11["Talwar"]
 		n6["Thrasher"]
 	end
 	n5 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n6
 	n6 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
+	n10 -->|"Explosive Light Missile and Rocket DPS"| n11
 ```
