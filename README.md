@@ -12,5 +12,9 @@ flowchart
 	subgraph s2["Cruiser"]
 		n2["Stabber"]
 	end
-	n1 -->|"7.5% bonus to Projectile Turret rate of fire, 10% bonus to Projectile Turret falloff"| n2
+	n1 -->|"Projectile Turret rate of fire, Projectile Turret falloff"| n2
+	subgraph s3["Battlecruiser"]
+		n3["Tornado"]
+	end
+	n2 -->|"Projectile Turret rate of fire, Projectile Turret falloff"| n3
 ```
