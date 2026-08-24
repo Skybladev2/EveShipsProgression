@@ -1,5 +1,7 @@
 # EveShipsProgression
 
+## Bonuses
+
 ```mermaid
 flowchart
 	
