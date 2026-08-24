@@ -43,4 +43,8 @@ flowchart
 	n11 -->|"RL, LML -> RLML, HML, HAML DPS"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
 	n13 -->|" HML, HAML -> RHML, CML, TL rate of fire"| n14
+	subgraph s6["Dreadnought"]
+		n15["Naglfar"]
+	end
+	n4 -->|"Large -> Capital: Projectile Turret damage, Projectile Turret rate of fire"| n15
 ```
