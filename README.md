@@ -14,6 +14,7 @@ flowchart
 	end
 	n1
 	subgraph s2["Cruiser"]
+		n12["Bellicose"]
 		n7["Rupture"]
 		n2["Stabber"]
 	end
@@ -37,4 +38,5 @@ flowchart
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
 	n10 -->|"Explosive Light Missile and Rocket DPS"| n11
+	n11 -->|"RL and LML -> RLML, HML, HAML DPS"| n12
 ```
