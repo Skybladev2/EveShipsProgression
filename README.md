@@ -8,12 +8,14 @@ flowchart
 	
 	
 	subgraph s1["Frigate"]
+		n17["Burst"]
 		n10["Breacher"]
 		n5["Slasher"]
 		n1["Rifter"]
 	end
 	n1
 	subgraph s2["Cruiser"]
+		n18["Scythe"]
 		n12["Bellicose"]
 		n7["Rupture"]
 		n2["Stabber"]
@@ -52,4 +54,9 @@ flowchart
 		n16["Ragnarok"]
 	end
 	n15 -->|"Projectile Turret damage"| n16
+	n17 -->|"Remote Shield Booster amount, Remote Shield Booster activation cost, Remote Shield Booster falloff"| n18
+	subgraph s8["Force Auxiliary"]
+		n19["Lif"]
+	end
+	n18 -->|"Remote Shield booster DPS, Logistic Drone transfer amount"| n19
 ```
