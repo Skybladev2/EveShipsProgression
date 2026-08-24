@@ -48,4 +48,8 @@ flowchart
 	end
 	n4 -->|"Large -> Capital: Projectile Turret damage, Projectile Turret rate of fire"| n15
 	n9 -->|"Large -> Capital: Projectile Turret damage"| n15
+	subgraph s7["Titan"]
+		n16["Ragnarok"]
+	end
+	n15 -->|"Projectile Turret damage"| n16
 ```
