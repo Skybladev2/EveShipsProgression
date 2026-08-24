@@ -47,4 +47,5 @@ flowchart
 		n15["Naglfar"]
 	end
 	n4 -->|"Large -> Capital: Projectile Turret damage, Projectile Turret rate of fire"| n15
+	n9 -->|"Large -> Capital: Projectile Turret damage"| n15
 ```
