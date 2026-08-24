@@ -17,4 +17,8 @@ flowchart
 		n3["Tornado"]
 	end
 	n2 -->|"Projectile Turret rate of fire, Projectile Turret falloff"| n3
+	subgraph s4["Battleship"]
+		n4["Tempest"]
+	end
+	n3 -->|"Projectile Turret rate of fire"| n4
 ```
