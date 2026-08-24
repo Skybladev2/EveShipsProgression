@@ -26,6 +26,7 @@ flowchart
 	end
 	n2 -->|"Medium -> Large: Projectile Turret rate of fire, Projectile Turret falloff"| n3
 	subgraph s4["Battleship"]
+		n14["Typhoon"]
 		n9["Maelstrom"]
 		n4["Tempest"]
 	end
@@ -41,4 +42,5 @@ flowchart
 	n10 -->|"Explosive Light Missile and Rocket DPS"| n11
 	n11 -->|"RL, LML -> RLML, HML, HAML DPS"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
+	n13 -->|" HML, HAML -> RHML, CML, TL rate of fire"| n14
 ```
