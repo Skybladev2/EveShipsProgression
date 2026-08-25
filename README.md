@@ -20,7 +20,8 @@ flowchart
 		n7["Rupture"]
 		n2["Stabber"]
 	end
-	n1 -->|"Projectile turrets"| n2
+	n1
+	n2
 	subgraph s3["Battlecruiser"]
 		n13["Cyclone"]
 		n8["Hurricane"]
@@ -78,4 +79,10 @@ flowchart
 		n25["Dramiel"]
 	end
 	n22 -->|"Projectile turrets, tackle"| n25
+	subgraph s13["Assault Frigates"]
+		n26["Wolf"]
+	end
+	n1
+	n26
+	n22 -->|"Projectile turrets"| n26
 ```
