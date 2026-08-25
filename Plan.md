@@ -1,4 +1,4 @@
-[ ] First pass - any bonuses to any ship, save traits
-[ ] Second pass - each bonus to all eligible ships
-[ ] Third pass - stats progression
-[ ] Fourth pass - combine bonuses and stats progressions
+[ ] First pass - navy variant
+[ ] Second pass - tech 2 variants
+[ ] Third pass - pirate successors
+[ ] Fourth pass - larger hulls
