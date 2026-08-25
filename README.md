@@ -1,13 +1,13 @@
 # EveShipsProgression
 
-## Bonuses
 
 ```mermaid
 flowchart
 	
 	
 	
-	subgraph s1["Frigate"]
+	subgraph s1["Frigates"]
+		n21["Vigil"]
 		n17["Burst"]
 		n10["Breacher"]
 		n5["Slasher"]
@@ -20,7 +20,7 @@ flowchart
 		n7["Rupture"]
 		n2["Stabber"]
 	end
-	n1 -->|"Small -> Medium: Projectile Turret rate of fire, Projectile Turret falloff"| n2
+	n1 -->|"Projectile turrets"| n2
 	subgraph s3["Battlecruiser"]
 		n13["Cyclone"]
 		n8["Hurricane"]
@@ -37,7 +37,7 @@ flowchart
 		n11["Talwar"]
 		n6["Thrasher"]
 	end
-	n5 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n6
+	n5 -->|"Projectile turrets"| n6
 	n6 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
@@ -59,4 +59,19 @@ flowchart
 		n19["Lif"]
 	end
 	n18 -->|"Remote Shield booster DPS, Logistic Drone transfer amount"| n19
+	subgraph s9["Logistics Frigate"]
+		n20["Scalpel"]
+	end
+	n1 -->|"Projectile turrets"| n6
+	subgraph s10["Navy Faction Frigates"]
+		n22["Republic Fleet Firetail"]
+	end
+	n5 -->|"Projectile turrets"| n22
+	n1 -->|"Projectile turrets"| n22
+	subgraph s11["Interceptors"]
+		n24["Claw"]
+		n23["Stiletto"]
+	end
+	n5 -->|"Projectile turrets, tackle"| n23
+	n5 -->|"Tackle, projectile turrets"| n24
 ```
