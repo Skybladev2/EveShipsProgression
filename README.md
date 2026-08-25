@@ -72,6 +72,10 @@ flowchart
 		n24["Claw"]
 		n23["Stiletto"]
 	end
-	n5 -->|"Projectile turrets, tackle"| n23
-	n5 -->|"Tackle, projectile turrets"| n24
+	n5 -->|"Tackle, projectile turrets"| n23
+	n5 -->|"Projectile turrets, tackle"| n24
+	subgraph s12["Pirate Faction Frigates"]
+		n25["Dramiel"]
+	end
+	n22 -->|"Projectile turrets, tackle"| n25
 ```
