@@ -1,4 +1,4 @@
-* First pass - navy variant
-* Second pass - tech 2 variants
-* Third pass - pirate successors
-* Fourth pass - larger hulls
+* First pass - navy variant (completed - green)
+* Second pass - tech 2 variants (completed - orange)
+* Third pass - pirate successors (completed - purple)
+* Fourth pass - larger hulls (completed - grey)
