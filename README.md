@@ -3,9 +3,6 @@
 
 ```mermaid
 flowchart
-	
-	
-	
 	subgraph s1["Frigates"]
 		n21["Vigil"]
 		n17["Burst"]
@@ -39,7 +36,7 @@ flowchart
 		n6["Thrasher"]
 	end
 	n5 -->|"Projectile turrets"| n6
-	n6 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n7
+	n6 -->|"Projectile turrets"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
 	n10 -->|"Missiles"| n11
@@ -64,7 +61,8 @@ flowchart
 		n20["Scalpel"]
 	end
 	n1 -->|"Projectile turrets"| n6
-	subgraph s10["Navy Faction Frigates"]
+	subgraph s10["Navy Frigates"]
+		n29["Vigil Fleet Issue"]
 		n22["Republic Fleet Firetail"]
 	end
 	n5 -->|"Projectile turrets"| n22
@@ -76,10 +74,12 @@ flowchart
 	n5 -->|"Tackle, projectile turrets"| n23
 	n5 -->|"Projectile turrets, tackle"| n24
 	subgraph s12["Pirate Faction Frigates"]
+		n31["Garmur"]
 		n25["Dramiel"]
 	end
 	n22 -->|"Projectile turrets, tackle"| n25
 	subgraph s13["Assault Frigates"]
+		n30["Jaguar"]
 		n26["Wolf"]
 	end
 	n1
@@ -96,4 +96,10 @@ flowchart
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
+	n10 -->|"Missiles"| n29
+	n10
+	n30
+	n29 -->|"Missiles"| n30
+	n10 -->|"Missiles, active shield tank"| n30
+	n31
 ```
