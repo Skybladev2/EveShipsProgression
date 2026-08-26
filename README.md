@@ -62,6 +62,7 @@ flowchart
 	end
 	n1 -->|"Projectile turrets"| n6
 	subgraph s10["Navy Frigates"]
+		n32["Probe Fleet Issue"]
 		n29["Vigil Fleet Issue"]
 		n22["Republic Fleet Firetail"]
 	end
@@ -88,7 +89,6 @@ flowchart
 	subgraph s14["Covert Ops"]
 		n27["Hound"]
 	end
-	n10
 	n27
 	n17 -->|"Remote shield boost"| n20
 	subgraph s15["Electronic Attack Frigates"]
@@ -96,10 +96,11 @@ flowchart
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
-	n10 -->|"Missiles"| n29
-	n10
+	n29
 	n30
 	n29 -->|"Missiles"| n30
-	n10 -->|"Missiles, active shield tank"| n30
+	n10
 	n31
+	n10 -->|"Missiles"| n32
+	n32 ---|"Missiles"| n30
 ```
