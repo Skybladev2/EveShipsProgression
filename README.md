@@ -55,11 +55,11 @@ flowchart
 		n16["Ragnarok"]
 	end
 	n15 -->|"Projectile Turret damage"| n16
-	n17 -->|"Remote Shield Booster amount, Remote Shield Booster activation cost, Remote Shield Booster falloff"| n18
+	n17 -->|"Remote shield boost"| n18
 	subgraph s8["Force Auxiliary"]
 		n19["Lif"]
 	end
-	n18 -->|"Remote Shield booster DPS, Logistic Drone transfer amount"| n19
+	n18 -->|"Remote shield boost, Remote capacitor boost, Logistic drones"| n19
 	subgraph s9["Logistics Frigate"]
 		n20["Scalpel"]
 	end
@@ -85,4 +85,10 @@ flowchart
 	n1
 	n26
 	n22 -->|"Projectile turrets"| n26
+	subgraph s14["Covert Ops"]
+		n27["Hound"]
+	end
+	n10
+	n27
+	n17 -->|"Remote shield boost"| n20
 ```
