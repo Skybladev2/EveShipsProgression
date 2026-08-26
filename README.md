@@ -42,8 +42,8 @@ flowchart
 	n6 -->|"Small -> Medium: Projectile Turret damage, Projectile Turret tracking speed"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
-	n10 -->|"Explosive Light Missile and Rocket DPS"| n11
-	n11 -->|"RL, LML -> RLML, HML, HAML DPS"| n12
+	n10 -->|"Missiles"| n11
+	n11 -->|"Missiles"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
 	n13 -->|" HML, HAML -> RHML, CML, TL rate of fire"| n14
 	subgraph s6["Dreadnought"]
@@ -91,4 +91,9 @@ flowchart
 	n10
 	n27
 	n17 -->|"Remote shield boost"| n20
+	subgraph s15["Electronic Attack Frigates"]
+		n28["Hyena"]
+	end
+	n21 -->|"Target paint"| n28
+	n21 -->|"Target paint"| n12
 ```
