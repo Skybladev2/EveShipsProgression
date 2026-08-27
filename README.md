@@ -4,6 +4,7 @@
 ```mermaid
 flowchart
 	subgraph s1["Frigates"]
+		n33["Probe"]
 		n21["Vigil"]
 		n17["Burst"]
 		n10["Breacher"]
@@ -75,6 +76,7 @@ flowchart
 	n5 -->|"Tackle, projectile turrets"| n23
 	n5 -->|"Projectile turrets, tackle"| n24
 	subgraph s12["Pirate Faction Frigates"]
+		n34["Astero"]
 		n31["Garmur"]
 		n25["Dramiel"]
 	end
@@ -83,24 +85,29 @@ flowchart
 		n30["Jaguar"]
 		n26["Wolf"]
 	end
-	n1
-	n26
 	n22 -->|"Projectile turrets"| n26
 	subgraph s14["Covert Ops"]
-		n27["Hound"]
+		n27["Cheetah"]
 	end
-	n27
 	n17 -->|"Remote shield boost"| n20
 	subgraph s15["Electronic Attack Frigates"]
 		n28["Hyena"]
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
-	n29
-	n30
 	n29 -->|"Missiles"| n30
-	n10
-	n31
 	n10 -->|"Missiles"| n32
-	n32 ---|"Missiles"| n30
+	n32 -->|"Missiles"| n30
+	n10 -->|"Missiles"| n29
+	n33 -->|"Scan, hack"| n27
+	n27 -->|"Cloak, scan, hack"| n34
+	n33 -->|"Scan, hack"| n34
+	subgraph s16["Haulers"]
+		n37["Mammoth"]
+		n36["Wreathe"]
+		n35["Hoarder"]
+	end
+	n33 -->|"Cargo (ammo)"| n35
+	n33 -->|"Cargo"| n37
+	n33 -->|"Cargo"| n36
 ```
