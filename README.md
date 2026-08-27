@@ -11,15 +11,12 @@ flowchart
 		n5["Slasher"]
 		n1["Rifter"]
 	end
-	n1
 	subgraph s2["Cruiser"]
 		n18["Scythe"]
 		n12["Bellicose"]
 		n7["Rupture"]
 		n2["Stabber"]
 	end
-	n1
-	n2
 	subgraph s3["Battlecruiser"]
 		n13["Cyclone"]
 		n8["Hurricane"]
@@ -61,8 +58,6 @@ flowchart
 	subgraph s9["Logistics Frigate"]
 		n20["Scalpel"]
 	end
-	n1
-	n6
 	subgraph s10["Navy Frigates"]
 		n32["Probe Fleet Issue"]
 		n29["Vigil Fleet Issue"]
@@ -103,8 +98,6 @@ flowchart
 	n32 -->|"Missiles"| n30
 	n10 -->|"Missiles"| n29
 	n33 -->|"Scan, hack"| n27
-	n27
-	n34
 	n33 -->|"Scan, hack"| n34
 	subgraph s16["Haulers"]
 		n37["Mammoth"]
@@ -131,5 +124,10 @@ flowchart
 	n1 -->|"Projectile turrets"| n6
 	n1 -->|"Projectile turrets"| n42
 	n5 -->|"Projectile turrets"| n42
-	n6 --> n42
+	n6 -->|"Projectile turrets"| n42
+	n42 -->|"Projectile turrets"| n2
+	subgraph s19["Interdictors"]
+		n43["Sabre"]
+	end
+	n6 -->|"Projectile turrets"| n43
 ```
