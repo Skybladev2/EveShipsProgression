@@ -3,7 +3,7 @@
 
 ```mermaid
 flowchart
-	subgraph s1["Frigates"]
+	subgraph s1["Empire Faction Frigates"]
 		n33["Probe"]
 		n21["Vigil"]
 		n17["Burst"]
@@ -100,7 +100,8 @@ flowchart
 	n32 -->|"Missiles"| n30
 	n10 -->|"Missiles"| n29
 	n33 -->|"Scan, hack"| n27
-	n27 -->|"Cloak, scan, hack"| n34
+	n27
+	n34
 	n33 -->|"Scan, hack"| n34
 	subgraph s16["Haulers"]
 		n37["Mammoth"]
@@ -110,4 +111,14 @@ flowchart
 	n33 -->|"Cargo (ammo)"| n35
 	n33 -->|"Cargo"| n37
 	n33 -->|"Cargo"| n36
+	subgraph s17["Other Faction Frigates"]
+		n39["Pacifier"]
+		n38["Metamorphosis"]
+	end
+	n38 -->|"Scan"| n33
+	n33 -->|"Scan"| n38
+	n38 -->|"Cloak, scan"| n34
+	n34 -->|"Cloak, scan, hack"| n27
+	n27 -->|"Cloak, scan, hack"| n39
+	n32 -->|"Missiles, scan"| n39
 ```
