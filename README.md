@@ -88,6 +88,7 @@ flowchart
 	end
 	n22 -->|"Projectile turrets"| n26
 	subgraph s14["Covert Ops"]
+		n41["Hound"]
 		n27["Cheetah"]
 	end
 	n17 -->|"Remote shield boost"| n20
