@@ -130,4 +130,21 @@ flowchart
 		n43["Sabre"]
 	end
 	n6 -->|"Projectile turrets"| n43
+	subgraph s20["Tactical Destroyers"]
+		n44["Svipul"]
+	end
+	n6 -->|"Projectile turrets"| n44
+	n42 --> n43
+	n42 -->|"Projectile turrets"| n44
+	subgraph s21["Pirate Faction Destroyers"]
+		n45["Mekubal"]
+	end
+	n6 ---|"Projectile turrets"| n45
+	n42 ---|"Projectile turrets"| n45
+	subgraph s22["Other Faction Destroyers"]
+		n46["Sunesis"]
+	end
+	n6 -->|"Projectile turrets"| n46
+	n42 -->|"Projectile turrets"| n46
+	n46 -->|"Projectile turrets"| n42
 ```
