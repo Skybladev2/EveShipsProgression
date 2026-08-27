@@ -76,6 +76,7 @@ flowchart
 	n5 -->|"Tackle, projectile turrets"| n23
 	n5 -->|"Projectile turrets, tackle"| n24
 	subgraph s12["Pirate Faction Frigates"]
+		n40["Cruor"]
 		n34["Astero"]
 		n31["Garmur"]
 		n25["Dramiel"]
@@ -121,4 +122,5 @@ flowchart
 	n34 -->|"Cloak, scan, hack"| n27
 	n27 -->|"Cloak, scan, hack"| n39
 	n32 -->|"Missiles, scan"| n39
+	n29 -->|"Web range"| n40
 ```
