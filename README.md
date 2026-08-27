@@ -32,7 +32,7 @@ flowchart
 		n4["Tempest"]
 	end
 	n3 -->|"Projectile Turret rate of fire"| n4
-	subgraph s5["Destroyer"]
+	subgraph s5["Destroyers"]
 		n11["Talwar"]
 		n6["Thrasher"]
 	end
@@ -61,7 +61,8 @@ flowchart
 	subgraph s9["Logistics Frigate"]
 		n20["Scalpel"]
 	end
-	n1 -->|"Projectile turrets"| n6
+	n1
+	n6
 	subgraph s10["Navy Frigates"]
 		n32["Probe Fleet Issue"]
 		n29["Vigil Fleet Issue"]
@@ -124,4 +125,11 @@ flowchart
 	n27 -->|"Cloak, scan, hack"| n39
 	n32 -->|"Missiles, scan"| n39
 	n29 -->|"Web range"| n40
+	subgraph s18["Navy Destroyers"]
+		n42["Thrasher Fleet Issue"]
+	end
+	n1 -->|"Projectile turrets"| n6
+	n1 -->|"Projectile turrets"| n42
+	n5 -->|"Projectile turrets"| n42
+	n6 --> n42
 ```
