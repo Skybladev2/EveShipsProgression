@@ -97,8 +97,8 @@ flowchart
 	n10 -->|"Missiles"| n32
 	n32 -->|"Missiles"| n30
 	n10 -->|"Missiles"| n29
-	n33 -->|"Scan, hack"| n27
-	n33 -->|"Scan, hack"| n34
+	n33 -->|"Scan"| n27
+	n33 -->|"Scan"| n34
 	subgraph s16["Haulers"]
 		n37["Mammoth"]
 		n36["Wreathe"]
@@ -114,8 +114,8 @@ flowchart
 	n38 -->|"Scan"| n33
 	n33 -->|"Scan"| n38
 	n38 -->|"Cloak, scan"| n34
-	n34 -->|"Cloak, scan, hack"| n27
-	n27 -->|"Cloak, scan, hack"| n39
+	n34 -->|"Cloak, scan"| n27
+	n27 -->|"Cloak, scan"| n39
 	n32 -->|"Missiles, scan"| n39
 	n29 -->|"Web range"| n40
 	subgraph s18["Navy Destroyers"]
@@ -147,4 +147,5 @@ flowchart
 	n6 -->|"Projectile turrets"| n46
 	n42 -->|"Projectile turrets"| n46
 	n46 -->|"Projectile turrets"| n42
+	n33 -->|"Cargo"| n46
 ```
