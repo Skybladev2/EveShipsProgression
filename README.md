@@ -119,6 +119,7 @@ flowchart
 	n32 -->|"Missiles, scan"| n39
 	n29 -->|"Web range"| n40
 	subgraph s18["Navy Destroyers"]
+		n47["Talwar Fleet Issue"]
 		n42["Thrasher Fleet Issue"]
 	end
 	n1 -->|"Projectile turrets"| n6
@@ -144,8 +145,19 @@ flowchart
 	subgraph s22["Other Faction Destroyers"]
 		n46["Sunesis"]
 	end
-	n6 -->|"Projectile turrets"| n46
-	n42 -->|"Projectile turrets"| n46
-	n46 -->|"Projectile turrets"| n42
+	n6
+	n46
+	n42
+	n46
+	n46
+	n42
 	n33 -->|"Cargo"| n46
+	n11 ---|"Missiles"| n47
+	subgraph s23["Command Destroyers"]
+		n48["Bifrost"]
+	end
+	n11 -->|"Missiles"| n48
+	n47 -->|"Missiles"| n48
+	n46 -->|"Missiles"| n11
+	n46 -->|"Projectile turrets"| n6
 ```
