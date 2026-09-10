@@ -145,12 +145,6 @@ flowchart
 	subgraph s22["Other Faction Destroyers"]
 		n46["Sunesis"]
 	end
-	n6
-	n46
-	n42
-	n46
-	n46
-	n42
 	n33 -->|"Cargo"| n46
 	n11 ---|"Missiles"| n47
 	subgraph s23["Command Destroyers"]
@@ -160,4 +154,9 @@ flowchart
 	n47 -->|"Missiles"| n48
 	n46 -->|"Missiles"| n11
 	n46 -->|"Projectile turrets"| n6
+	subgraph s24["Recon Ships"]
+		n49["Huginn"]
+	end
+	n12 --> n49
+	n29 --> n31
 ```
