@@ -159,7 +159,7 @@ flowchart
 		n49["Huginn"]
 	end
 	n12 -->|"Target paint"| n49
-	n29 --> n31
+	n29 -->|"Missiles (weak)"| n31
 	n29 -->|"Web range"| n49
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
@@ -179,5 +179,5 @@ flowchart
 	subgraph s28["Pirate Faction Cruisers"]
 		n54["Orthrus"]
 	end
-	n12 -->|"Missiles"| n54
+	n12 -->|"Missiles (weak)"| n54
 ```
