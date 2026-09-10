@@ -155,8 +155,29 @@ flowchart
 	n46 -->|"Missiles"| n11
 	n46 -->|"Projectile turrets"| n6
 	subgraph s24["Recon Ships"]
+		n51["Rapier"]
 		n49["Huginn"]
 	end
-	n12 --> n49
+	n12 -->|"Target paint"| n49
 	n29 --> n31
+	n29 -->|"Web range"| n49
+	n7 -->|"Projectile turrets"| n49
+	n2 -->|"Projectile turrets"| n49
+	subgraph s25["Navy Cruisers"]
+		n50["Scythe Fleet Issue"]
+	end
+	n12 -->|"Missiles"| n50
+	n12 -->|"Missiles"| n51
+	subgraph s26["Heavy Assault Cruisers"]
+		n53["Muninn"]
+	end
+	n12 -->|"Missiles"| n53
+	subgraph s27["Strategic Cruisers"]
+		n52["Loki"]
+	end
+	n53 -->|"Missiles"| n52
+	subgraph s28["Pirate Faction Cruisers"]
+		n54["Orthrus"]
+	end
+	n12 -->|"Missiles"| n54
 ```
