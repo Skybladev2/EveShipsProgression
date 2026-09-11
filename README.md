@@ -173,6 +173,7 @@ flowchart
 	end
 	n12 -->|"Missiles"| n53
 	subgraph s27["Strategic Cruisers"]
+		n55["Tengu"]
 		n52["Loki"]
 	end
 	n53 -->|"Missiles"| n52
@@ -180,4 +181,5 @@ flowchart
 		n54["Orthrus"]
 	end
 	n12 -->|"Missiles (weak)"| n54
+	n53 -->|"Missiles"| n55
 ```
