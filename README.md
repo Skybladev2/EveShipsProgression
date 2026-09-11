@@ -181,6 +181,7 @@ flowchart
 	end
 	n53 -->|"Missiles"| n52
 	subgraph s28["Pirate Faction Cruisers"]
+		n60["Cynabal"]
 		n54["Orthrus"]
 	end
 	n12 -->|"Missiles (weak)"| n54
@@ -195,4 +196,5 @@ flowchart
 	n57 -->|"Projectile turrets"| n59
 	n57 -->|"Projectile turrets"| n49
 	n57 -->|"Projectile turrets"| n52
+	n57 -->|"Projectile turrets"| n60
 ```
