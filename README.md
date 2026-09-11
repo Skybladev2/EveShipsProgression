@@ -170,6 +170,7 @@ flowchart
 	n12 -->|"Missiles"| n50
 	n12 -->|"Missiles"| n51
 	subgraph s26["Heavy Assault Cruisers"]
+		n58["Vagabond"]
 		n53["Muninn"]
 	end
 	n12 -->|"Missiles"| n53
@@ -187,4 +188,11 @@ flowchart
 	n53 -->|"Missiles"| n56
 	n2 -->|"Projectile turrets"| n57
 	n2 -->|"Projectile turrets"| n50
+	n2 -->|"Projectile turrets"| n58
+	subgraph s29["Heavy Interdiction Cruisers"]
+		n59["Broadsword"]
+	end
+	n57 -->|"Projectile turrets"| n59
+	n57 -->|"Projectile turrets"| n49
+	n57 -->|"Projectile turrets"| n52
 ```
