@@ -164,6 +164,7 @@ flowchart
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
 	subgraph s25["Navy Cruisers"]
+		n57["Stabber Fleet Issue"]
 		n50["Scythe Fleet Issue"]
 	end
 	n12 -->|"Missiles"| n50
@@ -184,4 +185,6 @@ flowchart
 	n12 -->|"Missiles (weak)"| n54
 	n53 -->|"Missiles"| n55
 	n53 -->|"Missiles"| n56
+	n2 -->|"Projectile turrets"| n57
+	n2 -->|"Projectile turrets"| n50
 ```
