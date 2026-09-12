@@ -22,7 +22,7 @@ flowchart
 		n8["Hurricane"]
 		n3["Tornado"]
 	end
-	n2 -->|"Medium -> Large: Projectile Turret rate of fire, Projectile Turret falloff"| n3
+	n2 -->|"Projectile turrets"| n3
 	subgraph s4["Battleship"]
 		n14["Typhoon"]
 		n9["Maelstrom"]
@@ -197,4 +197,5 @@ flowchart
 	n57 -->|"Projectile turrets"| n49
 	n57 -->|"Projectile turrets"| n52
 	n57 -->|"Projectile turrets"| n60
+	n2 -->|"Projectile turrets"| n8
 ```
