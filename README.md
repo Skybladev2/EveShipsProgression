@@ -18,6 +18,7 @@ flowchart
 		n2["Stabber"]
 	end
 	subgraph s3["Battlecruiser"]
+		
 		n13["Cyclone"]
 		n8["Hurricane"]
 		n3["Tornado"]
@@ -206,4 +207,16 @@ flowchart
 	n35 -->|"Cargo"| n62
 	n37 -->|"Cargo"| n62
 	n36 -->|"Cargo"| n62
+	subgraph s31["Navy Battlecruisers"]
+		n63["Cyclone Fleet Issue"]
+	end
+	n13 -->|"Missiles"| n63
+	subgraph s32["Command ships"]
+		n64["Claymore"]
+	end
+	n13 -->|"Missiles"| n64
+	subgraph s33["Other Faction Battlecruisers"]
+		n65["Gnosis"]
+	end
+	n65 -->|"Missiles"| n13
 ```
