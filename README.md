@@ -185,7 +185,6 @@ flowchart
 	subgraph s29["Heavy Interdiction Cruisers"]
 		n59["Broadsword"]
 	end
-	n57 -->|"Projectile turrets"| n59
 	n57 -->|"Projectile turrets"| n52
 	n57 -->|"Projectile turrets"| n60
 	n2 -->|"Projectile turrets"| n8
@@ -196,4 +195,7 @@ flowchart
 	n10 -->|"Missiles (weak)"| n41
 	n10 -->|"Missiles"| n30
 	n1 -->|"Projectile turrets"| n26
+	n2 -->|"Projectile turrets"| n59
+	n58 -->|"Projectile turrets"| n52
+	n59 -->|"Projectile turrets"| n52
 ```
