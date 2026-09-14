@@ -29,7 +29,7 @@ flowchart
 		n9["Maelstrom"]
 		n4["Tempest"]
 	end
-	n3 -->|"Projectile Turret rate of fire"| n4
+	n3 -->|"Projectile turrets"| n4
 	subgraph s5["Destroyers"]
 		n11["Talwar"]
 		n6["Thrasher"]
@@ -228,4 +228,6 @@ flowchart
 	end
 	n66 -->|"Projectile turrets"| n68
 	n65 -->|"Projectile turrets"| n8
+	n8 -->|"Projectile turrets"| n4
+	n3 -->|"Projectile turrets"| n9
 ```
