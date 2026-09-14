@@ -37,11 +37,11 @@ flowchart
 	n5 -->|"Projectile turrets"| n6
 	n6 -->|"Projectile turrets"| n7
 	n7 -->|"Projectile Turret damage"| n8
-	n8 -->|"Medium -> Large: Projectile Turret damage"| n9
+	n8 -->|"Projectile turrets"| n9
 	n10 -->|"Missiles"| n11
 	n11 -->|"Missiles"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
-	n13 -->|" HML, HAML -> RHML, CML, TL rate of fire"| n14
+	n13 -->|"Missiles"| n14
 	subgraph s6["Dreadnought"]
 		n15["Naglfar"]
 	end
@@ -58,7 +58,7 @@ flowchart
 	subgraph s9["Logistics Frigate"]
 		n20["Scalpel"]
 	end
-	subgraph s10["Navy Frigates"]
+	subgraph s10["Navy Faction Frigates"]
 		n32["Probe Fleet Issue"]
 		n29["Vigil Fleet Issue"]
 		n22["Republic Fleet Firetail"]
@@ -116,7 +116,7 @@ flowchart
 	n27 -->|"Cloak, scan"| n39
 	n32 -->|"Missiles, scan"| n39
 	n29 -->|"Web range"| n40
-	subgraph s18["Navy Destroyers"]
+	subgraph s18["Navy Faction Destroyers"]
 		n47["Talwar Fleet Issue"]
 		n42["Thrasher Fleet Issue"]
 	end
@@ -156,7 +156,7 @@ flowchart
 	n29 -->|"Web range"| n49
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
-	subgraph s25["Navy Cruisers"]
+	subgraph s25["Navy Faction Cruisers"]
 		n57["Stabber Fleet Issue"]
 		n50["Scythe Fleet Issue"]
 	end
@@ -207,11 +207,13 @@ flowchart
 	n35 -->|"Cargo"| n62
 	n37 -->|"Cargo"| n62
 	n36 -->|"Cargo"| n62
-	subgraph s31["Navy Battlecruisers"]
+	subgraph s31["Navy Faction Battlecruisers"]
+		n66["Hurricane Fleet Issue"]
 		n63["Cyclone Fleet Issue"]
 	end
 	n13 -->|"Missiles"| n63
 	subgraph s32["Command ships"]
+		n67["Sleipnir"]
 		n64["Claymore"]
 	end
 	n13 -->|"Missiles"| n64
@@ -219,4 +221,11 @@ flowchart
 		n65["Gnosis"]
 	end
 	n65 -->|"Missiles"| n13
+	n8 -->|"Projectile turrets"| n66
+	n8 -->|"Projectile turrets"| n67
+	subgraph s34["Pirate Faction Battlcruisers"]
+		n68["Khizriel"]
+	end
+	n66 -->|"Projectile turrets"| n68
+	n65 -->|"Projectile turrets"| n8
 ```
