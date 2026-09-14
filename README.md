@@ -96,6 +96,7 @@ flowchart
 	n33 -->|"Scan"| n27
 	n33 -->|"Scan"| n34
 	subgraph s16["Haulers"]
+		n62["Squall"]
 		n37["Mammoth"]
 		n36["Wreathe"]
 		n35["Hoarder"]
@@ -202,4 +203,7 @@ flowchart
 	end
 	n18 -->|"Remote shield boost, Logistic drones"| n61
 	n61 -->|"Remote shield boost, Logistic drones"| n19
+	n35 -->|"Cargo"| n62
+	n37 -->|"Cargo"| n62
+	n36 -->|"Cargo"| n62
 ```
