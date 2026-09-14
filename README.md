@@ -54,7 +54,6 @@ flowchart
 	subgraph s8["Force Auxiliary"]
 		n19["Lif"]
 	end
-	n18 -->|"Remote shield boost, Remote capacitor boost, Logistic drones"| n19
 	subgraph s9["Logistics Frigate"]
 		n20["Scalpel"]
 	end
@@ -198,4 +197,9 @@ flowchart
 	n2 -->|"Projectile turrets"| n59
 	n58 -->|"Projectile turrets"| n52
 	n59 -->|"Projectile turrets"| n52
+	subgraph s30["Logistics Cruisers"]
+		n61["Scimitar"]
+	end
+	n18 -->|"Remote shield boost, Logistic drones"| n61
+	n61 -->|"Remote shield boost, Logistic drones"| n19
 ```
