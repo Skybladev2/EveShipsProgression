@@ -255,4 +255,10 @@ flowchart
 	n9 -->|"Projectile turrets"| n71
 	n9 -->|"Projectile turrets"| n72
 	n70 -->|"Projectile turrets"| n74
+	subgraph s39["Other Faction Battleships"]
+		n75["Praxis"]
+	end
+	n75 -->|"Missiles"| n14
+	n75 -->|"Projectile turrets"| n9
+	n75 -->|"Projectile turrets"| n4
 ```
