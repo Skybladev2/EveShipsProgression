@@ -11,7 +11,7 @@ flowchart
 		n5["Slasher"]
 		n1["Rifter"]
 	end
-	subgraph s2["Cruiser"]
+	subgraph s2["Cruisers"]
 		n18["Scythe"]
 		n12["Bellicose"]
 		n7["Rupture"]
@@ -24,7 +24,7 @@ flowchart
 		n3["Tornado"]
 	end
 	n2 -->|"Projectile turrets"| n3
-	subgraph s4["Battleship"]
+	subgraph s4["Battleships"]
 		n14["Typhoon"]
 		n9["Maelstrom"]
 		n4["Tempest"]
@@ -230,4 +230,23 @@ flowchart
 	n65 -->|"Projectile turrets"| n8
 	n8 -->|"Projectile turrets"| n4
 	n3 -->|"Projectile turrets"| n9
+	subgraph s35["Navy Faction Battleships"]
+		n70["Tempest Fleet Issue"]
+		n69["Typhoon Fleet Issue"]
+	end
+	n14 -->|"Missiles"| n69
+	n4 -->|"Projectile turrets"| n70
+	n4 -->|"Projectile turrets"| n69
+	subgraph s36["Black Ops"]
+		n71["Panther"]
+	end
+	n4 -->|"Projectile turrets"| n71
+	subgraph s37["Marauders"]
+		n72["Vargur"]
+	end
+	n4 -->|"Projectile turrets"| n72
+	subgraph s38["Pirate Faction Battleships"]
+		n73["Barghest"]
+	end
+	n14 -->|"Missiles (weak)"| n73
 ```
