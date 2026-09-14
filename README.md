@@ -82,7 +82,6 @@ flowchart
 		n30["Jaguar"]
 		n26["Wolf"]
 	end
-	n22 -->|"Projectile turrets"| n26
 	subgraph s14["Covert Ops"]
 		n41["Hound"]
 		n27["Cheetah"]
@@ -93,9 +92,7 @@ flowchart
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
-	n29 -->|"Missiles"| n30
 	n10 -->|"Missiles"| n32
-	n32 -->|"Missiles"| n30
 	n10 -->|"Missiles"| n29
 	n33 -->|"Scan"| n27
 	n33 -->|"Scan"| n34
@@ -123,7 +120,6 @@ flowchart
 		n42["Thrasher Fleet Issue"]
 	end
 	n1 -->|"Projectile turrets"| n6
-	n1 -->|"Projectile turrets"| n42
 	n5 -->|"Projectile turrets"| n42
 	n6 -->|"Projectile turrets"| n42
 	n42 -->|"Projectile turrets"| n2
@@ -134,13 +130,10 @@ flowchart
 	subgraph s20["Tactical Destroyers"]
 		n44["Svipul"]
 	end
-	n6 -->|"Projectile turrets"| n44
-	n42 --> n43
 	n42 -->|"Projectile turrets"| n44
 	subgraph s21["Pirate Faction Destroyers"]
 		n45["Mekubal"]
 	end
-	n6 ---|"Projectile turrets"| n45
 	n42 ---|"Projectile turrets"| n45
 	subgraph s22["Other Faction Destroyers"]
 		n46["Sunesis"]
@@ -151,7 +144,6 @@ flowchart
 		n48["Bifrost"]
 	end
 	n11 -->|"Missiles"| n48
-	n47 -->|"Missiles"| n48
 	n46 -->|"Missiles"| n11
 	n46 -->|"Projectile turrets"| n6
 	subgraph s24["Recon Ships"]
@@ -194,8 +186,14 @@ flowchart
 		n59["Broadsword"]
 	end
 	n57 -->|"Projectile turrets"| n59
-	n57 -->|"Projectile turrets"| n49
 	n57 -->|"Projectile turrets"| n52
 	n57 -->|"Projectile turrets"| n60
 	n2 -->|"Projectile turrets"| n8
+	n7 -->|"Projectile turrets"| n57
+	n7 -->|"Projectile turrets"| n50
+	n7 -->|"Projectile turrets"| n58
+	n7 -->|"Projectile turrets"| n59
+	n10 -->|"Missiles (weak)"| n41
+	n10 -->|"Missiles"| n30
+	n1 -->|"Projectile turrets"| n26
 ```
