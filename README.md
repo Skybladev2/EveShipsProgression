@@ -45,8 +45,8 @@ flowchart
 	subgraph s6["Dreadnought"]
 		n15["Naglfar"]
 	end
-	n4 -->|"Large -> Capital: Projectile Turret damage, Projectile Turret rate of fire"| n15
-	n9 -->|"Large -> Capital: Projectile Turret damage"| n15
+	n4 -->|"Projectile turrets"| n15
+	n9 -->|"Projectile turrets"| n15
 	subgraph s7["Titan"]
 		n16["Ragnarok"]
 	end
@@ -246,7 +246,13 @@ flowchart
 	end
 	n4 -->|"Projectile turrets"| n72
 	subgraph s38["Pirate Faction Battleships"]
+		n74["Machariel"]
 		n73["Barghest"]
 	end
 	n14 -->|"Missiles (weak)"| n73
+	n9 -->|"Projectile turrets"| n70
+	n9 -->|"Projectile turrets"| n69
+	n9 -->|"Projectile turrets"| n71
+	n9 -->|"Projectile turrets"| n72
+	n70 -->|"Projectile turrets"| n74
 ```
