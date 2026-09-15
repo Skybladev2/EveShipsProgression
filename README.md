@@ -261,4 +261,8 @@ flowchart
 	n75 -->|"Missiles"| n14
 	n75 -->|"Projectile turrets"| n9
 	n75 -->|"Projectile turrets"| n4
+	subgraph s40["Navy Faction Dreadnaughts"]
+		n76["Naglfar Fleet Issue"]
+	end
+	n15 -->|"Projectile turrets"| n76
 ```
