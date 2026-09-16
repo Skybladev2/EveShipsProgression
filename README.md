@@ -265,4 +265,8 @@ flowchart
 		n76["Naglfar Fleet Issue"]
 	end
 	n15 -->|"Projectile turrets"| n76
+	subgraph s41["Lancer Dreadnaughts"]
+		n77["Valravn"]
+	end
+	n15 -->|"Projectile turrets"| n77
 ```
