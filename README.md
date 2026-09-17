@@ -277,4 +277,23 @@ flowchart
 		n79["Azariel"]
 	end
 	n78 -->|"Projectile turrets"| n79
+	subgraph s44["Carriers"]
+		n80["Nidhoggur"]
+	end
+	n48 -->|"Command bursts"| n64
+	n64 -->|"Command bursts"| n80
+	subgraph s45["Command carriers"]
+		n81["Ymir"]
+	end
+	n80 -->|"Fighters, Command bursts"| n81
+	subgraph s46["Supercarriers"]
+		n82["Hel"]
+	end
+	n80 -->|"Fighters, Command bursts"| n82
+	subgraph s47["Pirate Faction Supercarriers"]
+		n84["Vendetta"]
+		n83["Revenant"]
+	end
+	n82 -->|"Fighters, Command bursts"| n83
+	n82 ---|"Fighters, Command bursts"| n84
 ```
