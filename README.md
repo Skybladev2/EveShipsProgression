@@ -4,6 +4,7 @@
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
+		n89["Condor"]
 		n33["Probe"]
 		n21["Vigil"]
 		n17["Burst"]
@@ -152,7 +153,7 @@ flowchart
 		n49["Huginn"]
 	end
 	n12 -->|"Target paint"| n49
-	n29 -->|"Missiles (weak)"| n31
+	n29 -.->|"Missiles"| n31
 	n29 -->|"Web range"| n49
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
@@ -177,7 +178,7 @@ flowchart
 		n60["Cynabal"]
 		n54["Orthrus"]
 	end
-	n12 -->|"Missiles (weak)"| n54
+	n12 -.->|"Missiles"| n54
 	n53 -->|"Missiles"| n55
 	n53 -->|"Missiles"| n56
 	n2 -->|"Projectile turrets"| n57
@@ -193,7 +194,7 @@ flowchart
 	n7 -->|"Projectile turrets"| n50
 	n7 -->|"Projectile turrets"| n58
 	n7 -->|"Projectile turrets"| n59
-	n10 -->|"Missiles (weak)"| n41
+	n10 -.->|"Missiles"| n41
 	n10 -->|"Missiles"| n30
 	n1 -->|"Projectile turrets"| n26
 	n2 -->|"Projectile turrets"| n59
@@ -250,7 +251,7 @@ flowchart
 		n74["Machariel"]
 		n73["Barghest"]
 	end
-	n14 -->|"Missiles (weak)"| n73
+	n14 -.->|"Missiles"| n73
 	n9 -->|"Projectile turrets"| n70
 	n9 -->|"Projectile turrets"| n69
 	n9 -->|"Projectile turrets"| n71
@@ -315,4 +316,6 @@ flowchart
 		n88["Nomad"]
 	end
 	n87 -->|"Cargo"| n88
+	n1 <-->|"Projectile turrets"| n5
+	n89 <-->|"Missiles"| n10
 ```
