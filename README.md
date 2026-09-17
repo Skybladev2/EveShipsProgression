@@ -306,4 +306,13 @@ flowchart
 	n27 -->|"Cloak"| n85
 	n37 -->|"Cargo"| n86
 	n36 -->|"Cargo"| n86
+	subgraph s49["Freighters"]
+		n87["Fenrir"]
+	end
+	n37 -->|"Cargo"| n87
+	n36 -->|"Cargo"| n87
+	subgraph s50["Jump Freighters"]
+		n88["Nomad"]
+	end
+	n87 -->|"Cargo"| n88
 ```
