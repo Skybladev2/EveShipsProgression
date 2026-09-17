@@ -204,7 +204,8 @@ flowchart
 	end
 	n18 -->|"Remote shield boost, Logistic drones"| n61
 	n61 -->|"Remote shield boost, Logistic drones"| n19
-	n35 -->|"Cargo"| n62
+	n35
+	n62
 	n37 -->|"Cargo"| n62
 	n36 -->|"Cargo"| n62
 	subgraph s31["Navy Faction Battlecruisers"]
@@ -296,4 +297,13 @@ flowchart
 	end
 	n82 -->|"Fighters, Command bursts"| n83
 	n82 ---|"Fighters, Command bursts"| n84
+	subgraph s48["Transport ships"]
+		n86["Mastodon"]
+		n85["Prowler"]
+	end
+	n37 -->|"Cargo"| n85
+	n36 -->|"Cargo"| n85
+	n27 -->|"Cloak"| n85
+	n37 -->|"Cargo"| n86
+	n36 -->|"Cargo"| n86
 ```
