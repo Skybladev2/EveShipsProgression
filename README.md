@@ -273,4 +273,8 @@ flowchart
 		n78["Sarathiel"]
 	end
 	n76 -->|"Projectile turrets"| n78
+	subgraph s43["Pirate Faction Titans"]
+		n79["Azariel"]
+	end
+	n78 -->|"Projectile turrets"| n79
 ```
