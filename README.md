@@ -42,7 +42,7 @@ flowchart
 	n11 -->|"Missiles"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
 	n13 -->|"Missiles"| n14
-	subgraph s6["Dreadnought"]
+	subgraph s6["Dreadnoughts"]
 		n15["Naglfar"]
 	end
 	n4 -->|"Projectile turrets"| n15
@@ -261,12 +261,16 @@ flowchart
 	n75 -->|"Missiles"| n14
 	n75 -->|"Projectile turrets"| n9
 	n75 -->|"Projectile turrets"| n4
-	subgraph s40["Navy Faction Dreadnaughts"]
+	subgraph s40["Navy Faction Dreadnoughts"]
 		n76["Naglfar Fleet Issue"]
 	end
 	n15 -->|"Projectile turrets"| n76
-	subgraph s41["Lancer Dreadnaughts"]
+	subgraph s41["Lancer Dreadnoughts"]
 		n77["Valravn"]
 	end
 	n15 -->|"Projectile turrets"| n77
+	subgraph s42["Pirate Faction Dreadnoughts"]
+		n78["Sarathiel"]
+	end
+	n76 -->|"Projectile turrets"| n78
 ```
