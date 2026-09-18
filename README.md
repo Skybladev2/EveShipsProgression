@@ -60,6 +60,7 @@ flowchart
 		n20["Scalpel"]
 	end
 	subgraph s10["Navy Faction Frigates"]
+		n91["Heron Navy Issue"]
 		n90["Caldari Navy Hookbill"]
 		n32["Probe Fleet Issue"]
 		n29["Vigil Fleet Issue"]
@@ -321,9 +322,13 @@ flowchart
 	n89 <-->|"Missiles"| n10
 	n2 <-->|"Projectile turrets"| n7
 	n4 <-->|"Projectile turrets"| n9
-	n89 ---|"Missiles"| n90
-	n10 ---|"Missiles"| n90
-	n32 <-->|"Missiles"| n29
-	n32 <-->|"Missiles"| n90
+	n89 -->|"Missiles"| n90
+	n10 -->|"Missiles"| n90
 	n29 <-->|"Missiles"| n90
+	n89 -->|"Missiles"| n91
+	n91 <-->|"Missiles"| n32
+	n91 <-->|"Missiles"| n29
+	n32 <-->|"Missiles"| n29
+	n90 <-->|"Missiles"| n32
+	n91 <-->|"Missiles"| n90
 ```
