@@ -4,17 +4,17 @@
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
+		subgraph s53["Projectile turrets"]
+			n5["Slasher"]
+			n1["Rifter"]
+		end
 		subgraph s51["Missiles"]
 			n89["Condor"]
 			n10["Breacher"]
 		end
-		
 		n33["Probe"]
 		n21["Vigil"]
 		n17["Burst"]
-		
-		n5["Slasher"]
-		n1["Rifter"]
 	end
 	subgraph s2["Cruisers"]
 		n18["Scythe"]
@@ -39,7 +39,7 @@ flowchart
 		n11["Talwar"]
 		n6["Thrasher"]
 	end
-	n5 -->|"Projectile turrets"| n6
+	n6
 	n6 -->|"Projectile turrets"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Projectile turrets"| n9
@@ -76,14 +76,14 @@ flowchart
 		
 		n22["Republic Fleet Firetail"]
 	end
-	n5 -->|"Projectile turrets"| n22
-	n1 -->|"Projectile turrets"| n22
+	n22
+	n22
 	subgraph s11["Interceptors"]
 		n24["Claw"]
 		n23["Stiletto"]
 	end
-	n5 -->|"Tackle, projectile turrets"| n23
-	n5 -->|"Projectile turrets, tackle"| n24
+	n23
+	n24
 	subgraph s12["Pirate Faction Frigates"]
 		n40["Cruor"]
 		n34["Astero"]
@@ -133,8 +133,8 @@ flowchart
 		n47["Talwar Fleet Issue"]
 		n42["Thrasher Fleet Issue"]
 	end
-	n1 -->|"Projectile turrets"| n6
-	n5 -->|"Projectile turrets"| n42
+	n6
+	n42
 	n6 -->|"Projectile turrets"| n42
 	n42 -->|"Projectile turrets"| n2
 	subgraph s19["Interdictors"]
@@ -208,7 +208,7 @@ flowchart
 	n7 -->|"Projectile turrets"| n59
 	n41
 	n30
-	n1 -->|"Projectile turrets"| n26
+	n26
 	n2 -->|"Projectile turrets"| n59
 	n58 -->|"Projectile turrets"| n52
 	n59 -->|"Projectile turrets"| n52
@@ -328,7 +328,6 @@ flowchart
 		n88["Nomad"]
 	end
 	n87 -->|"Cargo"| n88
-	n1 <-->|"Projectile turrets"| n5
 	n2 <-->|"Projectile turrets"| n7
 	n4 <-->|"Projectile turrets"| n9
 	n10 -->|"Missiles"| n30
@@ -339,4 +338,11 @@ flowchart
 	n32 -->|"Missiles, scan"| n39
 	s51 -->|"Missiles"| s52
 	s51 -->|"Missiles"| n11
+	n1 -->|"Projectile turrets"| n26
+	n1 -->|"Projectile turrets"| n22
+	n5 -->|"Projectile turrets"| n42
+	n5 -->|"Projectile turrets, tackle"| n24
+	n5 -->|"Tackle, projectile turrets"| n23
+	n5 -->|"Projectile turrets"| n22
+	s53 -->|"Projectile turrets"| n6
 ```
