@@ -4,11 +4,15 @@
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
-		n89["Condor"]
+		subgraph s51["Missiles"]
+			n89["Condor"]
+			n10["Breacher"]
+		end
+		
 		n33["Probe"]
 		n21["Vigil"]
 		n17["Burst"]
-		n10["Breacher"]
+		
 		n5["Slasher"]
 		n1["Rifter"]
 	end
@@ -39,7 +43,7 @@ flowchart
 	n6 -->|"Projectile turrets"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Projectile turrets"| n9
-	n10 -->|"Missiles"| n11
+	n11
 	n11 -->|"Missiles"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
 	n13 -->|"Missiles"| n14
@@ -60,10 +64,16 @@ flowchart
 		n20["Scalpel"]
 	end
 	subgraph s10["Navy Faction Frigates"]
-		n91["Heron Navy Issue"]
-		n90["Caldari Navy Hookbill"]
-		n32["Probe Fleet Issue"]
-		n29["Vigil Fleet Issue"]
+		subgraph s52["Missiles"]
+			n32["Probe Fleet Issue"]
+			n91["Heron Navy Issue"]
+			n29["Vigil Fleet Issue"]
+			n90["Caldari Navy Hookbill"]
+		end
+		
+		
+		
+		
 		n22["Republic Fleet Firetail"]
 	end
 	n5 -->|"Projectile turrets"| n22
@@ -95,8 +105,8 @@ flowchart
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
-	n10 -->|"Missiles"| n32
-	n10 -->|"Missiles"| n29
+	
+	
 	n33 -->|"Scan"| n27
 	n33 -->|"Scan"| n34
 	subgraph s16["Haulers"]
@@ -117,8 +127,8 @@ flowchart
 	n38 -->|"Cloak, scan"| n34
 	n34 -->|"Cloak, scan"| n27
 	n27 -->|"Cloak, scan"| n39
-	n32 -->|"Missiles, scan"| n39
-	n29 -->|"Web range"| n40
+	n39
+	n40
 	subgraph s18["Navy Faction Destroyers"]
 		n47["Talwar Fleet Issue"]
 		n42["Thrasher Fleet Issue"]
@@ -155,8 +165,8 @@ flowchart
 		n49["Huginn"]
 	end
 	n12 -->|"Target paint"| n49
-	n29 -.->|"Missiles"| n31
-	n29 -->|"Web range"| n49
+	n31
+	n49
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
 	subgraph s25["Navy Faction Cruisers"]
@@ -196,8 +206,8 @@ flowchart
 	n7 -->|"Projectile turrets"| n50
 	n7 -->|"Projectile turrets"| n58
 	n7 -->|"Projectile turrets"| n59
-	n10 -.->|"Missiles"| n41
-	n10 -->|"Missiles"| n30
+	n41
+	n30
 	n1 -->|"Projectile turrets"| n26
 	n2 -->|"Projectile turrets"| n59
 	n58 -->|"Projectile turrets"| n52
@@ -319,16 +329,14 @@ flowchart
 	end
 	n87 -->|"Cargo"| n88
 	n1 <-->|"Projectile turrets"| n5
-	n89 <-->|"Missiles"| n10
 	n2 <-->|"Projectile turrets"| n7
 	n4 <-->|"Projectile turrets"| n9
-	n89 -->|"Missiles"| n90
-	n10 -->|"Missiles"| n90
-	n29 <-->|"Missiles"| n90
-	n89 -->|"Missiles"| n91
-	n91 <-->|"Missiles"| n32
-	n91 <-->|"Missiles"| n29
-	n32 <-->|"Missiles"| n29
-	n90 <-->|"Missiles"| n32
-	n91 <-->|"Missiles"| n90
+	n10 -->|"Missiles"| n30
+	n10 -.->|"Missiles"| n41
+	n29 -->|"Web range"| n49
+	n29 -.->|"Missiles"| n31
+	n29 -->|"Web range"| n40
+	n32 -->|"Missiles, scan"| n39
+	s51 -->|"Missiles"| s52
+	s51 -->|"Missiles"| n11
 ```
