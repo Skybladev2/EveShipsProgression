@@ -77,6 +77,8 @@ flowchart
 		n22["Republic Fleet Firetail"]
 	end
 	subgraph s11["Interceptors"]
+		n96["Raptor"]
+		n95["Crow"]
 		n24["Claw"]
 		n23["Stiletto"]
 	end
@@ -315,8 +317,8 @@ flowchart
 	n1 -->|"Projectile turrets"| n26
 	n1 -->|"Projectile turrets"| n22
 	n5 -->|"Projectile turrets"| n42
-	n5 -->|"Projectile turrets, tackle"| n24
-	n5 -->|"Tackle, projectile turrets"| n23
+	n5 -->|"Projectile turrets"| n24
+	n5 -->|"Projectile turrets"| n23
 	n5 -->|"Projectile turrets"| n22
 	s53 -->|"Projectile turrets"| n6
 	n33 -->|"Cargo"| s54
@@ -325,4 +327,7 @@ flowchart
 	s54 -->|"Cargo"| s48
 	s55 -->|"Remote shield boost"| n18
 	s55 -->|"Remote shield boost"| s56
+	n89 -->|"Missiles"| n95
+	n5 -->|"Tackle"| s11
+	n89 -->|"Tackle"| s11
 ```
