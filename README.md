@@ -23,7 +23,6 @@ flowchart
 		n2["Stabber"]
 	end
 	subgraph s3["Battlecruiser"]
-		
 		n13["Cyclone"]
 		n8["Hurricane"]
 		n3["Tornado"]
@@ -39,11 +38,9 @@ flowchart
 		n11["Talwar"]
 		n6["Thrasher"]
 	end
-	n6
 	n6 -->|"Projectile turrets"| n7
 	n7 -->|"Projectile Turret damage"| n8
 	n8 -->|"Projectile turrets"| n9
-	n11
 	n11 -->|"Missiles"| n12
 	n12 -->|"HML and HAML rate of fire"| n13
 	n13 -->|"Missiles"| n14
@@ -70,20 +67,12 @@ flowchart
 			n29["Vigil Fleet Issue"]
 			n90["Caldari Navy Hookbill"]
 		end
-		
-		
-		
-		
 		n22["Republic Fleet Firetail"]
 	end
-	n22
-	n22
 	subgraph s11["Interceptors"]
 		n24["Claw"]
 		n23["Stiletto"]
 	end
-	n23
-	n24
 	subgraph s12["Pirate Faction Frigates"]
 		n40["Cruor"]
 		n34["Astero"]
@@ -105,19 +94,17 @@ flowchart
 	end
 	n21 -->|"Target paint"| n28
 	n21 -->|"Target paint"| n12
-	
-	
 	n33 -->|"Scan"| n27
 	n33 -->|"Scan"| n34
 	subgraph s16["Haulers"]
+		subgraph s54["Cargo"]
+			n36["Wreathe"]
+			n37["Mammoth"]
+		end
 		n62["Squall"]
-		n37["Mammoth"]
-		n36["Wreathe"]
 		n35["Hoarder"]
 	end
 	n33 -->|"Cargo (ammo)"| n35
-	n33 -->|"Cargo"| n37
-	n33 -->|"Cargo"| n36
 	subgraph s17["Other Faction Frigates"]
 		n39["Pacifier"]
 		n38["Metamorphosis"]
@@ -127,14 +114,10 @@ flowchart
 	n38 -->|"Cloak, scan"| n34
 	n34 -->|"Cloak, scan"| n27
 	n27 -->|"Cloak, scan"| n39
-	n39
-	n40
 	subgraph s18["Navy Faction Destroyers"]
 		n47["Talwar Fleet Issue"]
 		n42["Thrasher Fleet Issue"]
 	end
-	n6
-	n42
 	n6 -->|"Projectile turrets"| n42
 	n42 -->|"Projectile turrets"| n2
 	subgraph s19["Interdictors"]
@@ -165,8 +148,6 @@ flowchart
 		n49["Huginn"]
 	end
 	n12 -->|"Target paint"| n49
-	n31
-	n49
 	n7 -->|"Projectile turrets"| n49
 	n2 -->|"Projectile turrets"| n49
 	subgraph s25["Navy Faction Cruisers"]
@@ -206,9 +187,6 @@ flowchart
 	n7 -->|"Projectile turrets"| n50
 	n7 -->|"Projectile turrets"| n58
 	n7 -->|"Projectile turrets"| n59
-	n41
-	n30
-	n26
 	n2 -->|"Projectile turrets"| n59
 	n58 -->|"Projectile turrets"| n52
 	n59 -->|"Projectile turrets"| n52
@@ -217,10 +195,6 @@ flowchart
 	end
 	n18 -->|"Remote shield boost, Logistic drones"| n61
 	n61 -->|"Remote shield boost, Logistic drones"| n19
-	n35
-	n62
-	n37 -->|"Cargo"| n62
-	n36 -->|"Cargo"| n62
 	subgraph s31["Navy Faction Battlecruisers"]
 		n66["Hurricane Fleet Issue"]
 		n63["Cyclone Fleet Issue"]
@@ -314,16 +288,10 @@ flowchart
 		n86["Mastodon"]
 		n85["Prowler"]
 	end
-	n37 -->|"Cargo"| n85
-	n36 -->|"Cargo"| n85
 	n27 -->|"Cloak"| n85
-	n37 -->|"Cargo"| n86
-	n36 -->|"Cargo"| n86
 	subgraph s49["Freighters"]
 		n87["Fenrir"]
 	end
-	n37 -->|"Cargo"| n87
-	n36 -->|"Cargo"| n87
 	subgraph s50["Jump Freighters"]
 		n88["Nomad"]
 	end
@@ -345,4 +313,8 @@ flowchart
 	n5 -->|"Tackle, projectile turrets"| n23
 	n5 -->|"Projectile turrets"| n22
 	s53 -->|"Projectile turrets"| n6
+	n33 -->|"Cargo"| s54
+	s54 -->|"Cargo"| n62
+	s54 ---|"Cargo"| n87
+	s54 ---|"Cargo"| s48
 ```
