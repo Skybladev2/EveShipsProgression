@@ -4,6 +4,10 @@
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
+		subgraph s55["Remote shield boost"]
+			n17["Burst"]
+			n92["Bantam"]
+		end
 		subgraph s53["Projectile turrets"]
 			n5["Slasher"]
 			n1["Rifter"]
@@ -14,7 +18,6 @@ flowchart
 		end
 		n33["Probe"]
 		n21["Vigil"]
-		n17["Burst"]
 	end
 	subgraph s2["Cruisers"]
 		n18["Scythe"]
@@ -53,7 +56,7 @@ flowchart
 		n16["Ragnarok"]
 	end
 	n15 -->|"Projectile Turret damage"| n16
-	n17 -->|"Remote shield boost"| n18
+	n18
 	subgraph s8["Force Auxiliary"]
 		n19["Lif"]
 	end
@@ -88,7 +91,7 @@ flowchart
 		n41["Hound"]
 		n27["Cheetah"]
 	end
-	n17 -->|"Remote shield boost"| n20
+	n20
 	subgraph s15["Electronic Attack Frigates"]
 		n28["Hyena"]
 	end
@@ -317,4 +320,6 @@ flowchart
 	s54 -->|"Cargo"| n62
 	s54 ---|"Cargo"| n87
 	s54 ---|"Cargo"| s48
+	s55 -->|"Remote shield boost"| n20
+	s55 -->|"Remote shield boost"| n18
 ```
