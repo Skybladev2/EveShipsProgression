@@ -13,6 +13,7 @@ flowchart
 			n1["Rifter"]
 		end
 		subgraph s51["Missiles"]
+			n93["Kestrel"]
 			n89["Condor"]
 			n10["Breacher"]
 		end
@@ -56,12 +57,15 @@ flowchart
 		n16["Ragnarok"]
 	end
 	n15 -->|"Projectile Turret damage"| n16
-	n18
 	subgraph s8["Force Auxiliary"]
 		n19["Lif"]
 	end
 	subgraph s9["Logistics Frigate"]
-		n20["Scalpel"]
+		subgraph s56["Remote shield boost"]
+			n20["Scalpel"]
+			n94["Kirin"]
+			
+		end
 	end
 	subgraph s10["Navy Faction Frigates"]
 		subgraph s52["Missiles"]
@@ -91,7 +95,6 @@ flowchart
 		n41["Hound"]
 		n27["Cheetah"]
 	end
-	n20
 	subgraph s15["Electronic Attack Frigates"]
 		n28["Hyena"]
 	end
@@ -318,8 +321,8 @@ flowchart
 	s53 -->|"Projectile turrets"| n6
 	n33 -->|"Cargo"| s54
 	s54 -->|"Cargo"| n62
-	s54 ---|"Cargo"| n87
-	s54 ---|"Cargo"| s48
-	s55 -->|"Remote shield boost"| n20
+	s54 -->|"Cargo"| n87
+	s54 -->|"Cargo"| s48
 	s55 -->|"Remote shield boost"| n18
+	s55 -->|"Remote shield boost"| s56
 ```
