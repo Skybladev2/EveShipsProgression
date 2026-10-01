@@ -553,7 +553,7 @@ flowchart
 	n_Atron -->|"Hybrid turrets"| n_Taranis
 	n_Bantam -->|"Remote shield boost"| n_Kirin
 	n_Breacher -->|"Missiles"| n_Jaguar
-	n_Breacher -->|"Missiles"| n_Hound
+	n_Breacher -.->|"Missiles"| n_Hound
 	n_Breacher -->|"Missiles"| n_Talwar
 	n_Burst -->|"Remote shield boost"| n_Scalpel
 	n_Condor -->|"Missiles"| n_Crow
@@ -624,7 +624,7 @@ flowchart
 	n_Wraith -->|"Missiles"| n_Phantom
 	n_Republic_Fleet_Firetail -->|"Projectile turrets, tackle"| n_Dramiel
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Cruor
-	n_Vigil_Fleet_Issue -->|"Missiles"| n_Garmur
+	n_Vigil_Fleet_Issue -.->|"Missiles"| n_Garmur
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Huginn
 	n_Astero -->|"Cloak, scan"| n_Cheetah
 	n_Astero -->|"Scan"| n_Stratios
@@ -688,7 +688,7 @@ flowchart
 	n_Augoror -->|"Remote armor repair"| n_Augoror_Navy_Issue
 	n_Augoror -->|"Remote armor repair"| n_Guardian
 	n_Bellicose -->|"Missiles"| n_Scythe_Fleet_Issue
-	n_Bellicose -->|"Missiles"| n_Orthrus
+	n_Bellicose -.->|"Missiles"| n_Orthrus
 	n_Bellicose -->|"Missiles"| n_Muninn
 	n_Bellicose -->|"Target paint"| n_Huginn
 	n_Bellicose -->|"Missiles"| n_Rapier
@@ -832,7 +832,7 @@ flowchart
 	n_Tempest -->|"Projectile turrets"| n_Vargur
 	n_Tempest -->|"Projectile turrets"| n_Naglfar
 	n_Typhoon -->|"Missiles"| n_Typhoon_Fleet_Issue
-	n_Typhoon -->|"Missiles"| n_Barghest
+	n_Typhoon -.->|"Missiles"| n_Barghest
 	n_Typhoon -->|"Missiles"| n_Panther
 	n_Tempest_Fleet_Issue -->|"Projectile turrets"| n_Machariel
 	n_Bhaalgorn -->|"Energy turrets"| n_Chemosh

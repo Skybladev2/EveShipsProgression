@@ -129,6 +129,14 @@ button:active { transform: translateY(1px); }
    however far the chart is zoomed out */
 #graph svg path.edge-hit { stroke-width: var(--edge-hit-w, 18px); }
 
+/* weak ("-.->") links: Mermaid bakes a dash pattern in diagram units, which
+   collapses to a solid line once the chart is zoomed out. Size the dashes in
+   screen pixels (set from JS) so they stay visible at any zoom. */
+#graph svg path.edge-pattern-dotted,
+#graph svg path.edge-pattern-dashed {
+  stroke-dasharray: var(--edge-dash, 6 5) !important;
+}
+
 /* a thin translucent sheen over the edge under the cursor */
 #graph svg path.edge-hover-line {
   stroke: var(--text);
