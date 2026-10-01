@@ -35,6 +35,8 @@
   var pendingView = null;
 
   var EDGE_HIT_PX = 18;     // clickable edge width, in screen pixels
+  var EDGE_DASH_PX = 6;     // dash length of weak links, in screen pixels
+  var EDGE_GAP_PX = 5;      // gap length of weak links, in screen pixels
   var hitWidthRaf = null;   // debounces hit-width updates during zoom/pan
 
   function fail(message) {
@@ -94,7 +96,7 @@
 
       if (s === "end") { stack.pop(); return; }
 
-      var edge = s.match(/^([A-Za-z_]\w*)\s*-->\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
       if (edge) {
         var a = ensure(edge[1]);
         var b = ensure(edge[2]);
@@ -165,7 +167,7 @@
         return;
       }
 
-      var edge = s.match(/^([A-Za-z_]\w*)\s*-->\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
       if (edge) {
         if (visible[edge[1]] && visible[edge[2]]) out.push(line);
         return;
@@ -313,6 +315,7 @@
       if (vb && vb.width && rect && rect.width) scale = rect.width / vb.width;
     }
     svgEl.style.setProperty("--edge-hit-w", (EDGE_HIT_PX / (scale || 1)) + "px");
+    svgEl.style.setProperty("--edge-dash", (EDGE_DASH_PX / (scale || 1)) + " " + (EDGE_GAP_PX / (scale || 1)));
   }
 
   function scheduleHitWidth() {
@@ -361,7 +364,7 @@
 
   function countStats(code) {
     var nodes = (code.match(/\bn_[A-Za-z0-9_]+\["/g) || []).length;
-    var edges = (code.match(/-->/g) || []).length;
+    var edges = (code.match(/-->|-\.->/g) || []).length;
     return { nodes: nodes, edges: edges };
   }
 
