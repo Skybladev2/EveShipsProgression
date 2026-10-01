@@ -65,14 +65,15 @@
      `id["label"]` node declarations and `A -->|"label"| B` edges. */
   function parseGraph(code) {
     var nodes = Object.create(null);        // id -> true
-    var adj = Object.create(null);          // id -> { neighbourId: true }
+    var outAdj = Object.create(null);       // id -> { dstId: true }  (variants)
+    var inAdj = Object.create(null);        // id -> { srcId: true }  (predecessors)
     var edges = [];                         // { src, dst }
     var clusters = Object.create(null);     // id -> { label, parent, children }
     var nodeClusters = Object.create(null); // nodeId -> [clusterId, ...]
     var stack = [];
 
     function ensure(id) {
-      if (!adj[id]) { adj[id] = Object.create(null); nodes[id] = true; }
+      if (!outAdj[id]) { outAdj[id] = Object.create(null); inAdj[id] = Object.create(null); nodes[id] = true; }
       return id;
     }
 
@@ -97,8 +98,8 @@
       if (edge) {
         var a = ensure(edge[1]);
         var b = ensure(edge[2]);
-        adj[a][b] = true;
-        adj[b][a] = true;
+        outAdj[a][b] = true;
+        inAdj[b][a] = true;
         edges.push({ src: a, dst: b });
         return;
       }
@@ -110,21 +111,30 @@
       }
     });
 
-    return { nodes: nodes, adj: adj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
+    return { nodes: nodes, outAdj: outAdj, inAdj: inAdj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
   }
 
-  /* Every ship reachable from `id` through any chain of variants. */
+  /* Ships kept when `id` is isolated: the ones reachable from it (its
+     variants) plus the ones that can reach it (its progression ancestors).
+     Traversal is directed, so a ship that merely shares a descendant — a
+     dead end, say — is not pulled in. */
   function connectedComponent(id) {
     var visible = Object.create(null);
-    var queue = [id];
     visible[id] = true;
-    while (queue.length) {
-      var current = queue.pop();
-      var neighbours = graph.adj[current] || {};
-      for (var key in neighbours) {
-        if (!visible[key]) { visible[key] = true; queue.push(key); }
+
+    function walk(adjacency) {
+      var queue = [id];
+      while (queue.length) {
+        var current = queue.pop();
+        var neighbours = adjacency[current] || {};
+        for (var key in neighbours) {
+          if (!visible[key]) { visible[key] = true; queue.push(key); }
+        }
       }
     }
+
+    walk(graph.outAdj);  // ships reachable from `id`
+    walk(graph.inAdj);   // ships that can reach `id`
     return visible;
   }
 
