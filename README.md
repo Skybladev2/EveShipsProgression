@@ -8,6 +8,9 @@ Corvettes, shuttles and Special Edition ships are not included.
 Arrows lead from a base hull to its advanced, faction or pirate variants; the edge label names
 the weapon system or role the source hull is bonused for (per the E-Uni wiki).
 
+Click any ship to isolate its progression line: only the ships connected to it, directly or
+through a chain of variants, stay visible. Click the background to bring the full chart back.
+
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
