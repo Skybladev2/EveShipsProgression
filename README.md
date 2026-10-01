@@ -592,6 +592,8 @@ flowchart
 	n_Probe -->|"Scan"| n_Astero
 	n_Probe -->|"Scan"| n_Cheetah
 	n_Probe -->|"Cargo (ammo)"| n_Hoarder
+	n_Probe -->|"Cargo"| n_Wreathe
+	n_Probe -->|"Cargo"| n_Mammoth
 	n_Punisher -->|"Energy turrets"| n_Imperial_Navy_Slicer
 	n_Punisher -->|"Energy turrets"| n_Retribution
 	n_Punisher -->|"Energy turrets"| n_Vengeance
@@ -882,23 +884,33 @@ flowchart
 	n_Leviathan -->|"Capital missiles"| n_Komodo
 	n_Badger -->|"Cargo"| n_Bustard
 	n_Badger -->|"Cargo"| n_Crane
+	n_Badger -->|"Cargo"| n_Charon
 	n_Bestower -->|"Cargo"| n_Impel
 	n_Bestower -->|"Cargo"| n_Prorator
+	n_Bestower -->|"Cargo"| n_Providence
+	n_Deluge -->|"Cargo"| n_Avalanche
 	n_Epithal -->|"Cargo"| n_Occator
 	n_Iteron_Mark_V -->|"Cargo"| n_Occator
 	n_Iteron_Mark_V -->|"Cargo"| n_Viator
+	n_Iteron_Mark_V -->|"Cargo"| n_Obelisk
 	n_Kryos -->|"Cargo"| n_Viator
 	n_Mammoth -->|"Cargo"| n_Mastodon
 	n_Mammoth -->|"Cargo"| n_Prowler
+	n_Mammoth -->|"Cargo"| n_Fenrir
 	n_Miasmos -->|"Cargo"| n_Occator
 	n_Nereus -->|"Cargo"| n_Occator
 	n_Nereus -->|"Cargo"| n_Viator
+	n_Nereus -->|"Cargo"| n_Obelisk
 	n_Noctis -->|"Salvage"| n_Porpoise
 	n_Sigil -->|"Cargo"| n_Prorator
+	n_Sigil -->|"Cargo"| n_Providence
 	n_Squall -->|"Cargo"| n_Deluge
 	n_Squall -->|"Cargo"| n_Torrent
 	n_Tayra -->|"Cargo"| n_Bustard
+	n_Tayra -->|"Cargo"| n_Charon
+	n_Torrent -->|"Cargo"| n_Avalanche
 	n_Wreathe -->|"Cargo"| n_Prowler
+	n_Wreathe -->|"Cargo"| n_Fenrir
 	n_Charon -->|"Cargo"| n_Rhea
 	n_Fenrir -->|"Cargo"| n_Nomad
 	n_Obelisk -->|"Cargo"| n_Anshar
