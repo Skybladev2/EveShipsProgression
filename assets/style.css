@@ -115,3 +115,21 @@ button:active { transform: translateY(1px); }
   stroke-width: 3px !important;
   filter: drop-shadow(0 0 6px rgba(255, 213, 74, .8));
 }
+
+/* click-to-isolate */
+#graph svg .node { cursor: pointer; }
+#graph svg .node.ship-hidden,
+#graph svg g.cluster.ship-hidden,
+#graph svg path.edge-hidden,
+#graph svg path.ship-hidden,
+#graph svg g.edgeLabel.ship-hidden { display: none; }
+
+#graph svg.isolating .node { transition: opacity .15s ease; }
+#graph svg .node.ship-selected rect,
+#graph svg .node.ship-selected polygon,
+#graph svg .node.ship-selected path,
+#graph svg .node.ship-selected circle {
+  stroke: var(--accent) !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 7px rgba(255, 213, 74, .85));
+}
