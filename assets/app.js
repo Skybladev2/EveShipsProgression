@@ -600,9 +600,15 @@
         secondaryColor: "#182130",
         tertiaryColor: "#121823",
         clusterBkg: "#0f141d",
-        clusterBorder: "#2a3444"
+        clusterBorder: "#2a3444",
+        fontSize: "24px"
       },
-      flowchart: { useMaxWidth: false, htmlLabels: false }
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: false,
+        minNodeWidth: 16,
+        wrappingWidth: 400
+      }
     });
 
     wireSelection();
