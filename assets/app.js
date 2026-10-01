@@ -4,8 +4,8 @@
   "use strict";
 
   var MERMAID_CDN = [
-    "https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js",
-    "https://unpkg.com/mermaid@11.17.2/dist/mermaid.min.js"
+    "https://cdn.jsdelivr.net/npm/mermaid@12.0.0/dist/mermaid.min.js",
+    "https://unpkg.com/mermaid@12.0.0/dist/mermaid.min.js"
   ];
   var PANZOOM_CDN = [
     "https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js",
@@ -119,7 +119,7 @@
         clusterBkg: "#0f141d",
         clusterBorder: "#2a3444"
       },
-      flowchart: { useMaxWidth: false, htmlLabels: false, curve: "linear" }
+      flowchart: { useMaxWidth: false, htmlLabels: false }
     });
 
     return mermaid.render("shipProgressGraph", code).then(function (result) {
