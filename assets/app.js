@@ -1,6 +1,7 @@
-/* Renders the Mermaid diagram from README.md and adds pan / zoom / search,
-   plus click-to-isolate: clicking a ship keeps only the ships reachable from
-   it and hides everything else; clicking the background restores the diagram.
+/* Renders the Mermaid diagram from README.md and adds pan / zoom / search.
+   Clicking a ship rebuilds the chart from just its connected component, so the
+   remaining ships are laid out as their own compact diagram; the two views
+   cross-fade. Clicking the background brings the full chart back.
    Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
@@ -13,6 +14,7 @@
     "https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js",
     "https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"
   ];
+  var FADE_MS = 200;
 
   var host = document.getElementById("graph");
   var statusEl = document.getElementById("status");
@@ -20,9 +22,17 @@
   var panZoom = null;
   var svgEl = null;
 
-  var graph = null;     // parsed source: nodes, adjacency, clusters
-  var domIndex = null;  // rendered elements keyed by source id
-  var selectedId = null;
+  var baseCode = "";      // full Mermaid source
+  var fullMarkup = null;  // pristine full-diagram SVG, reused when restoring
+  var graph = null;       // parsed source: nodes, adjacency, clusters
+  var domIndex = null;    // rendered elements keyed by source id
+  var selectedId = null;  // currently isolated ship, or null for the full chart
+  var selectedEdgeId = null; // currently highlighted edge (does not filter)
+
+  var renderSeq = 0;      // unique Mermaid render ids
+  var viewToken = 0;      // guards against stale async renders
+  var rendering = false;  // serialises Mermaid renders
+  var pendingView = null;
 
   function fail(message) {
     host.innerHTML = '<div class="error">' + message + "</div>";
@@ -45,12 +55,6 @@
     }, Promise.reject()).then(function () {
       if (!window[name]) throw new Error(name + " did not load");
     });
-  }
-
-  function countStats(code) {
-    var nodes = (code.match(/\bn_[A-Za-z0-9_]+\["/g) || []).length;
-    var edges = (code.match(/-->/g) || []).length;
-    return { nodes: nodes, edges: edges };
   }
 
   /* Parse the flowchart source into an undirected graph. Only the subset of
@@ -106,8 +110,67 @@
     return { nodes: nodes, adj: adj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
   }
 
+  /* Every ship reachable from `id` through any chain of variants. */
+  function connectedComponent(id) {
+    var visible = Object.create(null);
+    var queue = [id];
+    visible[id] = true;
+    while (queue.length) {
+      var current = queue.pop();
+      var neighbours = graph.adj[current] || {};
+      for (var key in neighbours) {
+        if (!visible[key]) { visible[key] = true; queue.push(key); }
+      }
+    }
+    return visible;
+  }
+
+  /* Rebuild the Mermaid source keeping only the visible ships: their node
+     declarations, the edges between them and the subgraphs that still hold
+     something. Everything else is dropped so the layout recomputes compactly. */
+  function buildFilteredCode(code, visible) {
+    var needed = Object.create(null);
+    Object.keys(visible).forEach(function (nid) {
+      (graph.nodeClusters[nid] || []).forEach(function (cid) { needed[cid] = true; });
+    });
+
+    var out = [];
+    var stack = [];
+    code.split(/\r?\n/).forEach(function (line) {
+      var s = line.trim();
+      if (!s) return;
+
+      var sub = s.match(/^subgraph\s+([A-Za-z_]\w*)/);
+      if (sub) {
+        var keep = !!needed[sub[1]];
+        stack.push(keep);
+        if (keep) out.push(line);
+        return;
+      }
+      if (s === "end") {
+        if (stack.pop()) out.push(line);
+        return;
+      }
+
+      var edge = s.match(/^([A-Za-z_]\w*)\s*-->\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      if (edge) {
+        if (visible[edge[1]] && visible[edge[2]]) out.push(line);
+        return;
+      }
+
+      var decl = s.match(/^([A-Za-z_]\w*)\s*\[/);
+      if (decl) {
+        if (visible[decl[1]]) out.push(line);
+        return;
+      }
+      out.push(line); // the `flowchart` header and anything else
+    });
+
+    return out.join("\n");
+  }
+
   /* Recover a rendered node's source id from its group id, e.g.
-     "shipProgressGraph-flowchart-n_Kestrel-0" -> "n_Kestrel". */
+     "shipGraph3-flowchart-n_Kestrel-0" -> "n_Kestrel". */
   function nodeIdFromDom(el) {
     var m = el.id.match(/-flowchart-(.+?)-\d+$/);
     return m ? m[1] : null;
@@ -127,17 +190,18 @@
     return null;
   }
 
-  function collect(selector) {
-    return Array.prototype.slice.call(host.querySelectorAll(selector));
+  function collect(scope, selector) {
+    return Array.prototype.slice.call(scope.querySelectorAll(selector));
   }
 
-  /* Build a lookup from source ids to the SVG elements Mermaid produced. */
+  /* Build a lookup from source ids to the SVG elements Mermaid produced for
+     the currently displayed layer. */
   function buildDomIndex() {
     var nodes = graph.nodes;
 
     var nodeItems = [];
     var byId = Object.create(null);
-    collect("g.node").forEach(function (el) {
+    collect(svgEl, "g.node").forEach(function (el) {
       var id = nodeIdFromDom(el);
       if (!id || !nodes[id]) return;
       var item = { id: id, el: el };
@@ -146,92 +210,201 @@
     });
 
     var edgeItems = [];
-    collect('path[data-et="edge"]').forEach(function (el) {
+    var pathByEdgeId = Object.create(null);
+    collect(svgEl, 'path[data-et="edge"]').forEach(function (el) {
       var id = el.getAttribute("data-id");
       if (!id) return;
+      pathByEdgeId[id] = el;
       var ends = splitEndpoints(id, nodes);
       if (ends) edgeItems.push({ el: el, src: ends[0], dst: ends[1] });
     });
 
-    // Edge labels sit in their own layer; map them by the same edge id.
     var labelByEdgeId = Object.create(null);
-    collect("g.edgeLabel").forEach(function (el) {
+    collect(svgEl, "g.edgeLabel").forEach(function (el) {
       var label = el.querySelector(".label[data-id]");
       if (label) labelByEdgeId[label.getAttribute("data-id")] = el;
-    });
-
-    var clusterItems = [];
-    collect("g.cluster").forEach(function (el) {
-      var cid = el.id.replace(/^.*-/, "");
-      if (!graph.clusters[cid]) return;
-      clusterItems.push({ id: cid, el: el, members: [] });
-    });
-    var clusterById = Object.create(null);
-    clusterItems.forEach(function (c) { clusterById[c.id] = c; });
-
-    // A cluster is visible while any ship inside it (directly or nested) is visible.
-    Object.keys(graph.nodeClusters).forEach(function (nid) {
-      graph.nodeClusters[nid].forEach(function (cid) {
-        if (clusterById[cid]) clusterById[cid].members.push(nid);
-      });
     });
 
     domIndex = {
       nodes: nodeItems,
       byId: byId,
       edges: edgeItems,
-      labelByEdgeId: labelByEdgeId,
-      clusters: clusterItems
+      pathByEdgeId: pathByEdgeId,
+      labelByEdgeId: labelByEdgeId
     };
   }
 
-  function clearSelection() {
+  function markSelected() {
+    if (domIndex && selectedId && domIndex.byId[selectedId]) {
+      domIndex.byId[selectedId].el.classList.add("ship-selected");
+    }
+    if (domIndex && selectedEdgeId) {
+      var path = domIndex.pathByEdgeId[selectedEdgeId];
+      var label = domIndex.labelByEdgeId[selectedEdgeId];
+      if (path) path.classList.add("edge-selected");
+      if (label) label.classList.add("edge-selected");
+    }
+  }
+
+  /* Highlight a single edge (line + label). Highlighting never filters: it is
+     independent of the isolated-ship view and works while a ship is selected. */
+  function toggleEdge(edgeId) {
     if (!domIndex) return;
-    selectedId = null;
-    svgEl.classList.remove("isolating");
-    domIndex.nodes.forEach(function (n) { n.el.classList.remove("ship-hidden", "ship-selected"); });
-    domIndex.clusters.forEach(function (c) { c.el.classList.remove("ship-hidden"); });
-    domIndex.edges.forEach(function (e) { e.el.classList.remove("ship-hidden"); });
-    Object.keys(domIndex.labelByEdgeId).forEach(function (id) {
-      domIndex.labelByEdgeId[id].classList.remove("ship-hidden");
+    var previous = selectedEdgeId;
+    if (previous) {
+      if (domIndex.pathByEdgeId[previous]) domIndex.pathByEdgeId[previous].classList.remove("edge-selected");
+      if (domIndex.labelByEdgeId[previous]) domIndex.labelByEdgeId[previous].classList.remove("edge-selected");
+    }
+    selectedEdgeId = previous === edgeId ? null : edgeId;
+    markSelected();
+  }
+
+  function edgeIdFromTarget(target) {
+    if (!target || !target.closest) return null;
+    var path = target.closest('path[data-et="edge"]');
+    if (path) return path.getAttribute("data-id");
+    var label = target.closest("g.edgeLabel");
+    if (label) {
+      var inner = label.querySelector(".label[data-id]");
+      if (inner) return inner.getAttribute("data-id");
+    }
+    return null;
+  }
+
+  function updateStatus(visibleCount, edgeCount) {
+    if (visibleCount == null) {
+      var stats = countStats(baseCode);
+      statusEl.textContent = stats.nodes + " ships · " + stats.edges + " connections";
+    } else {
+      statusEl.textContent = visibleCount + " ships · " + edgeCount + " connections · isolated";
+    }
+  }
+
+  function countStats(code) {
+    var nodes = (code.match(/\bn_[A-Za-z0-9_]+\["/g) || []).length;
+    var edges = (code.match(/-->/g) || []).length;
+    return { nodes: nodes, edges: edges };
+  }
+
+  function renderMermaid(code) {
+    return mermaid.render("shipGraph" + (++renderSeq), code).then(function (result) {
+      return result.svg;
+    });
+  }
+
+  function svgFromMarkup(markup) {
+    var tmp = document.createElement("div");
+    tmp.innerHTML = markup;
+    var svg = tmp.querySelector("svg");
+    svg.removeAttribute("style");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.style.maxWidth = "none";
+    svg.classList.add("graph-layer");
+    return svg;
+  }
+
+  function initPanZoom(svg) {
+    if (panZoom) { try { panZoom.destroy(); } catch (e) { /* ignore */ } panZoom = null; }
+    if (!window.svgPanZoom) return;
+    panZoom = svgPanZoom(svg, {
+      controlIconsEnabled: false,
+      fit: true,
+      center: true,
+      minZoom: 0.02,
+      maxZoom: 25,
+      zoomScaleSensitivity: 0.25,
+      dblClickZoomEnabled: false,
+      mouseWheelZoomEnabled: true
+    });
+  }
+
+  /* Put a freshly rendered SVG on top of the current one and cross-fade. */
+  function applyView(markup, selected, visibleCount, edgeCount) {
+    var placeholder = host.querySelector(".loading");
+    if (placeholder) placeholder.remove();
+
+    var old = svgEl;
+    var svg = svgFromMarkup(markup);
+    svg.style.opacity = "0";
+    host.appendChild(svg);
+    svgEl = svg;
+
+    buildDomIndex();
+    markSelected();
+    // Let the new layer take layout before initialising pan/zoom on it.
+    svg.getBoundingClientRect();
+    initPanZoom(svg);
+    updateStatus(visibleCount, edgeCount);
+
+    if (old) old.style.pointerEvents = "none";
+    requestAnimationFrame(function () {
+      svg.style.opacity = "1";
+      if (old) old.style.opacity = "0";
+    });
+    if (old) {
+      setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, FADE_MS + 60);
+    }
+  }
+
+  /* Render requests are serialised and only the newest one is applied, so
+     rapid clicks never scramble the diagram or leave a stale view behind. */
+  function requestView(request) {
+    request.token = ++viewToken;
+    pendingView = request;
+    if (!rendering) pump();
+  }
+
+  function pump() {
+    if (!pendingView) { rendering = false; return; }
+    var req = pendingView;
+    pendingView = null;
+    rendering = true;
+
+    var markup;
+    if (req.full && fullMarkup) {
+      markup = Promise.resolve(fullMarkup);
+    } else {
+      markup = renderMermaid(req.code).then(function (svg) {
+        if (req.full) fullMarkup = svg;
+        return svg;
+      });
+    }
+
+    markup.then(function (svg) {
+      if (req.token !== viewToken) { rendering = false; pump(); return; }
+      applyView(svg, req.selectedId, req.visibleCount, req.edgeCount);
+      rendering = false;
+      pump();
+    }).catch(function (err) {
+      rendering = false;
+      fail("Could not draw the diagram: " + err.message);
     });
   }
 
   function selectShip(id) {
-    if (!domIndex || !graph.nodes[id]) return;
-
-    // Undirected breadth/depth-first walk over every edge.
-    var visible = Object.create(null);
-    var queue = [id];
-    visible[id] = true;
-    while (queue.length) {
-      var current = queue.pop();
-      var neighbours = graph.adj[current] || {};
-      for (var key in neighbours) {
-        if (!visible[key]) { visible[key] = true; queue.push(key); }
-      }
-    }
-
+    if (!graph.nodes[id] || selectedId === id) return;
     selectedId = id;
-    svgEl.classList.add("isolating");
+    selectedEdgeId = null;
+    var visible = connectedComponent(id);
+    var visibleCount = Object.keys(visible).length;
+    var edgeCount = graph.edges.filter(function (e) {
+      return visible[e.src] && visible[e.dst];
+    }).length;
+    requestView({
+      code: buildFilteredCode(baseCode, visible),
+      full: false,
+      selectedId: id,
+      visibleCount: visibleCount,
+      edgeCount: edgeCount
+    });
+  }
 
-    domIndex.nodes.forEach(function (n) {
-      var show = !!visible[n.id];
-      n.el.classList.toggle("ship-hidden", !show);
-      n.el.classList.toggle("ship-selected", n.id === id);
-    });
-    domIndex.clusters.forEach(function (c) {
-      c.el.classList.toggle("ship-hidden", !c.members.some(function (m) { return visible[m]; }));
-    });
-    domIndex.edges.forEach(function (e) {
-      var show = !!visible[e.src] && !!visible[e.dst];
-      e.el.classList.toggle("ship-hidden", !show);
-    });
-    Object.keys(domIndex.labelByEdgeId).forEach(function (edgeId) {
-      var ends = splitEndpoints(edgeId, graph.nodes);
-      var show = !!ends && !!visible[ends[0]] && !!visible[ends[1]];
-      domIndex.labelByEdgeId[edgeId].classList.toggle("ship-hidden", !show);
-    });
+  function clearSelection() {
+    if (!selectedId) return;
+    selectedId = null;
+    selectedEdgeId = null;
+    requestView({ code: baseCode, full: true, selectedId: null, visibleCount: null, edgeCount: null });
   }
 
   function centerOn(el) {
@@ -292,6 +465,12 @@
       if (movedFar) { pointerDown = null; return; }
       pointerDown = null;
       var target = e.target;
+
+      // Edges are checked first: highlighting one must never filter or reset
+      // the view, even while a ship is isolated.
+      var edgeId = edgeIdFromTarget(target);
+      if (edgeId) { toggleEdge(edgeId); return; }
+
       var nodeGroup = target && target.closest ? target.closest("g.node") : null;
       if (nodeGroup) {
         var id = nodeIdFromDom(nodeGroup);
@@ -303,17 +482,20 @@
       }
       // Clicks in the toolbar (search, zoom, download) should not reset the view.
       if (target && target.closest && target.closest(".topbar")) return;
+      if (selectedEdgeId) toggleEdge(selectedEdgeId);
       if (selectedId) clearSelection();
     });
   }
 
   function wireControls() {
-    document.getElementById("zoom-in").addEventListener("click", function () { panZoom.zoomIn(); });
-    document.getElementById("zoom-out").addEventListener("click", function () { panZoom.zoomOut(); });
+    document.getElementById("zoom-in").addEventListener("click", function () { if (panZoom) panZoom.zoomIn(); });
+    document.getElementById("zoom-out").addEventListener("click", function () { if (panZoom) panZoom.zoomOut(); });
     document.getElementById("fit").addEventListener("click", function () {
+      if (!panZoom) return;
       panZoom.resize(); panZoom.fit(); panZoom.center();
     });
     document.getElementById("reset").addEventListener("click", function () {
+      if (!panZoom) return;
       panZoom.resetZoom(); panZoom.center();
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
@@ -323,7 +505,8 @@
     });
   }
 
-  function render(code) {
+  function boot(code) {
+    baseCode = code;
     graph = parseGraph(code);
 
     mermaid.initialize({
@@ -346,34 +529,9 @@
       flowchart: { useMaxWidth: false, htmlLabels: false }
     });
 
-    return mermaid.render("shipProgressGraph", code).then(function (result) {
-      host.innerHTML = result.svg;
-      svgEl = host.querySelector("svg");
-      svgEl.removeAttribute("style");
-      svgEl.setAttribute("width", "100%");
-      svgEl.setAttribute("height", "100%");
-      svgEl.style.maxWidth = "none";
-
-      buildDomIndex();
-      wireSelection();
-
-      if (window.svgPanZoom) {
-        panZoom = svgPanZoom(svgEl, {
-          controlIconsEnabled: false,
-          fit: true,
-          center: true,
-          minZoom: 0.02,
-          maxZoom: 25,
-          zoomScaleSensitivity: 0.25,
-          dblClickZoomEnabled: false,
-          mouseWheelZoomEnabled: true
-        });
-      }
-
-      var stats = countStats(code);
-      statusEl.textContent = stats.nodes + " ships · " + stats.edges + " connections";
-      wireControls();
-    });
+    wireSelection();
+    wireControls();
+    requestView({ code: baseCode, full: true, selectedId: null, visibleCount: null, edgeCount: null });
   }
 
   ensureGlobal("mermaid", MERMAID_CDN)
@@ -387,7 +545,7 @@
     .then(function (md) {
       var match = md.match(/```mermaid[ \t]*\r?\n([\s\S]*?)```/);
       if (!match) throw new Error("no ```mermaid block found in README.md");
-      return render(match[1].trim());
+      boot(match[1].trim());
     })
     .catch(function (err) {
       fail(

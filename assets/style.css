@@ -118,18 +118,44 @@ button:active { transform: translateY(1px); }
 
 /* click-to-isolate */
 #graph svg .node { cursor: pointer; }
-#graph svg .node.ship-hidden,
-#graph svg g.cluster.ship-hidden,
-#graph svg path.edge-hidden,
-#graph svg path.ship-hidden,
-#graph svg g.edgeLabel.ship-hidden { display: none; }
+#graph svg path[data-et="edge"],
+#graph svg g.edgeLabel { cursor: pointer; }
 
-#graph svg.isolating .node { transition: opacity .15s ease; }
-#graph svg .node.ship-selected rect,
-#graph svg .node.ship-selected polygon,
-#graph svg .node.ship-selected path,
-#graph svg .node.ship-selected circle {
+/* stacked layers cross-fade when the diagram is rebuilt */
+#graph svg.graph-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: opacity .2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #graph svg.graph-layer { transition: none; }
+}
+
+/* selected ship: invert the rectangle and its label */
+#graph svg .node.ship-selected { filter: invert(1); }
+
+/* selected edge: brighten the line and its label */
+#graph svg path.edge-selected {
   stroke: var(--accent) !important;
   stroke-width: 3px !important;
-  filter: drop-shadow(0 0 7px rgba(255, 213, 74, .85));
+  filter: drop-shadow(0 0 5px rgba(255, 213, 74, .9));
+}
+#graph svg g.edgeLabel.edge-selected .background,
+#graph svg g.edgeLabel.edge-selected rect {
+  fill: var(--accent) !important;
+  opacity: 1 !important;
+}
+#graph svg g.edgeLabel.edge-selected text,
+#graph svg g.edgeLabel.edge-selected tspan,
+#graph svg g.edgeLabel.edge-selected span {
+  fill: #1b2432 !important;
+  color: #1b2432 !important;
+}
+
+/* arrowheads follow the stroke of the edge that references them */
+#graph svg marker path {
+  fill: lightgrey;
+  fill: context-stroke;
 }

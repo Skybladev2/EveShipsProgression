@@ -8,8 +8,12 @@ Corvettes, shuttles and Special Edition ships are not included.
 Arrows lead from a base hull to its advanced, faction or pirate variants; the edge label names
 the weapon system or role the source hull is bonused for (per the E-Uni wiki).
 
-Click any ship to isolate its progression line: only the ships connected to it, directly or
-through a chain of variants, stay visible. Click the background to bring the full chart back.
+Click any ship to isolate its progression line: the chart is redrawn from just the ships
+connected to it, directly or through a chain of variants, so what remains is laid out as a
+compact diagram of its own. Click the background to bring the full chart back.
+
+Click an edge to highlight that single connection — it only lights up the line and its label
+and never changes what is shown, so it also works while a ship is isolated.
 
 ```mermaid
 flowchart
