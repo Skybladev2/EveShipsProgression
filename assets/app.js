@@ -119,7 +119,7 @@
         clusterBkg: "#0f141d",
         clusterBorder: "#2a3444"
       },
-      flowchart: { useMaxWidth: false, htmlLabels: false, curve: "basis", nodeSpacing: 18, rankSpacing: 40 }
+      flowchart: { useMaxWidth: false, htmlLabels: false, curve: "linear" }
     });
 
     return mermaid.render("shipProgressGraph", code).then(function (result) {
