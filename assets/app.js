@@ -1,6 +1,16 @@
-/* Renders the Mermaid diagram from README.md and adds pan / zoom / search. */
+/* Renders the Mermaid diagram from README.md and adds pan / zoom / search.
+   Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
+
+  var MERMAID_CDN = [
+    "https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js",
+    "https://unpkg.com/mermaid@11.17.2/dist/mermaid.min.js"
+  ];
+  var PANZOOM_CDN = [
+    "https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js",
+    "https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"
+  ];
 
   var host = document.getElementById("graph");
   var statusEl = document.getElementById("status");
@@ -10,6 +20,25 @@
 
   function fail(message) {
     host.innerHTML = '<div class="error">' + message + "</div>";
+  }
+
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = src;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { reject(new Error("failed to load " + src)); };
+      document.head.appendChild(s);
+    });
+  }
+
+  function ensureGlobal(name, urls) {
+    if (window[name]) return Promise.resolve();
+    return urls.reduce(function (chain, url) {
+      return chain.catch(function () { return loadScript(url); });
+    }, Promise.reject()).then(function () {
+      if (!window[name]) throw new Error(name + " did not load");
+    });
   }
 
   function countStats(code) {
@@ -101,16 +130,18 @@
       svgEl.setAttribute("height", "100%");
       svgEl.style.maxWidth = "none";
 
-      panZoom = svgPanZoom(svgEl, {
-        controlIconsEnabled: false,
-        fit: true,
-        center: true,
-        minZoom: 0.02,
-        maxZoom: 25,
-        zoomScaleSensitivity: 0.25,
-        dblClickZoomEnabled: false,
-        mouseWheelZoomEnabled: true
-      });
+      if (window.svgPanZoom) {
+        panZoom = svgPanZoom(svgEl, {
+          controlIconsEnabled: false,
+          fit: true,
+          center: true,
+          minZoom: 0.02,
+          maxZoom: 25,
+          zoomScaleSensitivity: 0.25,
+          dblClickZoomEnabled: false,
+          mouseWheelZoomEnabled: true
+        });
+      }
 
       var stats = countStats(code);
       statusEl.textContent = stats.nodes + " ships · " + stats.edges + " connections";
@@ -118,10 +149,13 @@
     });
   }
 
-  fetch("README.md", { cache: "no-cache" })
-    .then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status + " while fetching README.md");
-      return res.text();
+  ensureGlobal("mermaid", MERMAID_CDN)
+    .then(function () { return ensureGlobal("svgPanZoom", PANZOOM_CDN).catch(function () { /* pan/zoom optional */ }); })
+    .then(function () {
+      return fetch("README.md", { cache: "no-cache" }).then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status + " while fetching README.md");
+        return res.text();
+      });
     })
     .then(function (md) {
       var match = md.match(/```mermaid[ \t]*\r?\n([\s\S]*?)```/);
@@ -130,8 +164,8 @@
     })
     .catch(function (err) {
       fail(
-        "Could not load the diagram: " + err.message +
-        '<br><br>If you opened this file directly from disk, serve it over HTTP instead — e.g. run ' +
+        "Could not load the diagram: " + err.message + "<br><br>" +
+        "If you opened this file directly from disk, serve it over HTTP instead — e.g. run " +
         "<code>python3 -m http.server</code> in the project folder and open " +
         "<code>http://localhost:8000/</code>."
       );
