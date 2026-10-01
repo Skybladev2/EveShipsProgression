@@ -117,10 +117,13 @@ button:active { transform: translateY(1px); }
 }
 
 /* click-to-isolate */
-#graph svg .node { cursor: pointer; }
+#graph svg .node { cursor: pointer; transition: filter .12s ease; }
 #graph svg path[data-et="edge"],
 #graph svg g.edgeLabel,
 #graph svg path.edge-hit { cursor: pointer; }
+
+/* a slight sheen over the ship rectangle under the cursor */
+#graph svg .node:hover:not(.ship-selected) { filter: brightness(1.3); }
 
 /* hit strokes are sized in screen pixels (set from JS) so they stay wide
    however far the chart is zoomed out */
@@ -147,6 +150,7 @@ button:active { transform: translateY(1px); }
 @media (prefers-reduced-motion: reduce) {
   #graph svg.graph-layer { transition: none; }
   #graph svg path.edge-hover-line { transition: none; }
+  #graph svg .node { transition: none; }
 }
 
 /* selected ship: invert the rectangle and its label */
