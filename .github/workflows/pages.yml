@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p _site/assets
           cp index.html _site/
-          cp assets/style.css assets/app.js _site/assets/
+          cp -r assets/. _site/assets/
           cp README.md _site/
           touch _site/.nojekyll
 
