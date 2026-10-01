@@ -34,6 +34,9 @@
   var rendering = false;  // serialises Mermaid renders
   var pendingView = null;
 
+  var EDGE_HIT_PX = 18;     // clickable edge width, in screen pixels
+  var hitWidthRaf = null;   // debounces hit-width updates during zoom/pan
+
   function fail(message) {
     host.innerHTML = '<div class="error">' + message + "</div>";
   }
@@ -246,6 +249,70 @@
     }
   }
 
+  /* Edges are drawn ~1px wide, which is very hard to click. Lay an invisible
+     but much thicker copy of each edge on top of it (inside the same layer, so
+     it stays below the node and label layers) purely as a hit target. */
+  function addEdgeHitAreas() {
+    collect(svgEl, 'path[data-et="edge"]').forEach(function (path) {
+      var hit = path.cloneNode(false);
+      hit.removeAttribute("id");
+      hit.removeAttribute("style");
+      hit.removeAttribute("marker-end");
+      hit.removeAttribute("marker-start");
+      hit.setAttribute("class", "edge-hit");
+      hit.setAttribute("data-et", "edge-hit");
+      hit.setAttribute("fill", "none");
+      hit.setAttribute("stroke", "transparent");
+      hit.style.stroke = "transparent";
+      hit.style.fill = "none";
+      hit.style.pointerEvents = "stroke";
+      path.parentNode.insertBefore(hit, path.nextSibling);
+
+      // A thin overlay revealed while the hit area is hovered, so the edge
+      // under the cursor is obvious. It ignores pointer events itself.
+      var glow = path.cloneNode(false);
+      glow.removeAttribute("id");
+      glow.removeAttribute("style");
+      glow.removeAttribute("marker-end");
+      glow.removeAttribute("marker-start");
+      glow.setAttribute("class", "edge-hover-line");
+      glow.setAttribute("data-et", "edge-glow");
+      glow.setAttribute("fill", "none");
+      glow.style.pointerEvents = "none";
+      path.parentNode.insertBefore(glow, hit.nextSibling);
+    });
+    updateHitWidth();
+  }
+
+  /* The chart is scaled far below 1:1, so a stroke width in diagram units is
+     only a fraction of a pixel on screen. Measure the live user-to-screen
+     scale and size the hit strokes in screen pixels instead, so they stay
+     comfortably wide no matter how far the user zooms out. */
+  function updateHitWidth() {
+    if (!svgEl) return;
+    var sample = svgEl.querySelector("path.edge-hit");
+    if (!sample) return;
+    var scale = 1;
+    if (sample.getScreenCTM) {
+      var m = sample.getScreenCTM();
+      if (m) scale = Math.sqrt(m.a * m.a + m.b * m.b) || 1;
+    }
+    if (scale === 1) {
+      var vb = svgEl.viewBox && svgEl.viewBox.baseVal;
+      var rect = svgEl.getBoundingClientRect();
+      if (vb && vb.width && rect && rect.width) scale = rect.width / vb.width;
+    }
+    svgEl.style.setProperty("--edge-hit-w", (EDGE_HIT_PX / (scale || 1)) + "px");
+  }
+
+  function scheduleHitWidth() {
+    if (hitWidthRaf) return;
+    hitWidthRaf = requestAnimationFrame(function () {
+      hitWidthRaf = null;
+      updateHitWidth();
+    });
+  }
+
   /* Highlight a single edge (line + label). Highlighting never filters: it is
      independent of the isolated-ship view and works while a ship is selected. */
   function toggleEdge(edgeId) {
@@ -261,6 +328,8 @@
 
   function edgeIdFromTarget(target) {
     if (!target || !target.closest) return null;
+    var hit = target.closest("path.edge-hit");
+    if (hit) return hit.getAttribute("data-id");
     var path = target.closest('path[data-et="edge"]');
     if (path) return path.getAttribute("data-id");
     var label = target.closest("g.edgeLabel");
@@ -315,8 +384,11 @@
       maxZoom: 25,
       zoomScaleSensitivity: 0.25,
       dblClickZoomEnabled: false,
-      mouseWheelZoomEnabled: true
+      mouseWheelZoomEnabled: true,
+      onZoom: scheduleHitWidth,
+      onPan: scheduleHitWidth
     });
+    updateHitWidth();
   }
 
   /* Put a freshly rendered SVG on top of the current one and cross-fade. */
@@ -331,6 +403,7 @@
     svgEl = svg;
 
     buildDomIndex();
+    addEdgeHitAreas();
     markSelected();
     // Let the new layer take layout before initialising pan/zoom on it.
     svg.getBoundingClientRect();
@@ -493,15 +566,18 @@
     document.getElementById("fit").addEventListener("click", function () {
       if (!panZoom) return;
       panZoom.resize(); panZoom.fit(); panZoom.center();
+      scheduleHitWidth();
     });
     document.getElementById("reset").addEventListener("click", function () {
       if (!panZoom) return;
       panZoom.resetZoom(); panZoom.center();
+      scheduleHitWidth();
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
     document.getElementById("search").addEventListener("input", function (e) { runSearch(e.target.value); });
     window.addEventListener("resize", function () {
       if (panZoom) { panZoom.resize(); panZoom.fit(); panZoom.center(); }
+      scheduleHitWidth();
     });
   }
 
