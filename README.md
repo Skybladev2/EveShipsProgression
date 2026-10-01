@@ -1,5 +1,7 @@
 # EveShipsProgression
 
+> 🌐 Live version: <https://skybladev2.github.io/EveShipsProgression/>
+
 Ship progression chart for EVE Online — from tech-1 frigates up to capital ships.
 Corvettes, shuttles and Special Edition ships are not included.
 
