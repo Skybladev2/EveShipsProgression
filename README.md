@@ -996,35 +996,35 @@ flowchart
 	n_Praxis -->|"Projectile turrets"| n_Maelstrom
 	n_Praxis -->|"Projectile turrets"| n_Tempest
 	n_Probe_Fleet_Issue -->|"Missiles, scan"| n_Pacifier
-	s2 ==>|"[GROUP] Missiles"| s35
-	s3 ==>|"[GROUP] Projectile turrets"| s40
-	s4 ==>|"[GROUP] Hybrid turrets"| s37
-	s5 ==>|"[GROUP] Energy turrets"| s36
-	s6 ==>|"[GROUP] Drones"| s39
-	s8 ==>|"[GROUP] Scan"| s38
-	s11 ==>|"[GROUP] Mining"| s41
-	s9 ==>|"[GROUP] Remote shield boost"| s32
-	s10 ==>|"[GROUP] Remote armor repair"| s33
-	d_missiles ==>|"[GROUP] Missiles"| nd_missiles
-	d_drones ==>|"[GROUP] Drones"| nd_drones
-	d_hybrid ==>|"[GROUP] Hybrid turrets"| nd_hybrid
-	d_energy ==>|"[GROUP] Energy turrets"| nd_energy
-	d_proj ==>|"[GROUP] Projectile turrets"| nd_proj
-	d_mining ==>|"[GROUP] Mining"| nd_mining
-	c_missiles ==>|"[GROUP] Missiles"| nc_missiles
-	c_proj ==>|"[GROUP] Projectile turrets"| nc_proj
-	c_energy ==>|"[GROUP] Energy turrets"| nc_energy
-	c_drones ==>|"[GROUP] Drones"| nc_drones
-	c_shield ==>|"[GROUP] Shield logistics"| nc_shield
-	c_armor ==>|"[GROUP] Armor logistics"| nc_armor
-	bc_missiles ==>|"[GROUP] Missiles"| nbc_missiles
-	bc_proj ==>|"[GROUP] Projectile turrets"| nbc_proj
-	bc_hybrid ==>|"[GROUP] Hybrid turrets"| nbc_hybrid
-	bc_energy ==>|"[GROUP] Energy turrets"| nbc_energy
-	bc_drones ==>|"[GROUP] Drones"| nbc_drones
-	bs_missiles ==>|"[GROUP] Missiles"| nbs_missiles
-	bs_proj ==>|"[GROUP] Projectile turrets"| nbs_proj
-	bs_hybrid ==>|"[GROUP] Hybrid turrets"| nbs_hybrid
-	bs_energy ==>|"[GROUP] Energy turrets"| nbs_energy
-	bs_drones ==>|"[GROUP] Drones"| nbs_drones
+	s2 ==>|"Missiles"| s35
+	s3 ==>|"Projectile turrets"| s40
+	s4 ==>|"Hybrid turrets"| s37
+	s5 ==>|"Energy turrets"| s36
+	s6 ==>|"Drones"| s39
+	s8 ==>|"Scan"| s38
+	s11 ==>|"Mining"| s41
+	s9 ==>|"Remote shield boost"| s32
+	s10 ==>|"Remote armor repair"| s33
+	d_missiles ==>|"Missiles"| nd_missiles
+	d_drones ==>|"Drones"| nd_drones
+	d_hybrid ==>|"Hybrid turrets"| nd_hybrid
+	d_energy ==>|"Energy turrets"| nd_energy
+	d_proj ==>|"Projectile turrets"| nd_proj
+	d_mining ==>|"Mining"| nd_mining
+	c_missiles ==>|"Missiles"| nc_missiles
+	c_proj ==>|"Projectile turrets"| nc_proj
+	c_energy ==>|"Energy turrets"| nc_energy
+	c_drones ==>|"Drones"| nc_drones
+	c_shield ==>|"Shield logistics"| nc_shield
+	c_armor ==>|"Armor logistics"| nc_armor
+	bc_missiles ==>|"Missiles"| nbc_missiles
+	bc_proj ==>|"Projectile turrets"| nbc_proj
+	bc_hybrid ==>|"Hybrid turrets"| nbc_hybrid
+	bc_energy ==>|"Energy turrets"| nbc_energy
+	bc_drones ==>|"Drones"| nbc_drones
+	bs_missiles ==>|"Missiles"| nbs_missiles
+	bs_proj ==>|"Projectile turrets"| nbs_proj
+	bs_hybrid ==>|"Hybrid turrets"| nbs_hybrid
+	bs_energy ==>|"Energy turrets"| nbs_energy
+	bs_drones ==>|"Drones"| nbs_drones
 ```
