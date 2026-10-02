@@ -120,18 +120,28 @@ flowchart
 		n_Monitor["Monitor"]
 	end
 	subgraph s19["Battlecruiser"]
-		n_Brutix["Brutix"]
-		n_Cyclone["Cyclone"]
-		n_Drake["Drake"]
-		n_Ferox["Ferox"]
-		n_Harbinger["Harbinger"]
-		n_Hurricane["Hurricane"]
-		n_Myrmidon["Myrmidon"]
-		n_Naga["Naga"]
-		n_Oracle["Oracle"]
-		n_Prophecy["Prophecy"]
-		n_Talos["Talos"]
-		n_Tornado["Tornado"]
+		subgraph bc_missiles["Missiles"]
+			n_Cyclone["Cyclone"]
+			n_Drake["Drake"]
+			n_Naga["Naga"]
+		end
+		subgraph bc_proj["Projectile turrets"]
+			n_Hurricane["Hurricane"]
+			n_Tornado["Tornado"]
+		end
+		subgraph bc_hybrid["Hybrid turrets"]
+			n_Brutix["Brutix"]
+			n_Ferox["Ferox"]
+			n_Talos["Talos"]
+		end
+		subgraph bc_energy["Energy turrets"]
+			n_Harbinger["Harbinger"]
+			n_Oracle["Oracle"]
+			n_Prophecy["Prophecy"]
+		end
+		subgraph bc_drones["Drones"]
+			n_Myrmidon["Myrmidon"]
+		end
 	end
 	subgraph s20["Precursor Battlecruisers"]
 		n_Drekavac["Drekavac"]
@@ -445,14 +455,24 @@ flowchart
 		n_Zarmazd["Zarmazd"]
 	end
 	subgraph s64["Navy Faction Battlecruisers"]
-		n_Brutix_Navy_Issue["Brutix Navy Issue"]
-		n_Cyclone_Fleet_Issue["Cyclone Fleet Issue"]
-		n_Drake_Navy_Issue["Drake Navy Issue"]
-		n_Ferox_Navy_Issue["Ferox Navy Issue"]
-		n_Harbinger_Navy_Issue["Harbinger Navy Issue"]
-		n_Hurricane_Fleet_Issue["Hurricane Fleet Issue"]
-		n_Myrmidon_Navy_Issue["Myrmidon Navy Issue"]
-		n_Prophecy_Navy_Issue["Prophecy Navy Issue"]
+		subgraph nbc_missiles["Missiles"]
+			n_Cyclone_Fleet_Issue["Cyclone Fleet Issue"]
+			n_Drake_Navy_Issue["Drake Navy Issue"]
+		end
+		subgraph nbc_proj["Projectile turrets"]
+			n_Hurricane_Fleet_Issue["Hurricane Fleet Issue"]
+		end
+		subgraph nbc_hybrid["Hybrid turrets"]
+			n_Brutix_Navy_Issue["Brutix Navy Issue"]
+			n_Ferox_Navy_Issue["Ferox Navy Issue"]
+		end
+		subgraph nbc_energy["Energy turrets"]
+			n_Harbinger_Navy_Issue["Harbinger Navy Issue"]
+			n_Prophecy_Navy_Issue["Prophecy Navy Issue"]
+		end
+		subgraph nbc_drones["Drones"]
+			n_Myrmidon_Navy_Issue["Myrmidon Navy Issue"]
+		end
 	end
 	subgraph s65["Command ships"]
 		n_Absolution["Absolution"]
@@ -975,4 +995,9 @@ flowchart
 	c_drones ==>|"[GROUP] Drones"| nc_drones
 	c_shield ==>|"[GROUP] Shield logistics"| nc_shield
 	c_armor ==>|"[GROUP] Armor logistics"| nc_armor
+	bc_missiles ==>|"[GROUP] Missiles"| nbc_missiles
+	bc_proj ==>|"[GROUP] Projectile turrets"| nbc_proj
+	bc_hybrid ==>|"[GROUP] Hybrid turrets"| nbc_hybrid
+	bc_energy ==>|"[GROUP] Energy turrets"| nbc_energy
+	bc_drones ==>|"[GROUP] Drones"| nbc_drones
 ```
