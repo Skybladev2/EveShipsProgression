@@ -648,6 +648,7 @@ flowchart
 	n_Breacher -->|"Missiles"| n_Talwar
 	n_Condor -->|"Missiles"| n_Crow
 	n_Condor -->|"Missiles"| n_Raptor
+	n_Condor -->|"Tackle"| s42
 	n_Crucifier -->|"Weapon disruption"| n_Crucifier_Navy_Issue
 	n_Crucifier -->|"Weapon disruption"| n_Herald
 	n_Crucifier -->|"Weapon disruption"| n_Sentinel
@@ -686,6 +687,7 @@ flowchart
 	n_Rifter -->|"Projectile turrets"| n_Wolf
 	n_Slasher -->|"Projectile turrets"| n_Claw
 	n_Slasher -->|"Projectile turrets"| n_Stiletto
+	n_Slasher -->|"Tackle"| s42
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Tristan -->|"Drones"| n_Algos
