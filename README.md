@@ -914,13 +914,13 @@ flowchart
 	n_Praxis -->|"Projectile turrets"| n_Maelstrom
 	n_Praxis -->|"Projectile turrets"| n_Tempest
 	n_Probe_Fleet_Issue -->|"Missiles, scan"| n_Pacifier
-	s2 -->|"Missiles"| s35
-	s3 -->|"Projectile turrets"| s40
-	s4 -->|"Hybrid turrets"| s37
-	s5 -->|"Energy turrets"| s36
-	s6 -->|"Drones"| s39
-	s8 -->|"Scan"| s38
-	s11 -->|"Mining"| s41
-	s9 -->|"Remote shield boost"| s32
-	s10 -->|"Remote armor repair"| s33
+	s2 ==>|"[GROUP] Missiles"| s35
+	s3 ==>|"[GROUP] Projectile turrets"| s40
+	s4 ==>|"[GROUP] Hybrid turrets"| s37
+	s5 ==>|"[GROUP] Energy turrets"| s36
+	s6 ==>|"[GROUP] Drones"| s39
+	s8 ==>|"[GROUP] Scan"| s38
+	s11 ==>|"[GROUP] Mining"| s41
+	s9 ==>|"[GROUP] Remote shield boost"| s32
+	s10 ==>|"[GROUP] Remote armor repair"| s33
 ```
