@@ -22,6 +22,18 @@
   var panZoom = null;
   var svgEl = null;
 
+  /* Mermaid builds the diagram inside a temporary element before handing back
+     the SVG string. Left in the normal document flow, that element briefly
+     shows up as a full-width strip at the bottom of the page while a large
+     diagram renders. Park it off-screen instead: it stays laid out (Mermaid
+     measures it with getBBox) but can never affect or appear in the page. */
+  var renderHost = document.createElement("div");
+  renderHost.setAttribute("aria-hidden", "true");
+  renderHost.style.cssText =
+    "position:fixed;left:-100000px;top:0;width:1000px;height:1000px;" +
+    "overflow:hidden;pointer-events:none;visibility:hidden;";
+  document.body.appendChild(renderHost);
+
   var baseCode = "";      // full Mermaid source
   var fullMarkup = null;  // pristine full-diagram SVG, reused when restoring
   var graph = null;       // parsed source: nodes, adjacency, clusters
@@ -461,7 +473,7 @@
   }
 
   function renderMermaid(code) {
-    return mermaid.render("shipGraph" + (++renderSeq), code).then(function (result) {
+    return mermaid.render("shipGraph" + (++renderSeq), code, renderHost).then(function (result) {
       return result.svg;
     });
   }
