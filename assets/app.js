@@ -204,6 +204,30 @@
       (graph.nodeClusters[nid] || []).forEach(function (cid) { needed[cid] = true; });
     });
 
+    // Group connections that survive the filter. A direct ship edge is
+    // redundant when a surviving group edge already joins the two groups the
+    // ships sit in, so the direct edge is dropped in favour of the group one.
+    var groupEdges = [];
+    code.split(/\r?\n/).forEach(function (line) {
+      var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      if (!m) return;
+      if (graph.clusters[m[1]] === undefined || graph.clusters[m[2]] === undefined) return;
+      if (needed[m[1]] && needed[m[2]]) groupEdges.push([m[1], m[2]]);
+    });
+
+    function inGroup(nid, groupId) {
+      if (graph.clusters[groupId] === undefined) return nid === groupId;
+      var parents = graph.nodeClusters[nid];
+      return !!parents && parents.indexOf(groupId) !== -1;
+    }
+
+    function coveredByGroup(a, b) {
+      for (var k = 0; k < groupEdges.length; k++) {
+        if (inGroup(a, groupEdges[k][0]) && inGroup(b, groupEdges[k][1])) return true;
+      }
+      return false;
+    }
+
     var out = [];
     var stack = [];
     code.split(/\r?\n/).forEach(function (line) {
@@ -227,11 +251,16 @@
         var a = edge[1], b = edge[2];
         var aIsCluster = graph.clusters[a] !== undefined;
         var bIsCluster = graph.clusters[b] !== undefined;
-        // A group-to-group edge is kept only while both of its subgraph
-        // blocks survive the filter. Otherwise Mermaid would draw a phantom
-        // node for the dropped group id, showing a raw `s2`-style name.
-        var keep = aIsCluster ? !!needed[a] : !!visible[a];
-        if (keep) keep = bIsCluster ? !!needed[b] : !!visible[b];
+        var keep;
+        if (aIsCluster || bIsCluster) {
+          // A group-to-group edge is kept only while both of its subgraph
+          // blocks survive the filter. Otherwise Mermaid would draw a phantom
+          // node for the dropped group id, showing a raw `s2`-style name.
+          keep = (aIsCluster ? !!needed[a] : !!visible[a]) &&
+                 (bIsCluster ? !!needed[b] : !!visible[b]);
+        } else {
+          keep = !!visible[a] && !!visible[b] && !coveredByGroup(a, b);
+        }
         if (keep) out.push(line);
         return;
       }
