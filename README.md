@@ -22,8 +22,6 @@ flowchart
 			n_Kestrel["Kestrel"]
 			n_Condor["Condor"]
 			n_Breacher["Breacher"]
-			n_Specter["Specter"]
-			n_Wraith["Wraith"]
 		end
 		subgraph s3["Projectile turrets"]
 			n_Slasher["Slasher"]
@@ -602,7 +600,6 @@ flowchart
 	n_Slasher -->|"Projectile turrets"| n_Republic_Fleet_Firetail
 	n_Slasher -->|"Projectile turrets"| n_Claw
 	n_Slasher -->|"Projectile turrets"| n_Stiletto
-	n_Specter -->|"Missiles"| n_Phantom
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Tristan -->|"Drones"| n_Algos
@@ -615,7 +612,6 @@ flowchart
 	n_Vigil -->|"Target paint"| n_Vigil_Fleet_Issue
 	n_Vigil -->|"Target paint"| n_Hyena
 	n_Vigil -->|"Target paint"| n_Bellicose
-	n_Wraith -->|"Missiles"| n_Phantom
 	n_Republic_Fleet_Firetail -->|"Projectile turrets, tackle"| n_Dramiel
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Cruor
 	n_Vigil_Fleet_Issue -.->|"Missiles"| n_Garmur
