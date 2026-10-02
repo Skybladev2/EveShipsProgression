@@ -551,11 +551,9 @@ flowchart
 	end
 	n_Atron -->|"Hybrid turrets"| n_Ares
 	n_Atron -->|"Hybrid turrets"| n_Taranis
-	n_Bantam -->|"Remote shield boost"| n_Kirin
 	n_Breacher -->|"Missiles"| n_Jaguar
 	n_Breacher -.->|"Missiles"| n_Hound
 	n_Breacher -->|"Missiles"| n_Talwar
-	n_Burst -->|"Remote shield boost"| n_Scalpel
 	n_Condor -->|"Missiles"| n_Crow
 	n_Condor -->|"Missiles"| n_Raptor
 	n_Crucifier -->|"Weapon disruption"| n_Crucifier_Navy_Issue
@@ -576,7 +574,6 @@ flowchart
 	n_Incursus -->|"Hybrid turrets"| n_Catalyst
 	n_Inquisitor -->|"Remote armor repair"| n_Purifier
 	n_Inquisitor -->|"Remote armor repair"| n_Deacon
-	n_Kestrel -->|"Missiles"| n_Caldari_Navy_Hookbill
 	n_Kestrel -->|"Missiles"| n_Manticore
 	n_Kestrel -->|"Missiles"| n_Corax
 	n_Magnate -->|"Scan"| n_Magnate_Navy_Issue
@@ -602,12 +599,9 @@ flowchart
 	n_Rifter -->|"Projectile turrets"| n_Republic_Fleet_Firetail
 	n_Rifter -->|"Projectile turrets"| n_Jaguar
 	n_Rifter -->|"Projectile turrets"| n_Wolf
-	n_Rifter -->|"Projectile turrets"| n_Thrasher
 	n_Slasher -->|"Projectile turrets"| n_Republic_Fleet_Firetail
 	n_Slasher -->|"Projectile turrets"| n_Claw
 	n_Slasher -->|"Projectile turrets"| n_Stiletto
-	n_Slasher -->|"Projectile turrets"| n_Thrasher
-	n_Slasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Specter -->|"Missiles"| n_Phantom
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
@@ -933,4 +927,11 @@ flowchart
 	n_Praxis -->|"Projectile turrets"| n_Maelstrom
 	n_Praxis -->|"Projectile turrets"| n_Tempest
 	n_Probe_Fleet_Issue -->|"Missiles, scan"| n_Pacifier
+	s2 -->|"Missiles"| s35
+	s2 -->|"Missiles"| n_Talwar
+	s3 -->|"Projectile turrets"| n_Thrasher
+	s9 -->|"Remote shield boost"| n_Scythe
+	s9 -->|"Remote shield boost"| s32
+	s48 -->|"Cargo"| n_Squall
+	s48 -->|"Cargo"| n_Fenrir
 ```
