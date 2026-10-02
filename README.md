@@ -564,17 +564,13 @@ flowchart
 	n_Griffin -->|"ECM"| n_Kitsune
 	n_Heron -->|"Scan"| n_Heron_Navy_Issue
 	n_Heron -->|"Scan"| n_Buzzard
-	n_Imicus -->|"Scan"| n_Imicus_Navy_Issue
 	n_Imicus -->|"Scan"| n_Helios
-	n_Incursus -->|"Hybrid turrets"| n_Federation_Navy_Comet
 	n_Incursus -->|"Hybrid turrets"| n_Enyo
 	n_Incursus -->|"Hybrid turrets"| n_Ishkur
 	n_Incursus -->|"Hybrid turrets"| n_Catalyst
 	n_Inquisitor -->|"Remote armor repair"| n_Purifier
-	n_Inquisitor -->|"Remote armor repair"| n_Deacon
 	n_Kestrel -->|"Missiles"| n_Manticore
 	n_Kestrel -->|"Missiles"| n_Corax
-	n_Magnate -->|"Scan"| n_Magnate_Navy_Issue
 	n_Magnate -->|"Scan"| n_Anathema
 	n_Maulus -->|"Sensor dampening"| n_Maulus_Navy_Issue
 	n_Maulus -->|"Sensor dampening"| n_Keres
@@ -582,28 +578,23 @@ flowchart
 	n_Merlin -->|"Hybrid turrets"| n_Harpy
 	n_Merlin -->|"Hybrid turrets"| n_Hawk
 	n_Merlin -->|"Hybrid turrets"| n_Cormorant
-	n_Navitas -->|"Remote armor repair"| n_Thalia
 	n_Probe -->|"Scan"| n_Probe_Fleet_Issue
 	n_Probe -->|"Scan"| n_Astero
 	n_Probe -->|"Scan"| n_Cheetah
 	n_Probe -->|"Cargo (ammo)"| n_Hoarder
 	n_Probe -->|"Cargo"| n_Wreathe
 	n_Probe -->|"Cargo"| n_Mammoth
-	n_Punisher -->|"Energy turrets"| n_Imperial_Navy_Slicer
 	n_Punisher -->|"Energy turrets"| n_Retribution
 	n_Punisher -->|"Energy turrets"| n_Vengeance
 	n_Punisher -->|"Energy turrets"| n_Coercer
 	n_Punisher -->|"Energy turrets"| n_Maller
-	n_Rifter -->|"Projectile turrets"| n_Republic_Fleet_Firetail
 	n_Rifter -->|"Projectile turrets"| n_Jaguar
 	n_Rifter -->|"Projectile turrets"| n_Wolf
-	n_Slasher -->|"Projectile turrets"| n_Republic_Fleet_Firetail
 	n_Slasher -->|"Projectile turrets"| n_Claw
 	n_Slasher -->|"Projectile turrets"| n_Stiletto
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Tristan -->|"Drones"| n_Algos
-	n_Venture -->|"Mining"| n_Venture_Consortium_Issue
 	n_Venture -->|"Mining"| n_Endurance
 	n_Venture -->|"Mining"| n_Prospect
 	n_Venture -->|"Mining"| n_Covetor
@@ -924,10 +915,12 @@ flowchart
 	n_Praxis -->|"Projectile turrets"| n_Tempest
 	n_Probe_Fleet_Issue -->|"Missiles, scan"| n_Pacifier
 	s2 -->|"Missiles"| s35
-	s2 -->|"Missiles"| n_Talwar
-	s3 -->|"Projectile turrets"| n_Thrasher
-	s9 -->|"Remote shield boost"| n_Scythe
+	s3 -->|"Projectile turrets"| s40
+	s4 -->|"Hybrid turrets"| s37
+	s5 -->|"Energy turrets"| s36
+	s6 -->|"Drones"| s39
+	s8 -->|"Scan"| s38
+	s11 -->|"Mining"| s41
 	s9 -->|"Remote shield boost"| s32
-	s48 -->|"Cargo"| n_Squall
-	s48 -->|"Cargo"| n_Fenrir
+	s10 -->|"Remote armor repair"| s33
 ```
