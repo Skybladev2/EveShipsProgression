@@ -51,6 +51,11 @@
   var EDGE_GAP_PX = 5;      // gap length of weak links, in screen pixels
   var hitWidthRaf = null;   // debounces hit-width updates during zoom/pan
 
+  // The full chart is far too wide to read at once, so the default view is
+  // framed on this group (by its subgraph label) instead of the whole diagram.
+  var DEFAULT_GROUP_LABEL = "Empire Faction Frigates";
+  var FOCUS_PADDING_PX = 24; // breathing room left around the focused group
+
   function fail(message) {
     host.innerHTML = '<div class="error">' + message + "</div>";
   }
@@ -525,6 +530,9 @@
     // Let the new layer take layout before initialising pan/zoom on it.
     svg.getBoundingClientRect();
     initPanZoom(svg);
+    // The full chart opens framed on the default group; isolated components are
+    // left fitted to their own bounds.
+    if (!selected) focusDefaultGroup();
     updateStatus(visibleCount, edgeCount);
 
     if (old) old.style.pointerEvents = "none";
@@ -607,6 +615,59 @@
     });
   }
 
+  /* Find a rendered subgraph by its visible label, e.g. "Empire Faction
+     Frigates". Cluster ids are Mermaid internals, so match the label instead.
+     `:scope >` keeps nested subgraphs from matching their parent's label. */
+  function findClusterByLabel(label) {
+    var clusters = collect(svgEl, "g.cluster");
+    for (var i = 0; i < clusters.length; i++) {
+      var labelEl = clusters[i].querySelector(":scope > g.cluster-label");
+      var text = (labelEl || clusters[i]).textContent.replace(/\s+/g, " ").trim();
+      if (text === label) return clusters[i];
+    }
+    return null;
+  }
+
+  /* Zoom and pan so `el` fills the viewport with a little padding. Works from
+     the diagram-space bbox plus the live pan/zoom, so it does not depend on the
+     browser having repainted the deferred transform yet. */
+  function focusOnElement(el) {
+    if (!panZoom || !svgEl || !el) return;
+    var bbox;
+    try { bbox = el.getBBox(); } catch (e) { return; }
+    if (!bbox || !bbox.width || !bbox.height) return;
+
+    var vp = viewport.getBoundingClientRect();
+    var svgRect = svgEl.getBoundingClientRect();
+    var availW = Math.max(1, vp.width - FOCUS_PADDING_PX * 2);
+    var availH = Math.max(1, vp.height - FOCUS_PADDING_PX * 2);
+
+    var absZoom = panZoom.getSizes().realZoom || 1; // diagram units -> screen px
+    var relZoom = panZoom.getZoom() || 1;           // 1 == initial fit
+    var targetRel = Math.min(availW / bbox.width, availH / bbox.height) / absZoom * relZoom;
+
+    panZoom.zoom(targetRel); // clamps to the configured zoom limits
+
+    var abs = panZoom.getSizes().realZoom || absZoom;
+    var centerX = vp.left + vp.width / 2 - svgRect.left;
+    var centerY = vp.top + vp.height / 2 - svgRect.top;
+    panZoom.pan({
+      x: centerX - (bbox.x + bbox.width / 2) * abs,
+      y: centerY - (bbox.y + bbox.height / 2) * abs
+    });
+    scheduleHitWidth();
+  }
+
+  /* Frame the default group on the full chart. Returns false when the group is
+     not part of the current diagram (e.g. an isolated ship's component). */
+  function focusDefaultGroup() {
+    if (!panZoom || !svgEl) return false;
+    var cluster = findClusterByLabel(DEFAULT_GROUP_LABEL);
+    if (!cluster) return false;
+    focusOnElement(cluster);
+    return true;
+  }
+
   function runSearch(query) {
     if (!svgEl) return;
     var q = query.trim().toLowerCase();
@@ -687,13 +748,17 @@
     });
     document.getElementById("reset").addEventListener("click", function () {
       if (!panZoom) return;
-      panZoom.resetZoom(); panZoom.center();
-      scheduleHitWidth();
+      // Reset means "back to the default view": drop any isolated ship so the
+      // full chart comes back, then frame the default group on it.
+      if (selectedId) { clearSelection(); return; }
+      if (!focusDefaultGroup()) { panZoom.resetZoom(); panZoom.center(); scheduleHitWidth(); }
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
     document.getElementById("search").addEventListener("input", function (e) { runSearch(e.target.value); });
     window.addEventListener("resize", function () {
-      if (panZoom) { panZoom.resize(); panZoom.fit(); panZoom.center(); }
+      if (!panZoom) return;
+      panZoom.resize(); panZoom.fit(); panZoom.center();
+      if (!selectedId && focusDefaultGroup()) return;
       scheduleHitWidth();
     });
   }
