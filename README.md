@@ -75,23 +75,39 @@ flowchart
 		n_Prospect["Prospect"]
 	end
 	subgraph s15["Cruisers"]
-		n_Arbitrator["Arbitrator"]
-		n_Augoror["Augoror"]
-		n_Bellicose["Bellicose"]
-		n_Blackbird["Blackbird"]
-		n_Caracal["Caracal"]
-		n_Celestis["Celestis"]
-		n_Exequror["Exequror"]
-		n_Maller["Maller"]
-		n_Moa["Moa"]
-		n_Omen["Omen"]
-		n_Osprey["Osprey"]
-		n_Phantom["Phantom"]
-		n_Rupture["Rupture"]
-		n_Scythe["Scythe"]
-		n_Stabber["Stabber"]
-		n_Thorax["Thorax"]
-		n_Vexor["Vexor"]
+		subgraph c_missiles["Missiles"]
+			n_Bellicose["Bellicose"]
+			n_Caracal["Caracal"]
+			n_Moa["Moa"]
+		end
+		subgraph c_proj["Projectile turrets"]
+			n_Rupture["Rupture"]
+			n_Stabber["Stabber"]
+		end
+		subgraph c_hybrid["Hybrid turrets"]
+			n_Maller["Maller"]
+			n_Thorax["Thorax"]
+		end
+		subgraph c_energy["Energy turrets"]
+			n_Omen["Omen"]
+		end
+		subgraph c_drones["Drones"]
+			n_Arbitrator["Arbitrator"]
+			n_Vexor["Vexor"]
+		end
+		subgraph c_shield["Shield logistics"]
+			n_Osprey["Osprey"]
+			n_Scythe["Scythe"]
+		end
+		subgraph c_armor["Armor logistics"]
+			n_Augoror["Augoror"]
+			n_Exequror["Exequror"]
+		end
+		subgraph c_other["Other"]
+			n_Blackbird["Blackbird"]
+			n_Celestis["Celestis"]
+			n_Phantom["Phantom"]
+		end
 	end
 	subgraph s16["EDENCOM Cruisers"]
 		n_Stormbringer["Stormbringer"]
@@ -142,15 +158,27 @@ flowchart
 		n_Leshak["Leshak"]
 	end
 	subgraph s24["Destroyers"]
-		n_Algos["Algos"]
-		n_Catalyst["Catalyst"]
-		n_Coercer["Coercer"]
-		n_Corax["Corax"]
-		n_Cormorant["Cormorant"]
-		n_Dragoon["Dragoon"]
-		n_Pioneer["Pioneer"]
-		n_Talwar["Talwar"]
-		n_Thrasher["Thrasher"]
+		subgraph d_missiles["Missiles"]
+			n_Corax["Corax"]
+			n_Talwar["Talwar"]
+		end
+		subgraph d_drones["Drones"]
+			n_Algos["Algos"]
+			n_Dragoon["Dragoon"]
+		end
+		subgraph d_hybrid["Hybrid turrets"]
+			n_Catalyst["Catalyst"]
+			n_Cormorant["Cormorant"]
+		end
+		subgraph d_energy["Energy turrets"]
+			n_Coercer["Coercer"]
+		end
+		subgraph d_proj["Projectile turrets"]
+			n_Thrasher["Thrasher"]
+		end
+		subgraph d_mining["Mining"]
+			n_Pioneer["Pioneer"]
+		end
 	end
 	subgraph s25["Precursor Destroyers"]
 		n_Kikimora["Kikimora"]
@@ -293,15 +321,27 @@ flowchart
 		n_Pacifier["Pacifier"]
 	end
 	subgraph s51["Navy Faction Destroyers"]
-		n_Algos_Navy_Issue["Algos Navy Issue"]
-		n_Catalyst_Navy_Issue["Catalyst Navy Issue"]
-		n_Coercer_Navy_Issue["Coercer Navy Issue"]
-		n_Corax_Navy_Issue["Corax Navy Issue"]
-		n_Cormorant_Navy_Issue["Cormorant Navy Issue"]
-		n_Dragoon_Navy_Issue["Dragoon Navy Issue"]
-		n_Pioneer_Consortium_Issue["Pioneer Consortium Issue"]
-		n_Talwar_Fleet_Issue["Talwar Fleet Issue"]
-		n_Thrasher_Fleet_Issue["Thrasher Fleet Issue"]
+		subgraph nd_missiles["Missiles"]
+			n_Corax_Navy_Issue["Corax Navy Issue"]
+			n_Talwar_Fleet_Issue["Talwar Fleet Issue"]
+		end
+		subgraph nd_drones["Drones"]
+			n_Algos_Navy_Issue["Algos Navy Issue"]
+			n_Dragoon_Navy_Issue["Dragoon Navy Issue"]
+		end
+		subgraph nd_hybrid["Hybrid turrets"]
+			n_Catalyst_Navy_Issue["Catalyst Navy Issue"]
+			n_Cormorant_Navy_Issue["Cormorant Navy Issue"]
+		end
+		subgraph nd_energy["Energy turrets"]
+			n_Coercer_Navy_Issue["Coercer Navy Issue"]
+		end
+		subgraph nd_proj["Projectile turrets"]
+			n_Thrasher_Fleet_Issue["Thrasher Fleet Issue"]
+		end
+		subgraph nd_mining["Mining"]
+			n_Pioneer_Consortium_Issue["Pioneer Consortium Issue"]
+		end
 	end
 	subgraph s52["Interdictors"]
 		n_Eris["Eris"]
@@ -343,14 +383,26 @@ flowchart
 		n_Rook["Rook"]
 	end
 	subgraph s58["Navy Faction Cruisers"]
-		n_Augoror_Navy_Issue["Augoror Navy Issue"]
-		n_Caracal_Navy_Issue["Caracal Navy Issue"]
-		n_Exequror_Navy_Issue["Exequror Navy Issue"]
-		n_Omen_Navy_Issue["Omen Navy Issue"]
-		n_Osprey_Navy_Issue["Osprey Navy Issue"]
-		n_Scythe_Fleet_Issue["Scythe Fleet Issue"]
-		n_Stabber_Fleet_Issue["Stabber Fleet Issue"]
-		n_Vexor_Navy_Issue["Vexor Navy Issue"]
+		subgraph nc_missiles["Missiles"]
+			n_Caracal_Navy_Issue["Caracal Navy Issue"]
+		end
+		subgraph nc_proj["Projectile turrets"]
+			n_Stabber_Fleet_Issue["Stabber Fleet Issue"]
+		end
+		subgraph nc_energy["Energy turrets"]
+			n_Omen_Navy_Issue["Omen Navy Issue"]
+		end
+		subgraph nc_drones["Drones"]
+			n_Vexor_Navy_Issue["Vexor Navy Issue"]
+		end
+		subgraph nc_shield["Shield logistics"]
+			n_Osprey_Navy_Issue["Osprey Navy Issue"]
+			n_Scythe_Fleet_Issue["Scythe Fleet Issue"]
+		end
+		subgraph nc_armor["Armor logistics"]
+			n_Augoror_Navy_Issue["Augoror Navy Issue"]
+			n_Exequror_Navy_Issue["Exeqor Navy Issue"]
+		end
 	end
 	subgraph s59["Heavy Assault Cruisers"]
 		n_Cerberus["Cerberus"]
@@ -620,41 +672,29 @@ flowchart
 	n_Damavik -->|"Entropic disintegrator"| n_Nergal
 	n_Damavik -->|"Entropic disintegrator"| n_Kikimora
 	n_Cheetah -->|"Cloak"| n_Prowler
-	n_Algos -->|"Drones"| n_Algos_Navy_Issue
 	n_Algos -->|"Drones"| n_Magus
 	n_Algos -->|"Drones"| n_Vexor
-	n_Catalyst -->|"Hybrid turrets"| n_Catalyst_Navy_Issue
 	n_Catalyst -->|"Hybrid turrets"| n_Eris
 	n_Catalyst -->|"Hybrid turrets"| n_Hecate
 	n_Catalyst -->|"Hybrid turrets"| n_Thorax
-	n_Coercer -->|"Energy turrets"| n_Coercer_Navy_Issue
 	n_Coercer -->|"Energy turrets"| n_Heretic
 	n_Coercer -->|"Energy turrets"| n_Confessor
 	n_Coercer -->|"Energy turrets"| n_Omen
-	n_Corax -->|"Missiles"| n_Corax_Navy_Issue
 	n_Corax -->|"Missiles"| n_Mamba
 	n_Corax -->|"Missiles"| n_Stork
 	n_Corax -->|"Missiles"| n_Jackdaw
 	n_Corax -->|"Missiles"| n_Caracal
-	n_Cormorant -->|"Hybrid turrets"| n_Cormorant_Navy_Issue
 	n_Cormorant -->|"Hybrid turrets"| n_Flycatcher
 	n_Cormorant -->|"Hybrid turrets"| n_Moa
-	n_Dragoon -->|"Drones"| n_Dragoon_Navy_Issue
 	n_Dragoon -->|"Drones"| n_Pontifex
 	n_Dragoon -->|"Drones"| n_Arbitrator
-	n_Pioneer -->|"Mining"| n_Pioneer_Consortium_Issue
 	n_Pioneer -->|"Mining"| n_Outrider
-	n_Talwar -->|"Missiles"| n_Talwar_Fleet_Issue
 	n_Talwar -->|"Missiles"| n_Bifrost
 	n_Talwar -->|"Missiles"| n_Bellicose
-	n_Thrasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Thrasher -->|"Projectile turrets"| n_Sabre
 	n_Thrasher -->|"Projectile turrets"| n_Svipul
 	n_Thrasher -->|"Projectile turrets"| n_Rupture
 	n_Thrasher -->|"Projectile turrets"| n_Stabber
-	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Mekubal
-	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Svipul
-	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Stabber
 	n_Mamba -->|"Missiles"| n_Gila
 	n_Mekubal -->|"Projectile turrets"| n_Khizriel
 	n_Tholos -->|"Projectile turrets"| n_Cenotaph
@@ -923,4 +963,16 @@ flowchart
 	s11 ==>|"[GROUP] Mining"| s41
 	s9 ==>|"[GROUP] Remote shield boost"| s32
 	s10 ==>|"[GROUP] Remote armor repair"| s33
+	d_missiles ==>|"[GROUP] Missiles"| nd_missiles
+	d_drones ==>|"[GROUP] Drones"| nd_drones
+	d_hybrid ==>|"[GROUP] Hybrid turrets"| nd_hybrid
+	d_energy ==>|"[GROUP] Energy turrets"| nd_energy
+	d_proj ==>|"[GROUP] Projectile turrets"| nd_proj
+	d_mining ==>|"[GROUP] Mining"| nd_mining
+	c_missiles ==>|"[GROUP] Missiles"| nc_missiles
+	c_proj ==>|"[GROUP] Projectile turrets"| nc_proj
+	c_energy ==>|"[GROUP] Energy turrets"| nc_energy
+	c_drones ==>|"[GROUP] Drones"| nc_drones
+	c_shield ==>|"[GROUP] Shield logistics"| nc_shield
+	c_armor ==>|"[GROUP] Armor logistics"| nc_armor
 ```
