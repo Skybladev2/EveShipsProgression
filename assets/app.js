@@ -72,6 +72,7 @@
     var edges = [];                         // { src, dst }
     var clusters = Object.create(null);     // id -> { label, parent, children }
     var nodeClusters = Object.create(null); // nodeId -> [clusterId, ...]
+
     var stack = [];
 
     function ensure(id) {
@@ -79,47 +80,101 @@
       return id;
     }
 
-    code.split(/\r?\n/).forEach(function (line) {
-      var s = line.trim();
-      if (!s) return;
-
-      var sub = s.match(/^subgraph\s+([A-Za-z_]\w*)\s*(?:\["([^"]*)"\])?/);
+    // First pass: collect clusters and node->cluster mappings
+    var lines = code.split(/\r?\n/);
+    var subgraphStack = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var sub = line.match(/^subgraph\s+([A-Za-z_]\w*)/);
       if (sub) {
         var cid = sub[1];
-        if (!clusters[cid]) clusters[cid] = { label: sub[2] || cid, parent: null, children: [] };
-        var parent = stack.length ? stack[stack.length - 1] : null;
+        if (!clusters[cid]) clusters[cid] = { label: cid, parent: null, children: [] };
+        var parent = subgraphStack.length ? subgraphStack[subgraphStack.length - 1] : null;
         clusters[cid].parent = parent;
         if (parent) clusters[parent].children.push(cid);
-        stack.push(cid);
-        return;
+        subgraphStack.push(cid);
+        continue;
       }
-
-      if (s === "end") { stack.pop(); return; }
-
-      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
-      if (edge) {
-        var a = ensure(edge[1]);
-        var b = ensure(edge[2]);
-        outAdj[a][b] = true;
-        inAdj[b][a] = true;
-        edges.push({ src: a, dst: b });
-        return;
-      }
-
-      var decl = s.match(/^([A-Za-z_]\w*)\s*\[/);
+      if (line === "end") { subgraphStack.pop(); continue; }
+      var decl = line.match(/^([A-Za-z_]\w*)\s*\[/);
       if (decl) {
-        var id = ensure(decl[1]);
-        nodeClusters[id] = stack.slice();
+        var nid = ensure(decl[1]);
+        nodeClusters[nid] = subgraphStack.slice();
+      }
+    }
+
+    // Build reverse mapping: cluster -> nodes in it
+    var clusterNodes = Object.create(null);
+    Object.keys(nodeClusters).forEach(function(nid) {
+      var cids = nodeClusters[nid];
+      for (var k = 0; k < cids.length; k++) {
+        var cid = cids[k];
+        if (!clusterNodes[cid]) clusterNodes[cid] = [];
+        clusterNodes[cid].push(nid);
       }
     });
 
+    // Second pass: process edges (expanding group-to-group)
+    subgraphStack = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var sub = line.match(/^subgraph\s+([A-Za-z_]\w*)/);
+      if (sub) { subgraphStack.push(sub[1]); continue; }
+      if (line === "end") { subgraphStack.pop(); continue; }
+      var edge = line.match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      if (edge) {
+        var a = edge[1];
+        var b = edge[2];
+        // Check if they're subgraphs (clusters)
+        var aIsCluster = clusters[a] !== undefined;
+        var bIsCluster = clusters[b] !== undefined;
+        if (aIsCluster && bIsCluster) {
+          // Expand: connect all nodes in a to all nodes in b
+          var nodesA = clusterNodes[a] || [];
+          var nodesB = clusterNodes[b] || [];
+          for (var na = 0; na < nodesA.length; na++) {
+            for (var nb = 0; nb < nodesB.length; nb++) {
+              var naId = ensure(nodesA[na]);
+              var nbId = ensure(nodesB[nb]);
+              outAdj[naId][nbId] = true;
+              inAdj[nbId][naId] = true;
+              edges.push({ src: naId, dst: nbId });
+            }
+          }
+        } else if (aIsCluster && !bIsCluster) {
+          var nodesA = clusterNodes[a] || [];
+          var nbId = ensure(b);
+          for (var na = 0; na < nodesA.length; na++) {
+            var naId = ensure(nodesA[na]);
+            outAdj[naId][nbId] = true;
+            inAdj[nbId][naId] = true;
+            edges.push({ src: naId, dst: nbId });
+          }
+        } else if (!aIsCluster && bIsCluster) {
+          var naId = ensure(a);
+          var nodesB = clusterNodes[b] || [];
+          for (var nb = 0; nb < nodesB.length; nb++) {
+            var nbId = ensure(nodesB[nb]);
+            outAdj[naId][nbId] = true;
+            inAdj[nbId][naId] = true;
+            edges.push({ src: naId, dst: nbId });
+          }
+        } else {
+          // Both are nodes
+          var naId = ensure(a);
+          var nbId = ensure(b);
+          outAdj[naId][nbId] = true;
+          inAdj[nbId][naId] = true;
+          edges.push({ src: naId, dst: nbId });
+        }
+        continue;
+      }
+    }
+
     return { nodes: nodes, outAdj: outAdj, inAdj: inAdj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
   }
-
-  /* Ships kept when `id` is isolated: the ones reachable from it (its
-     variants) plus the ones that can reach it (its progression ancestors).
-     Traversal is directed, so a ship that merely shares a descendant — a
-     dead end, say — is not pulled in. */
   function connectedComponent(id) {
     var visible = Object.create(null);
     visible[id] = true;
@@ -167,9 +222,17 @@
         return;
       }
 
-      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
       if (edge) {
-        if (visible[edge[1]] && visible[edge[2]]) out.push(line);
+        var a = edge[1], b = edge[2];
+        var aIsCluster = graph.clusters[a] !== undefined;
+        var bIsCluster = graph.clusters[b] !== undefined;
+        // A group-to-group edge is kept only while both of its subgraph
+        // blocks survive the filter. Otherwise Mermaid would draw a phantom
+        // node for the dropped group id, showing a raw `s2`-style name.
+        var keep = aIsCluster ? !!needed[a] : !!visible[a];
+        if (keep) keep = bIsCluster ? !!needed[b] : !!visible[b];
+        if (keep) out.push(line);
         return;
       }
 
