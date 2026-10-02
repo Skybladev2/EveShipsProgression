@@ -147,19 +147,31 @@ flowchart
 		n_Drekavac["Drekavac"]
 	end
 	subgraph s21["Battleships"]
-		n_Abaddon["Abaddon"]
-		n_Apocalypse["Apocalypse"]
-		n_Armageddon["Armageddon"]
-		n_Dominix["Dominix"]
-		n_Eidolon["Eidolon"]
-		n_Hyperion["Hyperion"]
-		n_Maelstrom["Maelstrom"]
-		n_Megathron["Megathron"]
-		n_Raven["Raven"]
-		n_Rokh["Rokh"]
-		n_Scorpion["Scorpion"]
-		n_Tempest["Tempest"]
-		n_Typhoon["Typhoon"]
+		subgraph bs_missiles["Missiles"]
+			n_Raven["Raven"]
+			n_Scorpion["Scorpion"]
+			n_Typhoon["Typhoon"]
+		end
+		subgraph bs_proj["Projectile turrets"]
+			n_Maelstrom["Maelstrom"]
+			n_Tempest["Tempest"]
+		end
+		subgraph bs_hybrid["Hybrid turrets"]
+			n_Hyperion["Hyperion"]
+			n_Megathron["Megathron"]
+			n_Rokh["Rokh"]
+		end
+		subgraph bs_energy["Energy turrets"]
+			n_Abaddon["Abaddon"]
+			n_Apocalypse["Apocalypse"]
+			n_Armageddon["Armageddon"]
+		end
+		subgraph bs_drones["Drones"]
+			n_Dominix["Dominix"]
+		end
+		subgraph bs_logi["Logistics"]
+			n_Eidolon["Eidolon"]
+		end
 	end
 	subgraph s22["EDENCOM Battleships"]
 		n_Thunderchild["Thunderchild"]
@@ -493,14 +505,24 @@ flowchart
 		n_Khizriel["Khizriel"]
 	end
 	subgraph s68["Navy Faction Battleships"]
-		n_Apocalypse_Navy_Issue["Apocalypse Navy Issue"]
-		n_Armageddon_Navy_Issue["Armageddon Navy Issue"]
-		n_Dominix_Navy_Issue["Dominix Navy Issue"]
-		n_Megathron_Navy_Issue["Megathron Navy Issue"]
-		n_Raven_Navy_Issue["Raven Navy Issue"]
-		n_Scorpion_Navy_Issue["Scorpion Navy Issue"]
-		n_Tempest_Fleet_Issue["Tempest Fleet Issue"]
-		n_Typhoon_Fleet_Issue["Typhoon Fleet Issue"]
+		subgraph nbs_missiles["Missiles"]
+			n_Raven_Navy_Issue["Raven Navy Issue"]
+			n_Scorpion_Navy_Issue["Scorpion Navy Issue"]
+			n_Typhoon_Fleet_Issue["Typhoon Fleet Issue"]
+		end
+		subgraph nbs_proj["Projectile turrets"]
+			n_Tempest_Fleet_Issue["Tempest Fleet Issue"]
+		end
+		subgraph nbs_hybrid["Hybrid turrets"]
+			n_Megathron_Navy_Issue["Megathron Navy Issue"]
+		end
+		subgraph nbs_energy["Energy turrets"]
+			n_Apocalypse_Navy_Issue["Apocalypse Navy Issue"]
+			n_Armageddon_Navy_Issue["Armageddon Navy Issue"]
+		end
+		subgraph nbs_drones["Drones"]
+			n_Dominix_Navy_Issue["Dominix Navy Issue"]
+		end
 	end
 	subgraph s69["Black Ops"]
 		n_Panther["Panther"]
@@ -1000,4 +1022,9 @@ flowchart
 	bc_hybrid ==>|"[GROUP] Hybrid turrets"| nbc_hybrid
 	bc_energy ==>|"[GROUP] Energy turrets"| nbc_energy
 	bc_drones ==>|"[GROUP] Drones"| nbc_drones
+	bs_missiles ==>|"[GROUP] Missiles"| nbs_missiles
+	bs_proj ==>|"[GROUP] Projectile turrets"| nbs_proj
+	bs_hybrid ==>|"[GROUP] Hybrid turrets"| nbs_hybrid
+	bs_energy ==>|"[GROUP] Energy turrets"| nbs_energy
+	bs_drones ==>|"[GROUP] Drones"| nbs_drones
 ```
