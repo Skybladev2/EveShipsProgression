@@ -273,14 +273,22 @@ flowchart
 		end
 	end
 	subgraph s42["Interceptors"]
-		n_Ares["Ares"]
-		n_Claw["Claw"]
-		n_Crow["Crow"]
-		n_Crusader["Crusader"]
-		n_Malediction["Malediction"]
-		n_Raptor["Raptor"]
-		n_Stiletto["Stiletto"]
-		n_Taranis["Taranis"]
+		subgraph s42_projectile["Projectile turrets"]
+			n_Claw["Claw"]
+			n_Stiletto["Stiletto"]
+		end
+		subgraph s42_missiles["Missiles"]
+			n_Crow["Crow"]
+			n_Raptor["Raptor"]
+		end
+		subgraph s42_hybrid["Hybrid turrets"]
+			n_Ares["Ares"]
+			n_Taranis["Taranis"]
+		end
+		subgraph s42_energy["Energy turrets"]
+			n_Crusader["Crusader"]
+			n_Malediction["Malediction"]
+		end
 	end
 	subgraph s43["Pirate Faction Frigates"]
 		n_Astero["Astero"]
@@ -644,19 +652,15 @@ flowchart
 	subgraph s88["Expedition Command Ships"]
 		n_Odysseus["Odysseus"]
 	end
-	n_Atron -->|"Hybrid turrets"| n_Ares
-	n_Atron -->|"Hybrid turrets"| n_Taranis
+	n_Atron -->|"Tackle"| s42_hybrid
 	n_Breacher -->|"Missiles"| n_Jaguar
 	n_Breacher -.->|"Missiles"| n_Hound
 	n_Breacher -->|"Missiles"| n_Talwar
-	n_Condor -->|"Missiles"| n_Crow
-	n_Condor -->|"Missiles"| n_Raptor
-	n_Condor -->|"Tackle"| s42
+	n_Condor -->|"Tackle"| s42_missiles
 	n_Crucifier -->|"Weapon disruption"| n_Crucifier_Navy_Issue
 	n_Crucifier -->|"Weapon disruption"| n_Herald
 	n_Crucifier -->|"Weapon disruption"| n_Sentinel
-	n_Executioner -->|"Energy turrets"| n_Crusader
-	n_Executioner -->|"Energy turrets"| n_Malediction
+	n_Executioner -->|"Tackle"| s42_energy
 	n_Executioner -->|"Energy turrets"| n_Coercer
 	n_Griffin -->|"ECM"| n_Griffin_Navy_Issue
 	n_Griffin -->|"ECM"| n_Kitsune
@@ -688,9 +692,7 @@ flowchart
 	n_Punisher -->|"Energy turrets"| n_Maller
 	n_Rifter -->|"Projectile turrets"| n_Jaguar
 	n_Rifter -->|"Projectile turrets"| n_Wolf
-	n_Slasher -->|"Projectile turrets"| n_Claw
-	n_Slasher -->|"Projectile turrets"| n_Stiletto
-	n_Slasher -->|"Tackle"| s42
+	n_Slasher -->|"Tackle"| s42_projectile
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Tristan -->|"Drones"| n_Algos
