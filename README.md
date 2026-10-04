@@ -655,13 +655,11 @@ flowchart
 	n_Atron -->|"Tackle"| s42_hybrid
 	n_Breacher -->|"Missiles"| n_Jaguar
 	n_Breacher -.->|"Missiles"| n_Hound
-	n_Breacher -->|"Missiles"| n_Talwar
 	n_Condor -->|"Tackle"| s42_missiles
 	n_Crucifier -->|"Weapon disruption"| n_Crucifier_Navy_Issue
 	n_Crucifier -->|"Weapon disruption"| n_Herald
 	n_Crucifier -->|"Weapon disruption"| n_Sentinel
 	n_Executioner -->|"Tackle"| s42_energy
-	n_Executioner -->|"Energy turrets"| n_Coercer
 	n_Griffin -->|"ECM"| n_Griffin_Navy_Issue
 	n_Griffin -->|"ECM"| n_Kitsune
 	n_Heron -->|"Scan"| n_Heron_Navy_Issue
@@ -669,17 +667,14 @@ flowchart
 	n_Imicus -->|"Scan"| n_Helios
 	n_Incursus -->|"Hybrid turrets"| n_Enyo
 	n_Incursus -->|"Hybrid turrets"| n_Ishkur
-	n_Incursus -->|"Hybrid turrets"| n_Catalyst
 	n_Inquisitor -->|"Remote armor repair"| n_Purifier
 	n_Kestrel -->|"Missiles"| n_Manticore
-	n_Kestrel -->|"Missiles"| n_Corax
 	n_Magnate -->|"Scan"| n_Anathema
 	n_Maulus -->|"Sensor dampening"| n_Maulus_Navy_Issue
 	n_Maulus -->|"Sensor dampening"| n_Keres
 	n_Merlin -->|"Hybrid turrets"| n_Worm
 	n_Merlin -->|"Hybrid turrets"| n_Harpy
 	n_Merlin -->|"Hybrid turrets"| n_Hawk
-	n_Merlin -->|"Hybrid turrets"| n_Cormorant
 	n_Probe -->|"Scan"| n_Probe_Fleet_Issue
 	n_Probe -->|"Scan"| n_Astero
 	n_Probe -->|"Scan"| n_Cheetah
@@ -688,7 +683,6 @@ flowchart
 	n_Probe -->|"Cargo"| n_Mammoth
 	n_Punisher -->|"Energy turrets"| n_Retribution
 	n_Punisher -->|"Energy turrets"| n_Vengeance
-	n_Punisher -->|"Energy turrets"| n_Coercer
 	n_Punisher -->|"Energy turrets"| n_Maller
 	n_Rifter -->|"Projectile turrets"| n_Wolf
 	n_Slasher -->|"Tackle"| s42_projectile
@@ -722,7 +716,6 @@ flowchart
 	n_Damavik -->|"Entropic disintegrator"| n_Kikimora
 	n_Cheetah -->|"Cloak"| n_Prowler
 	n_Algos -->|"Drones"| n_Magus
-	n_Algos -->|"Drones"| n_Vexor
 	n_Catalyst -->|"Hybrid turrets"| n_Eris
 	n_Catalyst -->|"Hybrid turrets"| n_Hecate
 	n_Catalyst -->|"Hybrid turrets"| n_Thorax
@@ -732,18 +725,13 @@ flowchart
 	n_Corax -->|"Missiles"| n_Mamba
 	n_Corax -->|"Missiles"| n_Stork
 	n_Corax -->|"Missiles"| n_Jackdaw
-	n_Corax -->|"Missiles"| n_Caracal
 	n_Cormorant -->|"Hybrid turrets"| n_Flycatcher
 	n_Cormorant -->|"Hybrid turrets"| n_Moa
 	n_Dragoon -->|"Drones"| n_Pontifex
-	n_Dragoon -->|"Drones"| n_Arbitrator
 	n_Pioneer -->|"Mining"| n_Outrider
 	n_Talwar -->|"Missiles"| n_Bifrost
-	n_Talwar -->|"Missiles"| n_Bellicose
 	n_Thrasher -->|"Projectile turrets"| n_Sabre
 	n_Thrasher -->|"Projectile turrets"| n_Svipul
-	n_Thrasher -->|"Projectile turrets"| n_Rupture
-	n_Thrasher -->|"Projectile turrets"| n_Stabber
 	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Stabber
 	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Svipul
 	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Mekubal
@@ -758,22 +746,18 @@ flowchart
 	n_Arbitrator -->|"Drones"| n_Penitence
 	n_Arbitrator -->|"Drones"| n_Pilgrim
 	n_Arbitrator -->|"Drones"| n_Prophecy
-	n_Augoror -->|"Remote armor repair"| n_Augoror_Navy_Issue
 	n_Augoror -->|"Remote armor repair"| n_Guardian
 	n_Bellicose -->|"Missiles"| n_Scythe_Fleet_Issue
 	n_Bellicose -.->|"Missiles"| n_Orthrus
 	n_Bellicose -->|"Missiles"| n_Muninn
 	n_Bellicose -->|"Target paint"| n_Huginn
 	n_Bellicose -->|"Missiles"| n_Rapier
-	n_Bellicose -->|"HML and HAML rate of fire"| n_Cyclone
 	n_Blackbird -->|"ECM"| n_Falcon
 	n_Blackbird -->|"ECM"| n_Rook
 	n_Caracal -->|"Missiles"| n_Caracal_Navy_Issue
 	n_Caracal -->|"Missiles"| n_Cerberus
-	n_Caracal -->|"Missiles"| n_Drake
 	n_Celestis -->|"Sensor dampening"| n_Arazu
 	n_Celestis -->|"Sensor dampening"| n_Lachesis
-	n_Exequror -->|"Remote armor repair"| n_Exequror_Navy_Issue
 	n_Exequror -->|"Remote armor repair"| n_Oneiros
 	n_Maller -->|"Energy turrets"| n_Sacrilege
 	n_Maller -->|"Energy turrets"| n_Devoter
@@ -785,26 +769,19 @@ flowchart
 	n_Omen -->|"Energy turrets"| n_Omen_Navy_Issue
 	n_Omen -->|"Energy turrets"| n_Zealot
 	n_Omen -->|"Energy turrets"| n_Harbinger
-	n_Osprey -->|"Remote shield boost"| n_Osprey_Navy_Issue
 	n_Osprey -->|"Remote shield boost"| n_Basilisk
 	n_Phantom -->|"Missiles"| n_Eidolon
 	n_Rupture -->|"Projectile turrets"| n_Scythe_Fleet_Issue
-	n_Rupture -->|"Projectile turrets"| n_Stabber_Fleet_Issue
 	n_Rupture -->|"Projectile turrets"| n_Muninn
 	n_Rupture -->|"Projectile turrets"| n_Vagabond
 	n_Rupture -->|"Projectile turrets"| n_Huginn
 	n_Rupture -->|"Projectile turrets"| n_Broadsword
-	n_Rupture -->|"Projectile Turret damage"| n_Hurricane
-	n_Scythe -->|"Remote shield boost"| n_Scythe_Fleet_Issue
 	n_Scythe -->|"Remote shield boost, Logistic drones"| n_Scimitar
 	n_Stabber -->|"Projectile turrets"| n_Rupture
 	n_Stabber -->|"Projectile turrets"| n_Scythe_Fleet_Issue
-	n_Stabber -->|"Projectile turrets"| n_Stabber_Fleet_Issue
 	n_Stabber -->|"Projectile turrets"| n_Vagabond
 	n_Stabber -->|"Projectile turrets"| n_Huginn
 	n_Stabber -->|"Projectile turrets"| n_Broadsword
-	n_Stabber -->|"Projectile turrets"| n_Hurricane
-	n_Stabber -->|"Projectile turrets"| n_Tornado
 	n_Thorax -->|"Hybrid turrets"| n_Vigilant
 	n_Thorax -->|"Hybrid turrets"| n_Deimos
 	n_Thorax -->|"Hybrid turrets"| n_Phobos
@@ -837,52 +814,31 @@ flowchart
 	n_Broadsword -->|"Projectile turrets"| n_Loki
 	n_Scimitar -->|"Remote shield boost, Logistic drones"| n_Lif
 	n_Brutix -->|"Hybrid turrets"| n_Talos
-	n_Brutix -->|"Hybrid turrets"| n_Brutix_Navy_Issue
 	n_Brutix -->|"Hybrid turrets"| n_Astarte
-	n_Brutix -->|"Hybrid turrets"| n_Hyperion
-	n_Brutix -->|"Hybrid turrets"| n_Megathron
-	n_Cyclone -->|"Missiles"| n_Cyclone_Fleet_Issue
 	n_Cyclone -->|"Missiles"| n_Claymore
-	n_Cyclone -->|"Missiles"| n_Typhoon
-	n_Drake -->|"Missiles"| n_Drake_Navy_Issue
 	n_Drake -->|"Missiles"| n_Alligator
 	n_Drake -->|"Missiles"| n_Nighthawk
-	n_Drake -->|"Missiles"| n_Raven
 	n_Ferox -->|"Hybrid turrets"| n_Naga
-	n_Ferox -->|"Hybrid turrets"| n_Ferox_Navy_Issue
 	n_Ferox -->|"Hybrid turrets"| n_Vulture
-	n_Ferox -->|"Hybrid turrets"| n_Rokh
 	n_Harbinger -->|"Energy turrets"| n_Oracle
-	n_Harbinger -->|"Energy turrets"| n_Harbinger_Navy_Issue
 	n_Harbinger -->|"Energy turrets"| n_Absolution
-	n_Harbinger -->|"Energy turrets"| n_Abaddon
-	n_Harbinger -->|"Energy turrets"| n_Apocalypse
 	n_Hurricane -->|"Projectile turrets"| n_Hurricane_Fleet_Issue
 	n_Hurricane -->|"Projectile turrets"| n_Sleipnir
-	n_Hurricane -->|"Projectile turrets"| n_Maelstrom
-	n_Hurricane -->|"Projectile turrets"| n_Tempest
 	n_Myrmidon -->|"Drones"| n_Myrmidon_Navy_Issue
 	n_Myrmidon -->|"Drones"| n_Eos
 	n_Myrmidon -->|"Drones"| n_Dominix
-	n_Prophecy -->|"Drones"| n_Prophecy_Navy_Issue
 	n_Prophecy -->|"Drones"| n_Damnation
-	n_Prophecy -->|"Drones"| n_Armageddon
-	n_Tornado -->|"Projectile turrets"| n_Maelstrom
-	n_Tornado -->|"Projectile turrets"| n_Tempest
 	n_Hurricane_Fleet_Issue -->|"Projectile turrets"| n_Khizriel
 	n_Alligator -->|"Missiles"| n_Rattlesnake
 	n_Khizriel -->|"Projectile turrets"| n_Machariel
 	n_Drekavac -->|"Entropic disintegrator"| n_Leshak
 	n_Claymore -->|"Command bursts"| n_Nidhoggur
-	n_Apocalypse -->|"Energy turrets"| n_Apocalypse_Navy_Issue
 	n_Apocalypse -->|"Energy turrets"| n_Paladin
 	n_Apocalypse -->|"Energy turrets"| n_Revelation
-	n_Armageddon -->|"Drones"| n_Armageddon_Navy_Issue
 	n_Armageddon -->|"Drones"| n_Bhaalgorn
 	n_Armageddon -->|"Drones"| n_Redeemer
 	n_Dominix -->|"Drones"| n_Dominix_Navy_Issue
 	n_Dominix -->|"Drones"| n_Sin
-	n_Maelstrom -->|"Projectile turrets"| n_Tempest_Fleet_Issue
 	n_Maelstrom -->|"Projectile turrets"| n_Typhoon_Fleet_Issue
 	n_Maelstrom -->|"Projectile turrets"| n_Panther
 	n_Maelstrom -->|"Projectile turrets"| n_Vargur
@@ -892,19 +848,15 @@ flowchart
 	n_Megathron -->|"Hybrid turrets"| n_Vindicator
 	n_Megathron -->|"Hybrid turrets"| n_Kronos
 	n_Megathron -->|"Hybrid turrets"| n_Moros
-	n_Raven -->|"Missiles"| n_Raven_Navy_Issue
 	n_Raven -->|"Missiles"| n_Golem
 	n_Raven -->|"Missiles"| n_Phoenix
-	n_Scorpion -->|"ECM"| n_Scorpion_Navy_Issue
 	n_Scorpion -->|"ECM"| n_Rattlesnake
 	n_Scorpion -->|"ECM"| n_Widow
 	n_Tempest -->|"Projectile turrets"| n_Maelstrom
-	n_Tempest -->|"Projectile turrets"| n_Tempest_Fleet_Issue
 	n_Tempest -->|"Projectile turrets"| n_Typhoon_Fleet_Issue
 	n_Tempest -->|"Projectile turrets"| n_Panther
 	n_Tempest -->|"Projectile turrets"| n_Vargur
 	n_Tempest -->|"Projectile turrets"| n_Naglfar
-	n_Typhoon -->|"Missiles"| n_Typhoon_Fleet_Issue
 	n_Typhoon -.->|"Missiles"| n_Barghest
 	n_Typhoon -->|"Missiles"| n_Panther
 	n_Tempest_Fleet_Issue -->|"Projectile turrets"| n_Machariel
@@ -1003,6 +955,7 @@ flowchart
 	c_armor ==>|"Armor logistics"| nc_armor
 	bc_missiles ==>|"Missiles"| nbc_missiles
 	bc_proj ==>|"Projectile turrets"| nbc_proj
+	bc_proj ==>|"Projectile turrets"| bs_proj
 	bc_hybrid ==>|"Hybrid turrets"| nbc_hybrid
 	bc_energy ==>|"Energy turrets"| nbc_energy
 	bc_drones ==>|"Drones"| nbc_drones
@@ -1013,4 +966,15 @@ flowchart
 	bs_drones ==>|"Drones"| nbs_drones
 	s48 ==>|"Cargo"| s81
 	s48 ==>|"Cargo"| s82
+	s2 ==>|"Missiles"| d_missiles
+	s5 ==>|"Energy turrets"| d_energy
+	s4 ==>|"Hybrid turrets"| d_hybrid
+	d_drones ==>|"Drones"| c_drones
+	d_missiles ==>|"Missiles"| c_missiles
+	d_proj ==>|"Projectile turrets"| c_proj
+	c_missiles ==>|"Missiles"| bc_missiles
+	c_proj ==>|"Projectile turrets"| bc_proj
+	bc_hybrid ==>|"Hybrid turrets"| bs_hybrid
+	bc_missiles ==>|"Missiles"| bs_missiles
+	bc_energy ==>|"Energy turrets"| bs_energy
 ```
