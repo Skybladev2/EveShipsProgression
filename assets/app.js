@@ -50,6 +50,7 @@
   var pendingView = null;
 
   var EDGE_HIT_PX = 18;     // clickable edge width, in screen pixels
+  var EDGE_STROKE_PX = 1.6; // visible edge width, in screen pixels
   var EDGE_DASH_PX = 6;     // dash length of weak links, in screen pixels
   var EDGE_GAP_PX = 5;      // gap length of weak links, in screen pixels
   var hitWidthRaf = null;   // debounces hit-width updates during zoom/pan
@@ -440,6 +441,10 @@
       if (vb && vb.width && rect && rect.width) scale = rect.width / vb.width;
     }
     svgEl.style.setProperty("--edge-hit-w", (EDGE_HIT_PX / (scale || 1)) + "px");
+    // The visible edges are sized in user units (so their dashes keep the
+    // screen-pixel length set below); the var just keeps the width constant
+    // on screen, matching the hit strokes.
+    svgEl.style.setProperty("--edge-w", (EDGE_STROKE_PX / (scale || 1)) + "px");
     svgEl.style.setProperty("--edge-dash", (EDGE_DASH_PX / (scale || 1)) + " " + (EDGE_GAP_PX / (scale || 1)));
   }
 
@@ -537,12 +542,26 @@
      "Projectile turrets → Claw". Group targets show their full path,
      e.g. "Missiles → Cruisers/Missiles". Shown on the first hover frame,
      with no delay or fade, so it feels immediate. */
+  /* Mermaid wraps a multi-word edge label into one row per word, each word in
+     its own <tspan>. textContent then glues the rows together ("Weapon" +
+     "disruption" -> "Weapondisruption"), so read the leaf tspans and rejoin
+     them with a space. */
+  function edgeLabelText(labelEl) {
+    var words = collect(labelEl, "tspan").filter(function (t) {
+      return !t.querySelector("tspan");
+    });
+    var text = words.length
+      ? words.map(function (t) { return t.textContent; }).join(" ")
+      : labelEl.textContent;
+    return text.replace(/\s+/g, " ").trim();
+  }
+
   function showEdgeTooltip(e, edgeId) {
     var tip = ensureTooltip();
     if (tip.hidden || edgeId !== tooltipEdgeId) {
       tooltipEdgeId = edgeId;
       var label = domIndex && domIndex.labelByEdgeId[edgeId];
-      var text = label ? label.textContent.replace(/\s+/g, " ").trim() : "";
+      var text = label ? edgeLabelText(label) : "";
       var ends = edgeEndpoints(edgeId);
       var name = ends ? endpointName(ends[1]) : "";
       tip.textContent = text && name ? text + " → " + name : (name || text);

@@ -101,8 +101,10 @@ button:active { transform: translateY(1px); }
 }
 #graph svg .edgePaths .path,
 #graph svg .flowchart-link {
-  stroke-width: 1.6px !important;
-  vector-effect: non-scaling-stroke;
+  /* Width is set from JS in user units so it stays a constant 1.6 screen
+     pixels; sizing it with non-scaling-stroke would also rescale the
+     screen-pixel dash pattern set on weak links and blow it up. */
+  stroke-width: var(--edge-w, 5px) !important;
 }
 
 .statusbar {
