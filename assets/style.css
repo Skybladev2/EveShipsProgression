@@ -5,6 +5,8 @@
   --text: #e7edf6;
   --muted: #8b98ac;
   --accent: #ffd54a;
+  --node-border: #c8d2e2;
+  --cluster-border: #46566e;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -79,6 +81,29 @@ button:active { transform: translateY(1px); }
 }
 #graph { position: absolute; inset: 0; }
 #graph svg { display: block; width: 100%; height: 100%; }
+
+/* Mermaid paints node and cluster outlines in diagram units, so a 1px border
+   collapses to a barely-visible hairline while the chart is zoomed out. Draw
+   them flat (no gradient) and in screen pixels instead, so the boxes stay
+   crisp and bright at any zoom. */
+#graph svg .node rect,
+#graph svg .node polygon,
+#graph svg .node circle,
+#graph svg .node ellipse {
+  stroke: var(--node-border) !important;
+  stroke-width: 2px !important;
+  vector-effect: non-scaling-stroke;
+}
+#graph svg .cluster rect {
+  stroke: var(--cluster-border) !important;
+  stroke-width: 2px !important;
+  vector-effect: non-scaling-stroke;
+}
+#graph svg .edgePaths .path,
+#graph svg .flowchart-link {
+  stroke-width: 1.6px !important;
+  vector-effect: non-scaling-stroke;
+}
 
 .statusbar {
   display: flex;

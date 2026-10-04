@@ -887,14 +887,15 @@
         primaryColor: "#1b2432",
         primaryTextColor: "#e7edf6",
         primaryBorderColor: "#3a475d",
-        lineColor: "#56657e",
+        lineColor: "#9aa8bf",
         secondaryColor: "#182130",
         tertiaryColor: "#121823",
         clusterBkg: "#0f141d",
-        clusterBorder: "#2a3444",
+        clusterBorder: "#46566e",
         fontSize: "24px"
       },
       flowchart: {
+        look: "classic",
         useMaxWidth: false,
         htmlLabels: false,
         minNodeWidth: 16,
