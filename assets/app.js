@@ -20,6 +20,7 @@
   var statusEl = document.getElementById("status");
   var viewport = document.getElementById("viewport");
   var panZoom = null;
+  var panZoomSvg = null;  // svg element the current panZoom instance controls
   var svgEl = null;
 
   /* Mermaid builds the diagram inside a temporary element before handing back
@@ -431,7 +432,14 @@
     var sample = svgEl.querySelector("path.edge-hit");
     if (!sample) return;
     var scale = 1;
-    if (sample.getScreenCTM) {
+    // svg-pan-zoom updates its own zoom state synchronously but writes the DOM
+    // transform on the next animation frame. Right after a programmatic zoom
+    // getScreenCTM can therefore still report the previous scale, which would
+    // leave the edges sized for the old view. Trust the library's live zoom for
+    // the svg it controls and fall back to measuring the rendered transform.
+    if (panZoom && panZoomSvg === svgEl) {
+      try { scale = panZoom.getSizes().realZoom || 1; } catch (e) { scale = 1; }
+    } else if (sample.getScreenCTM) {
       var m = sample.getScreenCTM();
       if (m) scale = Math.sqrt(m.a * m.a + m.b * m.b) || 1;
     }
@@ -623,6 +631,7 @@
 
   function initPanZoom(svg) {
     if (panZoom) { try { panZoom.destroy(); } catch (e) { /* ignore */ } panZoom = null; }
+    panZoomSvg = null;
     if (!window.svgPanZoom) return;
     panZoom = svgPanZoom(svg, {
       controlIconsEnabled: false,
@@ -636,6 +645,7 @@
       onZoom: scheduleHitWidth,
       onPan: scheduleHitWidth
     });
+    panZoomSvg = svg;
     updateHitWidth();
   }
 

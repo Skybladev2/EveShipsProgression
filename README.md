@@ -692,6 +692,7 @@ flowchart
 	n_Punisher -->|"Energy turrets"| n_Maller
 	n_Rifter -->|"Projectile turrets"| n_Wolf
 	n_Slasher -->|"Tackle"| s42_projectile
+	n_Slasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Tristan -->|"Drones"| n_Algos
@@ -743,6 +744,9 @@ flowchart
 	n_Thrasher -->|"Projectile turrets"| n_Svipul
 	n_Thrasher -->|"Projectile turrets"| n_Rupture
 	n_Thrasher -->|"Projectile turrets"| n_Stabber
+	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Stabber
+	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Svipul
+	n_Thrasher_Fleet_Issue -->|"Projectile turrets"| n_Mekubal
 	n_Mamba -->|"Missiles"| n_Gila
 	n_Mekubal -->|"Projectile turrets"| n_Khizriel
 	n_Tholos -->|"Projectile turrets"| n_Cenotaph
