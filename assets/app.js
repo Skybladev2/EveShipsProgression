@@ -230,6 +230,25 @@
     return visible;
   }
 
+  /* Deepest subgraph a ship lives in, e.g. n_Hurricane -> bc_proj. Used to
+     decide which group a filtered connection belongs to. */
+  function deepestCluster(nid) {
+    var chain = graph.nodeClusters[nid];
+    return chain && chain.length ? chain[chain.length - 1] : null;
+  }
+
+  /* True when `cid` is `ancestor` or sits inside it. Keeps a group edge from
+     being drawn between a group and its own container. */
+  function clusterContains(ancestor, cid) {
+    var guard = 0;
+    while (cid && guard++ < 50) {
+      if (cid === ancestor) return true;
+      var cluster = graph.clusters[cid];
+      cid = cluster ? cluster.parent : null;
+    }
+    return false;
+  }
+
   /* Rebuild the Mermaid source keeping only the visible ships: their node
      declarations, the edges between them and the subgraphs that still hold
      something. Everything else is dropped so the layout recomputes compactly. */
@@ -263,6 +282,41 @@
       return false;
     }
 
+    /* Ships whose connection is expressed at group level: several ship-to-ship
+       edges that all run between the same two subgraphs collapse into a single
+       group edge, so every isolated view stays readable however it is filtered.
+       The label is the source subgroup's name when the edges agree on it, and
+       otherwise the most common edge label. */
+    var shipGroups = Object.create(null); // "srcGroup\tdstGroup" -> { src, dst, labels, count }
+    code.split(/\r?\n/).forEach(function (line) {
+      var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|"([^"]*)"\|\s*)?([A-Za-z_]\w*)/);
+      if (!m) return;
+      var a = m[1], b = m[3];
+      if (graph.clusters[a] !== undefined || graph.clusters[b] !== undefined) return;
+      if (!visible[a] || !visible[b] || coveredByGroup(a, b)) return;
+      var src = deepestCluster(a), dst = deepestCluster(b);
+      if (!src || !dst || src === dst) return;
+      if (clusterContains(src, dst) || clusterContains(dst, src)) return;
+      var key = src + "\t" + dst;
+      var g = shipGroups[key] || (shipGroups[key] = { src: src, dst: dst, labels: Object.create(null), count: 0 });
+      g.count++;
+      var label = m[2] || "";
+      g.labels[label] = (g.labels[label] || 0) + 1;
+    });
+
+    var mergedGroups = Object.create(null); // "srcGroup\tdstGroup" -> { src, dst, label }
+    Object.keys(shipGroups).forEach(function (key) {
+      var g = shipGroups[key];
+      if (g.count < 2) return;
+      var name = displayNames[g.src] || "";
+      var labels = Object.keys(g.labels).sort(function (x, y) {
+        var xn = x === name ? 1 : 0, yn = y === name ? 1 : 0;
+        if (xn !== yn) return yn - xn;
+        return g.labels[y] - g.labels[x];
+      });
+      mergedGroups[key] = { src: g.src, dst: g.dst, label: labels[0] || "" };
+    });
+
     var out = [];
     var stack = [];
     code.split(/\r?\n/).forEach(function (line) {
@@ -295,6 +349,10 @@
                  (bIsCluster ? !!needed[b] : !!visible[b]);
         } else {
           keep = !!visible[a] && !!visible[b] && !coveredByGroup(a, b);
+          if (keep) {
+            var src = deepestCluster(a), dst = deepestCluster(b);
+            if (src && dst && mergedGroups[src + "\t" + dst]) keep = false;
+          }
         }
         if (keep) out.push(line);
         return;
@@ -306,6 +364,11 @@
         return;
       }
       out.push(line); // the `flowchart` header and anything else
+    });
+
+    Object.keys(mergedGroups).forEach(function (key) {
+      var g = mergedGroups[key];
+      out.push("\t" + g.src + " ==>|" + JSON.stringify(g.label) + "| " + g.dst);
     });
 
     return out.join("\n");
