@@ -187,3 +187,23 @@ button:active { transform: translateY(1px); }
   fill: lightgrey;
   fill: context-stroke;
 }
+
+/* floating label for the connection under the cursor; shown on the first
+   hover frame, so it has no fade or transition of its own */
+.edge-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  max-width: 340px;
+  padding: 5px 9px;
+  background: #0e131c;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: 12px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+}
+.edge-tooltip[hidden] { display: none; }

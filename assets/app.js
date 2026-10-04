@@ -40,6 +40,9 @@
   var domIndex = null;    // rendered elements keyed by source id
   var selectedId = null;  // currently isolated ship, or null for the full chart
   var selectedEdgeId = null; // currently highlighted edge (does not filter)
+  var displayNames = Object.create(null); // source id -> label shown on the chart
+  var tooltipEl = null;   // floating tooltip for the edge under the cursor
+  var tooltipEdgeId = null; // edge the tooltip currently describes
 
   var renderSeq = 0;      // unique Mermaid render ids
   var viewToken = 0;      // guards against stale async renders
@@ -192,6 +195,19 @@
 
     return { nodes: nodes, outAdj: outAdj, inAdj: inAdj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
   }
+
+  /* Map every node and subgraph id to the label shown on the chart, so the
+     tooltip can name the ship an edge leads to. Both `n_X["Name"]` node
+     declarations and `subgraph sN["Name"]` blocks use the same shape. */
+  function buildDisplayNames(code) {
+    var names = Object.create(null);
+    code.split(/\r?\n/).forEach(function (line) {
+      var m = line.trim().match(/^(?:subgraph\s+)?([A-Za-z_]\w*)\s*\["([^"]*)"\]/);
+      if (m) names[m[1]] = m[2];
+    });
+    return names;
+  }
+
   function connectedComponent(id) {
     var visible = Object.create(null);
     visible[id] = true;
@@ -462,6 +478,97 @@
     return null;
   }
 
+  /* Like splitEndpoints, but also accepts subgraph ids as endpoints, so the
+     tooltip works on group connections ("Slasher -> Interceptors") too. */
+  function edgeEndpoints(edgeId) {
+    var mid = edgeId.replace(/^L_/, "").replace(/_\d+$/, "");
+    for (var i = mid.length - 1; i > 0; i--) {
+      if (mid.charAt(i) !== "_") continue;
+      var a = mid.slice(0, i);
+      var b = mid.slice(i + 1);
+      if ((graph.nodes[a] || graph.clusters[a]) && (graph.nodes[b] || graph.clusters[b])) {
+        return [a, b];
+      }
+    }
+    return null;
+  }
+
+  function ensureTooltip() {
+    if (tooltipEl && tooltipEl.isConnected) return tooltipEl;
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "edge-tooltip";
+    tooltipEl.setAttribute("role", "tooltip");
+    tooltipEl.hidden = true;
+    document.body.appendChild(tooltipEl);
+    return tooltipEl;
+  }
+
+  /* Full path to a subgraph, e.g. the "Missiles" group inside "Cruisers"
+     becomes "Cruisers/Missiles". Top-level groups keep just their own name. */
+  function clusterPath(cid) {
+    var parts = [];
+    var guard = 0;
+    while (cid && guard++ < 50) {
+      parts.unshift(displayNames[cid] || cid);
+      var cluster = graph.clusters[cid];
+      cid = cluster ? cluster.parent : null;
+    }
+    return parts.join("/");
+  }
+
+  /* Name shown for an endpoint: a ship's name, or a group's full path. */
+  function endpointName(id) {
+    if (graph.clusters[id]) return clusterPath(id);
+    return displayNames[id] || id;
+  }
+
+  function placeTooltip(e) {
+    var pad = 14;
+    var r = tooltipEl.getBoundingClientRect();
+    var x = e.clientX + pad;
+    var y = e.clientY + pad;
+    if (x + r.width > window.innerWidth - 6) x = e.clientX - pad - r.width;
+    if (y + r.height > window.innerHeight - 6) y = e.clientY - pad - r.height;
+    tooltipEl.style.left = Math.max(6, x) + "px";
+    tooltipEl.style.top = Math.max(6, y) + "px";
+  }
+
+  /* Show the connection's label and the ship it leads to, e.g.
+     "Projectile turrets → Claw". Group targets show their full path,
+     e.g. "Missiles → Cruisers/Missiles". Shown on the first hover frame,
+     with no delay or fade, so it feels immediate. */
+  function showEdgeTooltip(e, edgeId) {
+    var tip = ensureTooltip();
+    if (tip.hidden || edgeId !== tooltipEdgeId) {
+      tooltipEdgeId = edgeId;
+      var label = domIndex && domIndex.labelByEdgeId[edgeId];
+      var text = label ? label.textContent.replace(/\s+/g, " ").trim() : "";
+      var ends = edgeEndpoints(edgeId);
+      var name = ends ? endpointName(ends[1]) : "";
+      tip.textContent = text && name ? text + " → " + name : (name || text);
+    }
+    if (!tip.textContent) { hideEdgeTooltip(); return; }
+    tip.hidden = false;
+    placeTooltip(e);
+  }
+
+  function hideEdgeTooltip() {
+    if (tooltipEl) tooltipEl.hidden = true;
+    tooltipEdgeId = null;
+  }
+
+  function wireEdgeTooltip() {
+    viewport.addEventListener("mousemove", function (e) {
+      var edgeId = edgeIdFromTarget(e.target);
+      if (edgeId) showEdgeTooltip(e, edgeId);
+      else hideEdgeTooltip();
+    });
+    viewport.addEventListener("mouseleave", hideEdgeTooltip);
+    // A drag (pan) or a scroll would leave the tooltip stranded.
+    viewport.addEventListener("mousedown", hideEdgeTooltip, true);
+    window.addEventListener("scroll", hideEdgeTooltip, true);
+  }
+
   function updateStatus(visibleCount, edgeCount) {
     if (visibleCount == null) {
       var stats = countStats(baseCode);
@@ -517,6 +624,7 @@
   function applyView(markup, selected, visibleCount, edgeCount) {
     var placeholder = host.querySelector(".loading");
     if (placeholder) placeholder.remove();
+    hideEdgeTooltip(); // the previous layer's edge ids are about to be replaced
 
     var old = svgEl;
     var svg = svgFromMarkup(markup);
@@ -766,6 +874,7 @@
   function boot(code) {
     baseCode = code;
     graph = parseGraph(code);
+    displayNames = buildDisplayNames(code);
 
     mermaid.initialize({
       startOnLoad: false,
@@ -795,6 +904,7 @@
 
     wireSelection();
     wireControls();
+    wireEdgeTooltip();
     requestView({ code: baseCode, full: true, selectedId: null, visibleCount: null, edgeCount: null });
   }
 

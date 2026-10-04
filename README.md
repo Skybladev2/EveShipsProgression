@@ -15,6 +15,9 @@ compact diagram of its own. Click the background to bring the full chart back.
 Click an edge to highlight that single connection — it only lights up the line and its label
 and never changes what is shown, so it also works while a ship is isolated.
 
+Hover an edge to see what it connects, in the form `edge label → connecting ship`; group
+targets use their full path, e.g. `Missiles → Cruisers/Missiles`.
+
 ```mermaid
 flowchart
 	subgraph s1["Empire Faction Frigates"]
