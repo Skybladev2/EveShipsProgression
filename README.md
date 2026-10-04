@@ -950,35 +950,9 @@ flowchart
 	n_Avatar -->|"Capital energy turrets"| n_Molok
 	n_Erebus -->|"Capital hybrid turrets"| n_Vanquisher
 	n_Leviathan -->|"Capital missiles"| n_Komodo
-	n_Badger -->|"Cargo"| n_Bustard
-	n_Badger -->|"Cargo"| n_Crane
-	n_Badger -->|"Cargo"| n_Charon
-	n_Bestower -->|"Cargo"| n_Impel
-	n_Bestower -->|"Cargo"| n_Prorator
-	n_Bestower -->|"Cargo"| n_Providence
 	n_Deluge -->|"Cargo"| n_Avalanche
-	n_Epithal -->|"Cargo"| n_Occator
-	n_Iteron_Mark_V -->|"Cargo"| n_Occator
-	n_Iteron_Mark_V -->|"Cargo"| n_Viator
-	n_Iteron_Mark_V -->|"Cargo"| n_Obelisk
-	n_Kryos -->|"Cargo"| n_Viator
-	n_Mammoth -->|"Cargo"| n_Mastodon
-	n_Mammoth -->|"Cargo"| n_Prowler
-	n_Mammoth -->|"Cargo"| n_Fenrir
-	n_Miasmos -->|"Cargo"| n_Occator
-	n_Nereus -->|"Cargo"| n_Occator
-	n_Nereus -->|"Cargo"| n_Viator
-	n_Nereus -->|"Cargo"| n_Obelisk
 	n_Noctis -->|"Salvage"| n_Porpoise
-	n_Sigil -->|"Cargo"| n_Prorator
-	n_Sigil -->|"Cargo"| n_Providence
-	n_Squall -->|"Cargo"| n_Deluge
-	n_Squall -->|"Cargo"| n_Torrent
-	n_Tayra -->|"Cargo"| n_Bustard
-	n_Tayra -->|"Cargo"| n_Charon
 	n_Torrent -->|"Cargo"| n_Avalanche
-	n_Wreathe -->|"Cargo"| n_Prowler
-	n_Wreathe -->|"Cargo"| n_Fenrir
 	n_Charon -->|"Cargo"| n_Rhea
 	n_Fenrir -->|"Cargo"| n_Nomad
 	n_Obelisk -->|"Cargo"| n_Anshar
@@ -1032,4 +1006,6 @@ flowchart
 	bs_hybrid ==>|"Hybrid turrets"| nbs_hybrid
 	bs_energy ==>|"Energy turrets"| nbs_energy
 	bs_drones ==>|"Drones"| nbs_drones
+	s48 ==>|"Cargo"| s81
+	s48 ==>|"Cargo"| s82
 ```
