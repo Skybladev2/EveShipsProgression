@@ -690,7 +690,6 @@ flowchart
 	n_Punisher -->|"Energy turrets"| n_Vengeance
 	n_Punisher -->|"Energy turrets"| n_Coercer
 	n_Punisher -->|"Energy turrets"| n_Maller
-	n_Rifter -->|"Projectile turrets"| n_Jaguar
 	n_Rifter -->|"Projectile turrets"| n_Wolf
 	n_Slasher -->|"Tackle"| s42_projectile
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
