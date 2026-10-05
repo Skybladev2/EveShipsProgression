@@ -17,7 +17,6 @@
   var FADE_MS = 200;
 
   var host = document.getElementById("graph");
-  var statusEl = document.getElementById("status");
   var viewport = document.getElementById("viewport");
   var panZoom = null;
   var panZoomSvg = null;  // svg element the current panZoom instance controls
@@ -659,21 +658,6 @@
     window.addEventListener("scroll", hideEdgeTooltip, true);
   }
 
-  function updateStatus(visibleCount, edgeCount) {
-    if (visibleCount == null) {
-      var stats = countStats(baseCode);
-      statusEl.textContent = stats.nodes + " ships · " + stats.edges + " connections";
-    } else {
-      statusEl.textContent = visibleCount + " ships · " + edgeCount + " connections · isolated";
-    }
-  }
-
-  function countStats(code) {
-    var nodes = (code.match(/\bn_[A-Za-z0-9_]+\["/g) || []).length;
-    var edges = (code.match(/-->|-\.->/g) || []).length;
-    return { nodes: nodes, edges: edges };
-  }
-
   function renderMermaid(code) {
     return mermaid.render("shipGraph" + (++renderSeq), code, renderHost).then(function (result) {
       return result.svg;
@@ -713,7 +697,7 @@
   }
 
   /* Put a freshly rendered SVG on top of the current one and cross-fade. */
-  function applyView(markup, selected, visibleCount, edgeCount) {
+  function applyView(markup, selected) {
     var placeholder = host.querySelector(".loading");
     if (placeholder) placeholder.remove();
     hideEdgeTooltip(); // the previous layer's edge ids are about to be replaced
@@ -733,7 +717,6 @@
     // The full chart opens framed on the default group; isolated components are
     // left fitted to their own bounds.
     if (!selected) focusDefaultGroup();
-    updateStatus(visibleCount, edgeCount);
 
     if (old) old.style.pointerEvents = "none";
     requestAnimationFrame(function () {
@@ -771,7 +754,7 @@
 
     markup.then(function (svg) {
       if (req.token !== viewToken) { rendering = false; pump(); return; }
-      applyView(svg, req.selectedId, req.visibleCount, req.edgeCount);
+      applyView(svg, req.selectedId);
       rendering = false;
       pump();
     }).catch(function (err) {
@@ -785,16 +768,10 @@
     selectedId = id;
     selectedEdgeId = null;
     var visible = connectedComponent(id);
-    var visibleCount = Object.keys(visible).length;
-    var edgeCount = graph.edges.filter(function (e) {
-      return visible[e.src] && visible[e.dst];
-    }).length;
     requestView({
       code: buildFilteredCode(baseCode, visible),
       full: false,
-      selectedId: id,
-      visibleCount: visibleCount,
-      edgeCount: edgeCount
+      selectedId: id
     });
   }
 
@@ -802,7 +779,7 @@
     if (!selectedId) return;
     selectedId = null;
     selectedEdgeId = null;
-    requestView({ code: baseCode, full: true, selectedId: null, visibleCount: null, edgeCount: null });
+    requestView({ code: baseCode, full: true, selectedId: null });
   }
 
   function centerOn(el) {
@@ -998,7 +975,7 @@
     wireSelection();
     wireControls();
     wireEdgeTooltip();
-    requestView({ code: baseCode, full: true, selectedId: null, visibleCount: null, edgeCount: null });
+    requestView({ code: baseCode, full: true, selectedId: null });
   }
 
   ensureGlobal("mermaid", MERMAID_CDN)
