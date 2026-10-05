@@ -1,7 +1,8 @@
 /* Renders the Mermaid diagram from README.md and adds pan / zoom / search.
    Clicking a ship rebuilds the chart from just its connected component, so the
    remaining ships are laid out as their own compact diagram; the two views
-   cross-fade. Clicking the background brings the full chart back.
+   cross-fade. Clicking an edge highlights it and narrows the chart to links of
+   the same connection type. Clicking the background brings the full chart back.
    Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
@@ -39,7 +40,7 @@
   var graph = null;       // parsed source: nodes, adjacency, clusters
   var domIndex = null;    // rendered elements keyed by source id
   var selectedId = null;  // currently isolated ship, or null for the full chart
-  var selectedEdgeId = null; // currently highlighted edge (does not filter)
+  var selectedEdge = null; // connection-type filter: { src, dst, label }, or null
   var displayNames = Object.create(null); // source id -> label shown on the chart
   var tooltipEl = null;   // floating tooltip for the edge under the cursor
   var tooltipEdgeId = null; // edge the tooltip currently describes
@@ -194,7 +195,69 @@
       }
     }
 
-    return { nodes: nodes, outAdj: outAdj, inAdj: inAdj, edges: edges, clusters: clusters, nodeClusters: nodeClusters };
+    return {
+      nodes: nodes, outAdj: outAdj, inAdj: inAdj, edges: edges,
+      clusters: clusters, nodeClusters: nodeClusters, clusterNodes: clusterNodes
+    };
+  }
+
+  /* Every edge of the source, with its connection-type label. Group-to-group
+     edges (e.g. `s2 ==>|"Missiles"| s35`) keep their cluster ids here; the
+     expansion into ship pairs happens in buildLabelAdjacency. */
+  function parseRawEdges(code) {
+    var out = [];
+    code.split(/\r?\n/).forEach(function (line) {
+      var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|"([^"]*)"\|\s*)?([A-Za-z_]\w*)/);
+      if (m) out.push({ src: m[1], dst: m[3], label: m[2] || "" });
+    });
+    return out;
+  }
+
+  /* The ship ids an endpoint stands for: a ship itself, or every ship inside
+     the subgraph when the endpoint is a group. */
+  function endpointNodes(id) {
+    if (graph.clusters[id] !== undefined) return graph.clusterNodes[id] || [];
+    return graph.nodes[id] ? [id] : [];
+  }
+
+  /* Adjacency keyed by connection type: label -> { nodeId -> { nodeId: true } }.
+     Group edges are expanded to all their ship pairs, so traversal can follow
+     only edges that carry the selected connection type. */
+  function buildLabelAdjacency(rawEdges) {
+    var byLabel = Object.create(null);
+    rawEdges.forEach(function (e) {
+      var from = endpointNodes(e.src);
+      var to = endpointNodes(e.dst);
+      var map = byLabel[e.label] || (byLabel[e.label] = Object.create(null));
+      for (var i = 0; i < from.length; i++) {
+        for (var j = 0; j < to.length; j++) {
+          var a = from[i], b = to[j];
+          if (a === b) continue;
+          (map[a] || (map[a] = Object.create(null)))[b] = true;
+          (map[b] || (map[b] = Object.create(null)))[a] = true;
+        }
+      }
+    });
+    return byLabel;
+  }
+
+  /* Ships reachable from the seed ships using only edges whose label matches
+     the selected connection type. This is the stricter counterpart of
+     connectedComponent, which follows every edge regardless of type. */
+  function sameTypeComponent(seedIds, label) {
+    var adjacency = graph.labelAdj[label] || Object.create(null);
+    var visible = Object.create(null);
+    var queue = [];
+    seedIds.forEach(function (id) {
+      if (!visible[id]) { visible[id] = true; queue.push(id); }
+    });
+    while (queue.length) {
+      var neighbours = adjacency[queue.pop()] || {};
+      for (var key in neighbours) {
+        if (!visible[key]) { visible[key] = true; queue.push(key); }
+      }
+    }
+    return visible;
   }
 
   /* Map every node and subgraph id to the label shown on the chart, so the
@@ -251,7 +314,11 @@
   /* Rebuild the Mermaid source keeping only the visible ships: their node
      declarations, the edges between them and the subgraphs that still hold
      something. Everything else is dropped so the layout recomputes compactly. */
-  function buildFilteredCode(code, visible) {
+  function buildFilteredCode(code, visible, labelFilter) {
+    // When set, only connections of this type are kept: clicking a "Tackle"
+    // edge leaves nothing but Tackle links, a "Projectile turrets" edge
+    // nothing but Projectile turrets, and so on.
+    var exactType = labelFilter != null;
     var needed = Object.create(null);
     Object.keys(visible).forEach(function (nid) {
       (graph.nodeClusters[nid] || []).forEach(function (cid) { needed[cid] = true; });
@@ -262,10 +329,12 @@
     // ships sit in, so the direct edge is dropped in favour of the group one.
     var groupEdges = [];
     code.split(/\r?\n/).forEach(function (line) {
-      var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|"([^"]*)"\|\s*)?([A-Za-z_]\w*)/);
       if (!m) return;
-      if (graph.clusters[m[1]] === undefined || graph.clusters[m[2]] === undefined) return;
-      if (needed[m[1]] && needed[m[2]]) groupEdges.push([m[1], m[2]]);
+      var a = m[1], b = m[3], label = m[2] || "";
+      if (graph.clusters[a] === undefined || graph.clusters[b] === undefined) return;
+      if (exactType && label !== labelFilter) return;
+      if (needed[a] && needed[b]) groupEdges.push([a, b]);
     });
 
     function inGroup(nid, groupId) {
@@ -292,6 +361,8 @@
       if (!m) return;
       var a = m[1], b = m[3];
       if (graph.clusters[a] !== undefined || graph.clusters[b] !== undefined) return;
+      var label = m[2] || "";
+      if (exactType && label !== labelFilter) return;
       if (!visible[a] || !visible[b] || coveredByGroup(a, b)) return;
       var src = deepestCluster(a), dst = deepestCluster(b);
       if (!src || !dst || src === dst) return;
@@ -299,7 +370,6 @@
       var key = src + "\t" + dst;
       var g = shipGroups[key] || (shipGroups[key] = { src: src, dst: dst, labels: Object.create(null), count: 0 });
       g.count++;
-      var label = m[2] || "";
       g.labels[label] = (g.labels[label] || 0) + 1;
     });
 
@@ -334,9 +404,9 @@
         return;
       }
 
-      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|[^|]*\|\s*)?([A-Za-z_]\w*)/);
+      var edge = s.match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|"([^"]*)"\|\s*)?([A-Za-z_]\w*)/);
       if (edge) {
-        var a = edge[1], b = edge[2];
+        var a = edge[1], b = edge[3], label = edge[2] || "";
         var aIsCluster = graph.clusters[a] !== undefined;
         var bIsCluster = graph.clusters[b] !== undefined;
         var keep;
@@ -353,6 +423,7 @@
             if (src && dst && mergedGroups[src + "\t" + dst]) keep = false;
           }
         }
+        if (keep && exactType && label !== labelFilter) keep = false;
         if (keep) out.push(line);
         return;
       }
@@ -442,12 +513,25 @@
     if (domIndex && selectedId && domIndex.byId[selectedId]) {
       domIndex.byId[selectedId].el.classList.add("ship-selected");
     }
-    if (domIndex && selectedEdgeId) {
-      var path = domIndex.pathByEdgeId[selectedEdgeId];
-      var label = domIndex.labelByEdgeId[selectedEdgeId];
+    if (domIndex && selectedEdge) {
+      var id = findEdgePathId(selectedEdge.src, selectedEdge.dst);
+      var path = id && domIndex.pathByEdgeId[id];
+      var label = id && domIndex.labelByEdgeId[id];
       if (path) path.classList.add("edge-selected");
       if (label) label.classList.add("edge-selected");
     }
+  }
+
+  /* Find the rendered edge joining two source endpoints, so the highlight can
+     follow the selected connection into the rebuilt diagram. */
+  function findEdgePathId(src, dst) {
+    if (!domIndex) return null;
+    for (var id in domIndex.pathByEdgeId) {
+      var ends = edgeEndpoints(id);
+      if (!ends) continue;
+      if ((ends[0] === src && ends[1] === dst) || (ends[0] === dst && ends[1] === src)) return id;
+    }
+    return null;
   }
 
   /* Edges are drawn ~1px wide, which is very hard to click. Lay an invisible
@@ -526,17 +610,39 @@
     });
   }
 
-  /* Highlight a single edge (line + label). Highlighting never filters: it is
-     independent of the isolated-ship view and works while a ship is selected. */
-  function toggleEdge(edgeId) {
-    if (!domIndex) return;
-    var previous = selectedEdgeId;
-    if (previous) {
-      if (domIndex.pathByEdgeId[previous]) domIndex.pathByEdgeId[previous].classList.remove("edge-selected");
-      if (domIndex.labelByEdgeId[previous]) domIndex.labelByEdgeId[previous].classList.remove("edge-selected");
-    }
-    selectedEdgeId = previous === edgeId ? null : edgeId;
-    markSelected();
+  /* Clicking an edge highlights it and narrows the diagram to its connection
+     type: only links that share the clicked edge's label survive, so a "Tackle"
+     click leaves nothing but Tackle and a "Projectile turrets" click nothing
+     but Projectile turrets. Clicking the same edge again restores the full
+     chart. The text is read from the rendered label, which is reliable for
+     group edges and for edges that only exist in a filtered view. */
+  function selectEdge(edgeId) {
+    if (!graph || !domIndex) return;
+    var ends = edgeEndpoints(edgeId);
+    if (!ends) return;
+    if (selectedEdge && sameEnds(selectedEdge, ends)) { clearSelection(); return; }
+    var label = renderedEdgeLabel(edgeId);
+    var seeds = endpointNodes(ends[0]).concat(endpointNodes(ends[1]));
+    var visible = sameTypeComponent(seeds, label);
+    if (!Object.keys(visible).length) return;
+    selectedId = null;
+    selectedEdge = { src: ends[0], dst: ends[1], label: label };
+    requestView({
+      code: buildFilteredCode(baseCode, visible, label),
+      full: false,
+      selectedId: null,
+      edgeFilter: true
+    });
+  }
+
+  function sameEnds(sel, ends) {
+    return (sel.src === ends[0] && sel.dst === ends[1]) ||
+           (sel.src === ends[1] && sel.dst === ends[0]);
+  }
+
+  function renderedEdgeLabel(edgeId) {
+    var labelEl = domIndex && domIndex.labelByEdgeId[edgeId];
+    return labelEl ? edgeLabelText(labelEl) : "";
   }
 
   function edgeIdFromTarget(target) {
@@ -697,7 +803,7 @@
   }
 
   /* Put a freshly rendered SVG on top of the current one and cross-fade. */
-  function applyView(markup, selected) {
+  function applyView(markup, filtered) {
     var placeholder = host.querySelector(".loading");
     if (placeholder) placeholder.remove();
     hideEdgeTooltip(); // the previous layer's edge ids are about to be replaced
@@ -716,7 +822,7 @@
     initPanZoom(svg);
     // The full chart opens framed on the default group; isolated components are
     // left fitted to their own bounds.
-    if (!selected) focusDefaultGroup();
+    if (!filtered) focusDefaultGroup();
 
     if (old) old.style.pointerEvents = "none";
     requestAnimationFrame(function () {
@@ -754,7 +860,7 @@
 
     markup.then(function (svg) {
       if (req.token !== viewToken) { rendering = false; pump(); return; }
-      applyView(svg, req.selectedId);
+      applyView(svg, !!(req.selectedId || req.edgeFilter));
       rendering = false;
       pump();
     }).catch(function (err) {
@@ -766,7 +872,7 @@
   function selectShip(id) {
     if (!graph.nodes[id] || selectedId === id) return;
     selectedId = id;
-    selectedEdgeId = null;
+    selectedEdge = null;
     var visible = connectedComponent(id);
     requestView({
       code: buildFilteredCode(baseCode, visible),
@@ -776,9 +882,9 @@
   }
 
   function clearSelection() {
-    if (!selectedId) return;
+    if (!selectedId && !selectedEdge) return;
     selectedId = null;
-    selectedEdgeId = null;
+    selectedEdge = null;
     requestView({ code: baseCode, full: true, selectedId: null });
   }
 
@@ -894,10 +1000,10 @@
       pointerDown = null;
       var target = e.target;
 
-      // Edges are checked first: highlighting one must never filter or reset
-      // the view, even while a ship is isolated.
+      // Edges are checked first: clicking one highlights it and narrows the
+      // chart to its connection type.
       var edgeId = edgeIdFromTarget(target);
-      if (edgeId) { toggleEdge(edgeId); return; }
+      if (edgeId) { selectEdge(edgeId); return; }
 
       var nodeGroup = target && target.closest ? target.closest("g.node") : null;
       if (nodeGroup) {
@@ -910,8 +1016,7 @@
       }
       // Clicks in the toolbar (search, zoom, download) should not reset the view.
       if (target && target.closest && target.closest(".topbar")) return;
-      if (selectedEdgeId) toggleEdge(selectedEdgeId);
-      if (selectedId) clearSelection();
+      if (selectedId || selectedEdge) clearSelection();
     });
   }
 
@@ -927,7 +1032,7 @@
       if (!panZoom) return;
       // Reset means "back to the default view": drop any isolated ship so the
       // full chart comes back, then frame the default group on it.
-      if (selectedId) { clearSelection(); return; }
+      if (selectedId || selectedEdge) { clearSelection(); return; }
       if (!focusDefaultGroup()) { panZoom.resetZoom(); panZoom.center(); scheduleHitWidth(); }
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
@@ -943,6 +1048,7 @@
   function boot(code) {
     baseCode = code;
     graph = parseGraph(code);
+    graph.labelAdj = buildLabelAdjacency(parseRawEdges(code));
     displayNames = buildDisplayNames(code);
 
     mermaid.initialize({

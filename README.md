@@ -12,8 +12,12 @@ Click any ship to isolate its progression line: the chart is redrawn from just t
 connected to it, directly or through a chain of variants, so what remains is laid out as a
 compact diagram of its own. Click the background to bring the full chart back.
 
-Click an edge to highlight that single connection — it only lights up the line and its label
-and never changes what is shown, so it also works while a ship is isolated.
+Click an edge to highlight that single connection and narrow the chart to its connection type.
+The remaining diagram keeps only links that share the clicked edge's label, so clicking a
+`Tackle` link leaves nothing but Tackle connections and clicking a `Projectile turrets` link
+leaves nothing but Projectile turrets. This is stricter than isolating a ship, which follows
+every connection regardless of type. Click the same edge again, or the background, to bring
+the full chart back.
 
 Hover an edge to see what it connects, in the form `edge label → connecting ship`; group
 targets use their full path, e.g. `Missiles → Cruisers/Missiles`.
@@ -689,7 +693,6 @@ flowchart
 	n_Slasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
-	n_Tristan -->|"Drones"| n_Algos
 	n_Venture -->|"Mining"| n_Endurance
 	n_Venture -->|"Mining"| n_Prospect
 	n_Venture -->|"Mining"| n_Covetor
@@ -718,10 +721,8 @@ flowchart
 	n_Algos -->|"Drones"| n_Magus
 	n_Catalyst -->|"Hybrid turrets"| n_Eris
 	n_Catalyst -->|"Hybrid turrets"| n_Hecate
-	n_Catalyst -->|"Hybrid turrets"| n_Thorax
 	n_Coercer -->|"Energy turrets"| n_Heretic
 	n_Coercer -->|"Energy turrets"| n_Confessor
-	n_Coercer -->|"Energy turrets"| n_Omen
 	n_Corax -->|"Missiles"| n_Mamba
 	n_Corax -->|"Missiles"| n_Stork
 	n_Corax -->|"Missiles"| n_Jackdaw
@@ -768,7 +769,6 @@ flowchart
 	n_Moa -->|"Hybrid turrets"| n_Ferox
 	n_Omen -->|"Energy turrets"| n_Omen_Navy_Issue
 	n_Omen -->|"Energy turrets"| n_Zealot
-	n_Omen -->|"Energy turrets"| n_Harbinger
 	n_Osprey -->|"Remote shield boost"| n_Basilisk
 	n_Phantom -->|"Missiles"| n_Eidolon
 	n_Rupture -->|"Projectile turrets"| n_Scythe_Fleet_Issue
@@ -785,10 +785,8 @@ flowchart
 	n_Thorax -->|"Hybrid turrets"| n_Vigilant
 	n_Thorax -->|"Hybrid turrets"| n_Deimos
 	n_Thorax -->|"Hybrid turrets"| n_Phobos
-	n_Thorax -->|"Hybrid turrets"| n_Brutix
 	n_Vexor -->|"Drones"| n_Vexor_Navy_Issue
 	n_Vexor -->|"Drones"| n_Ishtar
-	n_Vexor -->|"Drones"| n_Myrmidon
 	n_Stabber_Fleet_Issue -->|"Projectile turrets"| n_Cynabal
 	n_Stabber_Fleet_Issue -->|"Projectile turrets"| n_Loki
 	n_Ashimmu -->|"Energy turrets"| n_Bhaalgorn
@@ -826,7 +824,6 @@ flowchart
 	n_Hurricane -->|"Projectile turrets"| n_Sleipnir
 	n_Myrmidon -->|"Drones"| n_Myrmidon_Navy_Issue
 	n_Myrmidon -->|"Drones"| n_Eos
-	n_Myrmidon -->|"Drones"| n_Dominix
 	n_Prophecy -->|"Drones"| n_Damnation
 	n_Hurricane_Fleet_Issue -->|"Projectile turrets"| n_Khizriel
 	n_Alligator -->|"Missiles"| n_Rattlesnake
@@ -969,12 +966,21 @@ flowchart
 	s2 ==>|"Missiles"| d_missiles
 	s5 ==>|"Energy turrets"| d_energy
 	s4 ==>|"Hybrid turrets"| d_hybrid
+	s3 ==>|"Projectile turrets"| d_proj
+	s6 ==>|"Drones"| d_drones
+	s11 ==>|"Mining"| d_mining
 	d_drones ==>|"Drones"| c_drones
 	d_missiles ==>|"Missiles"| c_missiles
 	d_proj ==>|"Projectile turrets"| c_proj
+	d_hybrid ==>|"Hybrid turrets"| c_hybrid
+	d_energy ==>|"Energy turrets"| c_energy
 	c_missiles ==>|"Missiles"| bc_missiles
 	c_proj ==>|"Projectile turrets"| bc_proj
+	c_hybrid ==>|"Hybrid turrets"| bc_hybrid
+	c_energy ==>|"Energy turrets"| bc_energy
+	c_drones ==>|"Drones"| bc_drones
 	bc_hybrid ==>|"Hybrid turrets"| bs_hybrid
 	bc_missiles ==>|"Missiles"| bs_missiles
 	bc_energy ==>|"Energy turrets"| bs_energy
+	bc_drones ==>|"Drones"| bs_drones
 ```
