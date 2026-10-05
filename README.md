@@ -307,15 +307,25 @@ flowchart
 		n_Worm["Worm"]
 	end
 	subgraph s44["Assault Frigates"]
-		n_Enyo["Enyo"]
-		n_Harpy["Harpy"]
-		n_Hawk["Hawk"]
-		n_Ishkur["Ishkur"]
-		n_Jaguar["Jaguar"]
-		n_Nergal["Nergal"]
-		n_Retribution["Retribution"]
-		n_Vengeance["Vengeance"]
-		n_Wolf["Wolf"]
+		subgraph s44_missiles["Missiles"]
+			n_Hawk["Hawk"]
+			n_Jaguar["Jaguar"]
+			n_Vengeance["Vengeance"]
+		end
+		subgraph s44_proj["Projectile turrets"]
+			n_Wolf["Wolf"]
+		end
+		subgraph s44_hybrid["Hybrid turrets"]
+			n_Enyo["Enyo"]
+			n_Harpy["Harpy"]
+			n_Ishkur["Ishkur"]
+		end
+		subgraph s44_energy["Energy turrets"]
+			n_Retribution["Retribution"]
+		end
+		subgraph s44_entropic["Entropic disintegrator"]
+			n_Nergal["Nergal"]
+		end
 	end
 	subgraph s45["Covert Ops"]
 		n_Anathema["Anathema"]
@@ -659,7 +669,6 @@ flowchart
 		n_Odysseus["Odysseus"]
 	end
 	n_Atron -->|"Tackle"| s42_hybrid
-	n_Breacher -->|"Missiles"| n_Jaguar
 	n_Breacher -.->|"Missiles"| n_Hound
 	n_Condor -->|"Tackle"| s42_missiles
 	n_Crucifier -->|"Weapon disruption"| n_Crucifier_Navy_Issue
@@ -671,24 +680,17 @@ flowchart
 	n_Heron -->|"Scan"| n_Heron_Navy_Issue
 	n_Heron -->|"Scan"| n_Buzzard
 	n_Imicus -->|"Scan"| n_Helios
-	n_Incursus -->|"Hybrid turrets"| n_Enyo
-	n_Incursus -->|"Hybrid turrets"| n_Ishkur
 	n_Inquisitor -->|"Remote armor repair"| n_Purifier
 	n_Kestrel -->|"Missiles"| n_Manticore
 	n_Magnate -->|"Scan"| n_Anathema
 	n_Maulus -->|"Sensor dampening"| n_Maulus_Navy_Issue
 	n_Maulus -->|"Sensor dampening"| n_Keres
 	n_Caldari_Navy_Hookbill -->|"Missiles"| n_Worm
-	n_Merlin -->|"Hybrid turrets"| n_Harpy
-	n_Merlin -->|"Hybrid turrets"| n_Hawk
 	n_Probe -->|"Scan"| n_Probe_Fleet_Issue
 	n_Probe -->|"Scan"| n_Astero
 	n_Probe -->|"Scan"| n_Cheetah
 	n_Probe -->|"Cargo"| s48
-	n_Punisher -->|"Energy turrets"| n_Retribution
-	n_Punisher -->|"Energy turrets"| n_Vengeance
 	n_Punisher -->|"Energy turrets"| n_Maller
-	n_Rifter -->|"Projectile turrets"| n_Wolf
 	n_Slasher -->|"Tackle"| s42_projectile
 	n_Slasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
@@ -710,7 +712,6 @@ flowchart
 	n_Succubus -->|"Energy turrets"| n_Phantasm
 	n_Worm -->|"Missiles"| n_Mamba
 	n_Skybreaker -->|"Vorton projector"| n_Stormbringer
-	n_Damavik -->|"Entropic disintegrator"| n_Nergal
 	n_Damavik -->|"Entropic disintegrator"| n_Kikimora
 	n_Cheetah -->|"Cloak"| n_Prowler
 	n_Algos -->|"Drones"| n_Magus
@@ -891,6 +892,13 @@ flowchart
 	s11 ==>|"Mining"| s41
 	s9 ==>|"Remote shield boost"| s32
 	s10 ==>|"Remote armor repair"| s33
+	s2 ==>|"Missiles"| s44_missiles
+	s3 ==>|"Projectile turrets"| s44_proj
+	s4 ==>|"Hybrid turrets"| s44_hybrid
+	s4 ==>|"Hybrid turrets"| s44_missiles
+	s5 ==>|"Energy turrets"| s44_energy
+	s5 ==>|"Energy turrets"| s44_missiles
+	s13 ==>|"Entropic disintegrator"| s44_entropic
 	d_missiles ==>|"Missiles"| nd_missiles
 	d_drones ==>|"Drones"| nd_drones
 	d_hybrid ==>|"Hybrid turrets"| nd_hybrid
