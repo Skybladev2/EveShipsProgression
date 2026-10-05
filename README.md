@@ -130,7 +130,6 @@ flowchart
 		subgraph bc_missiles["Missiles"]
 			n_Cyclone["Cyclone"]
 			n_Drake["Drake"]
-			n_Naga["Naga"]
 		end
 		subgraph bc_proj["Projectile turrets"]
 			n_Hurricane["Hurricane"]
@@ -140,6 +139,7 @@ flowchart
 			n_Brutix["Brutix"]
 			n_Ferox["Ferox"]
 			n_Talos["Talos"]
+			n_Naga["Naga"]
 		end
 		subgraph bc_energy["Energy turrets"]
 			n_Harbinger["Harbinger"]
@@ -285,15 +285,15 @@ flowchart
 		end
 		subgraph s42_missiles["Missiles"]
 			n_Crow["Crow"]
-			n_Raptor["Raptor"]
+			n_Malediction["Malediction"]
 		end
 		subgraph s42_hybrid["Hybrid turrets"]
 			n_Ares["Ares"]
 			n_Taranis["Taranis"]
+			n_Raptor["Raptor"]
 		end
 		subgraph s42_energy["Energy turrets"]
 			n_Crusader["Crusader"]
-			n_Malediction["Malediction"]
 		end
 	end
 	subgraph s43["Pirate Faction Frigates"]
@@ -422,6 +422,7 @@ flowchart
 		n_Rook["Rook"]
 	end
 	subgraph s58["Navy Faction Cruisers"]
+		n_Scythe_Fleet_Issue["Scythe Fleet Issue"]
 		subgraph nc_missiles["Missiles"]
 			n_Caracal_Navy_Issue["Caracal Navy Issue"]
 		end
@@ -436,7 +437,6 @@ flowchart
 		end
 		subgraph nc_shield["Shield logistics"]
 			n_Osprey_Navy_Issue["Osprey Navy Issue"]
-			n_Scythe_Fleet_Issue["Scythe Fleet Issue"]
 		end
 		subgraph nc_armor["Armor logistics"]
 			n_Augoror_Navy_Issue["Augoror Navy Issue"]
@@ -522,10 +522,10 @@ flowchart
 		n_Khizriel["Khizriel"]
 	end
 	subgraph s68["Navy Faction Battleships"]
+		n_Typhoon_Fleet_Issue["Typhoon Fleet Issue"]
 		subgraph nbs_missiles["Missiles"]
 			n_Raven_Navy_Issue["Raven Navy Issue"]
 			n_Scorpion_Navy_Issue["Scorpion Navy Issue"]
-			n_Typhoon_Fleet_Issue["Typhoon Fleet Issue"]
 		end
 		subgraph nbs_proj["Projectile turrets"]
 			n_Tempest_Fleet_Issue["Tempest Fleet Issue"]
@@ -945,6 +945,7 @@ flowchart
 	bc_drones ==>|"Drones"| bs_drones
 	bs_proj ==>|"Projectile turrets"| n_Naglfar
 	bs_proj ==>|"Projectile turrets"| n_Panther
+	bs_missiles ==>|"Missiles"| n_Typhoon_Fleet_Issue
 	bs_proj ==>|"Projectile turrets"| n_Typhoon_Fleet_Issue
 	bs_proj ==>|"Projectile turrets"| n_Vargur
 	c_proj ==>|"Projectile turrets"| n_Broadsword
