@@ -85,17 +85,17 @@ flowchart
 		subgraph c_missiles["Missiles"]
 			n_Bellicose["Bellicose"]
 			n_Caracal["Caracal"]
-			n_Moa["Moa"]
 		end
 		subgraph c_proj["Projectile turrets"]
 			n_Rupture["Rupture"]
 			n_Stabber["Stabber"]
 		end
 		subgraph c_hybrid["Hybrid turrets"]
-			n_Maller["Maller"]
+			n_Moa["Moa"]
 			n_Thorax["Thorax"]
 		end
 		subgraph c_energy["Energy turrets"]
+			n_Maller["Maller"]
 			n_Omen["Omen"]
 		end
 		subgraph c_drones["Drones"]
@@ -144,10 +144,10 @@ flowchart
 		subgraph bc_energy["Energy turrets"]
 			n_Harbinger["Harbinger"]
 			n_Oracle["Oracle"]
-			n_Prophecy["Prophecy"]
 		end
 		subgraph bc_drones["Drones"]
 			n_Myrmidon["Myrmidon"]
+			n_Prophecy["Prophecy"]
 		end
 	end
 	subgraph s20["Precursor Battlecruisers"]
@@ -156,7 +156,6 @@ flowchart
 	subgraph s21["Battleships"]
 		subgraph bs_missiles["Missiles"]
 			n_Raven["Raven"]
-			n_Scorpion["Scorpion"]
 			n_Typhoon["Typhoon"]
 		end
 		subgraph bs_proj["Projectile turrets"]
@@ -171,13 +170,16 @@ flowchart
 		subgraph bs_energy["Energy turrets"]
 			n_Abaddon["Abaddon"]
 			n_Apocalypse["Apocalypse"]
-			n_Armageddon["Armageddon"]
 		end
 		subgraph bs_drones["Drones"]
 			n_Dominix["Dominix"]
+			n_Armageddon["Armageddon"]
 		end
 		subgraph bs_logi["Logistics"]
 			n_Eidolon["Eidolon"]
+		end
+		subgraph bs_other["Other"]
+			n_Scorpion["Scorpion"]
 		end
 	end
 	subgraph s22["EDENCOM Battleships"]
@@ -720,7 +722,6 @@ flowchart
 	n_Corax -->|"Missiles"| n_Stork
 	n_Corax -->|"Missiles"| n_Jackdaw
 	n_Cormorant -->|"Hybrid turrets"| n_Flycatcher
-	n_Cormorant -->|"Hybrid turrets"| n_Moa
 	n_Dragoon -->|"Drones"| n_Pontifex
 	n_Pioneer -->|"Mining"| n_Outrider
 	n_Talwar -->|"Missiles"| n_Bifrost
@@ -737,7 +738,6 @@ flowchart
 	n_Arbitrator -->|"Drones"| n_Curse
 	n_Arbitrator -->|"Drones"| n_Penitence
 	n_Arbitrator -->|"Drones"| n_Pilgrim
-	n_Arbitrator -->|"Drones"| n_Prophecy
 	n_Augoror -->|"Remote armor repair"| n_Guardian
 	n_Bellicose -->|"Missiles"| n_Scythe_Fleet_Issue
 	n_Bellicose -.->|"Missiles"| n_Orthrus
@@ -752,11 +752,9 @@ flowchart
 	n_Exequror -->|"Remote armor repair"| n_Oneiros
 	n_Maller -->|"Energy turrets"| n_Sacrilege
 	n_Maller -->|"Energy turrets"| n_Devoter
-	n_Maller -->|"Energy turrets"| n_Harbinger
 	n_Caracal_Navy_Issue -->|"Missiles"| n_Gila
 	n_Moa -->|"Hybrid turrets"| n_Eagle
 	n_Moa -->|"Hybrid turrets"| n_Onyx
-	n_Moa -->|"Hybrid turrets"| n_Ferox
 	n_Omen_Navy_Issue -->|"Energy turrets"| n_Ashimmu
 	n_Omen -->|"Energy turrets"| n_Zealot
 	n_Osprey -->|"Remote shield boost"| n_Basilisk
