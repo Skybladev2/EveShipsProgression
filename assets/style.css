@@ -47,7 +47,8 @@ body {
   box-shadow: 0 0 10px var(--accent);
 }
 .tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.search input {
+.ship-select { position: relative; }
+.ship-select input {
   width: 230px;
   max-width: 45vw;
   padding: 7px 11px;
@@ -57,7 +58,49 @@ body {
   border-radius: 7px;
   outline: none;
 }
-.search input:focus { border-color: var(--accent); }
+.ship-select input:focus { border-color: var(--accent); }
+.ship-select input::placeholder { color: var(--muted); }
+
+/* filterable dropdown of every ship name */
+.ship-select ul {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  min-width: 230px;
+  max-height: 320px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  background: #0e131c;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .55);
+}
+.ship-select ul[hidden] { display: none; }
+.ship-option {
+  padding: 6px 9px;
+  border-radius: 5px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ship-option:hover,
+.ship-option.is-active {
+  background: #1e2838;
+}
+.ship-option[aria-selected="true"] {
+  color: var(--accent);
+}
+.ship-option-empty {
+  padding: 6px 9px;
+  color: var(--muted);
+  cursor: default;
+}
 .buttons { display: flex; gap: 6px; }
 button {
   min-width: 34px;
@@ -130,18 +173,6 @@ button:active { transform: translateY(1px); }
 }
 .error { color: #ff9d9d; }
 .error code { color: var(--text); background: #1b2330; padding: 1px 5px; border-radius: 4px; }
-
-/* search highlighting */
-#graph svg.searching .node { opacity: .18; transition: opacity .15s ease; }
-#graph svg.searching .node.search-hit { opacity: 1; }
-#graph svg .node.search-hit rect,
-#graph svg .node.search-hit polygon,
-#graph svg .node.search-hit path,
-#graph svg .node.search-hit circle {
-  stroke: var(--accent) !important;
-  stroke-width: 3px !important;
-  filter: drop-shadow(0 0 6px rgba(255, 213, 74, .8));
-}
 
 /* click-to-isolate */
 #graph svg .node { cursor: pointer; transition: filter .12s ease; }
