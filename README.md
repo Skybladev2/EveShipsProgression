@@ -682,9 +682,7 @@ flowchart
 	n_Probe -->|"Scan"| n_Probe_Fleet_Issue
 	n_Probe -->|"Scan"| n_Astero
 	n_Probe -->|"Scan"| n_Cheetah
-	n_Probe -->|"Cargo (ammo)"| n_Hoarder
-	n_Probe -->|"Cargo"| n_Wreathe
-	n_Probe -->|"Cargo"| n_Mammoth
+	n_Probe -->|"Cargo"| s48
 	n_Punisher -->|"Energy turrets"| n_Retribution
 	n_Punisher -->|"Energy turrets"| n_Vengeance
 	n_Punisher -->|"Energy turrets"| n_Maller
