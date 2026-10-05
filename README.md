@@ -761,7 +761,6 @@ flowchart
 	n_Phantom -->|"Missiles"| n_Eidolon
 	n_Rupture -->|"Projectile turrets"| n_Muninn
 	n_Scythe -->|"Remote shield boost, Logistic drones"| n_Scimitar
-	n_Stabber -->|"Projectile turrets"| n_Rupture
 	n_Federation_Navy_Comet -->|"Hybrid turrets"| n_Daredevil
 	n_Vexor_Navy_Issue -->|"Hybrid turrets"| n_Vigilant
 	n_Thorax -->|"Hybrid turrets"| n_Deimos
@@ -791,14 +790,11 @@ flowchart
 	n_Zealot -->|"Energy turrets"| n_Legion
 	n_Broadsword -->|"Projectile turrets"| n_Loki
 	n_Scimitar -->|"Remote shield boost, Logistic drones"| n_Lif
-	n_Brutix -->|"Hybrid turrets"| n_Talos
 	n_Brutix -->|"Hybrid turrets"| n_Astarte
 	n_Cyclone -->|"Missiles"| n_Claymore
 	n_Drake_Navy_Issue -->|"Missiles"| n_Alligator
 	n_Drake -->|"Missiles"| n_Nighthawk
-	n_Ferox -->|"Hybrid turrets"| n_Naga
 	n_Ferox -->|"Hybrid turrets"| n_Vulture
-	n_Harbinger -->|"Energy turrets"| n_Oracle
 	n_Harbinger -->|"Energy turrets"| n_Absolution
 	n_Hurricane -->|"Projectile turrets"| n_Sleipnir
 	n_Myrmidon -->|"Drones"| n_Eos
@@ -812,7 +808,6 @@ flowchart
 	n_Apocalypse -->|"Energy turrets"| n_Revelation
 	n_Armageddon -->|"Drones"| n_Redeemer
 	n_Dominix -->|"Drones"| n_Sin
-	n_Megathron -->|"Hybrid turrets"| n_Hyperion
 	n_Megathron_Navy_Issue -->|"Hybrid turrets"| n_Vindicator
 	n_Megathron -->|"Hybrid turrets"| n_Kronos
 	n_Megathron -->|"Hybrid turrets"| n_Moros
@@ -821,7 +816,6 @@ flowchart
 	n_Raven_Navy_Issue -->|"Missiles"| n_Rattlesnake
 	n_Scorpion_Navy_Issue -->|"Missiles"| n_Rattlesnake
 	n_Scorpion -->|"ECM"| n_Widow
-	n_Tempest -->|"Projectile turrets"| n_Maelstrom
 	n_Typhoon -->|"Missiles"| n_Panther
 	n_Tempest_Fleet_Issue -->|"Projectile turrets"| n_Machariel
 	n_Bhaalgorn -->|"Energy turrets"| n_Chemosh
@@ -874,7 +868,6 @@ flowchart
 	n_Obelisk -->|"Cargo"| n_Anshar
 	n_Providence -->|"Cargo"| n_Ark
 	n_Orca -->|"Mining foreman bursts"| n_Rorqual
-	n_Porpoise -->|"Mining foreman bursts"| n_Orca
 	n_Covetor -->|"Mining"| n_Hulk
 	n_Procurer -->|"Mining"| n_Skiff
 	n_Retriever -->|"Mining"| n_Mackinaw
