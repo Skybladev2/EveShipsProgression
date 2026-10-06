@@ -22,10 +22,16 @@
              spellcheck="false" placeholder="Select a ship…" aria-label="Select a ship">
       <ul id="ship-list" role="listbox" aria-label="Ships" hidden></ul>
     </div>
-    <label class="edge-mode" title="On: clicking an edge narrows the chart to that connection type. Off: clicking an edge only highlights it.">
-      <input id="edge-filter-mode" type="checkbox" checked>
-      <span>Filter on edge click</span>
-    </label>
+    <div class="edge-mode" role="radiogroup" aria-label="What clicking an edge does">
+      <label title="Clicking an edge narrows the chart to that connection type">
+        <input type="radio" name="edge-mode" value="filter" checked>
+        <span>Filter</span>
+      </label>
+      <label title="Clicking an edge only highlights that single link">
+        <input type="radio" name="edge-mode" value="highlight">
+        <span>Highlight</span>
+      </label>
+    </div>
     <div class="buttons">
       <button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
       <button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>

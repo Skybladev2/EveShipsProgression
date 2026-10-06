@@ -2,8 +2,8 @@
    Clicking a ship rebuilds the chart from just its connected component, so the
    remaining ships are laid out as their own compact diagram; the two views
    cross-fade. Clicking an edge either highlights it in place or narrows the
-   chart to links of the same connection type, depending on the "Filter on edge
-   click" checkbox. Clicking the background brings the full chart back.
+   chart to links of the same connection type, depending on the Filter /
+   Highlight selector. Clicking the background brings the full chart back.
    Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
@@ -627,8 +627,8 @@
     });
   }
 
-  /* Clicking an edge does one of two things, set by the "Filter on edge click"
-     checkbox. In filter mode it narrows the diagram to the clicked edge's
+  /* Clicking an edge does one of two things, set by the Filter / Highlight
+     radio group. In filter mode it narrows the diagram to the clicked edge's
      connection type: only links that share its label survive, so a "Tackle"
      click leaves nothing but Tackle and a "Projectile turrets" click nothing
      but Projectile turrets; clicking the same edge again restores the full
@@ -1259,14 +1259,14 @@
 
     // Choose what clicking an edge does. Switching modes drops the current
     // selection so the two kinds of highlight never linger out of step.
-    var edgeMode = document.getElementById("edge-filter-mode");
-    if (edgeMode) {
-      filterOnEdgeClick = edgeMode.checked;
-      edgeMode.addEventListener("change", function () {
-        filterOnEdgeClick = edgeMode.checked;
+    collect(document, 'input[name="edge-mode"]').forEach(function (radio) {
+      if (radio.checked) filterOnEdgeClick = radio.value === "filter";
+      radio.addEventListener("change", function () {
+        if (!radio.checked) return;
+        filterOnEdgeClick = radio.value === "filter";
         clearSelection();
       });
-    }
+    });
   }
 
   function boot(code) {
