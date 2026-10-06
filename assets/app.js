@@ -49,6 +49,7 @@
   var viewToken = 0;      // guards against stale async renders
   var rendering = false;  // serialises Mermaid renders
   var pendingView = null;
+  var savedFullView = null; // full-chart { zoom, pan } to restore after filtering
 
   var EDGE_HIT_PX = 18;     // clickable edge width, in screen pixels
   var EDGE_STROKE_PX = 1.6; // visible edge width, in screen pixels
@@ -621,6 +622,7 @@
     var ends = edgeEndpoints(edgeId);
     if (!ends) return;
     if (selectedEdge && sameEnds(selectedEdge, ends)) { clearSelection(); return; }
+    captureFullView();
     var label = renderedEdgeLabel(edgeId);
     var seeds = endpointNodes(ends[0]).concat(endpointNodes(ends[1]));
     var visible = sameTypeComponent(seeds, label);
@@ -802,8 +804,10 @@
     updateHitWidth();
   }
 
-  /* Put a freshly rendered SVG on top of the current one and cross-fade. */
-  function applyView(markup, filtered) {
+  /* Put a freshly rendered SVG on top of the current one and cross-fade. When
+     `restoreView` is set, a full chart comes back with the pan/zoom the user
+     had before filtering; otherwise it opens framed on the default group. */
+  function applyView(markup, filtered, restoreView) {
     var placeholder = host.querySelector(".loading");
     if (placeholder) placeholder.remove();
     hideEdgeTooltip(); // the previous layer's edge ids are about to be replaced
@@ -822,7 +826,7 @@
     initPanZoom(svg);
     // The full chart opens framed on the default group; isolated components are
     // left fitted to their own bounds.
-    if (!filtered) focusDefaultGroup();
+    if (!filtered && !(restoreView && restoreFullView())) focusDefaultGroup();
 
     if (old) old.style.pointerEvents = "none";
     requestAnimationFrame(function () {
@@ -860,7 +864,7 @@
 
     markup.then(function (svg) {
       if (req.token !== viewToken) { rendering = false; pump(); return; }
-      applyView(svg, !!(req.selectedId || req.edgeFilter));
+      applyView(svg, !!(req.selectedId || req.edgeFilter), !!req.restoreView);
       rendering = false;
       pump();
     }).catch(function (err) {
@@ -871,6 +875,7 @@
 
   function selectShip(id) {
     if (!graph.nodes[id] || selectedId === id) return;
+    captureFullView();
     selectedId = id;
     selectedEdge = null;
     syncComboValue();
@@ -887,7 +892,7 @@
     selectedId = null;
     selectedEdge = null;
     syncComboValue();
-    requestView({ code: baseCode, full: true, selectedId: null });
+    requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
   }
 
   /* Find a rendered subgraph by its visible label, e.g. "Empire Faction
@@ -940,6 +945,25 @@
     var cluster = findClusterByLabel(DEFAULT_GROUP_LABEL);
     if (!cluster) return false;
     focusOnElement(cluster);
+    return true;
+  }
+
+  /* Remember how the full chart is framed right now, so returning from a
+     filtered view can put it back instead of snapping to the default group.
+     Only the full chart is captured; filtering one view from another keeps the
+     view that was current before the first filter. */
+  function captureFullView() {
+    if (!panZoom || selectedId || selectedEdge) return;
+    savedFullView = { zoom: panZoom.getZoom(), pan: panZoom.getPan() };
+  }
+
+  /* Re-apply the remembered full-chart framing. Returns false when there is
+     nothing to restore, so the caller can fall back to the default group. */
+  function restoreFullView() {
+    if (!panZoom || !savedFullView) return false;
+    panZoom.zoom(savedFullView.zoom);
+    panZoom.pan(savedFullView.pan);
+    scheduleHitWidth();
     return true;
   }
 
@@ -1175,10 +1199,17 @@
       scheduleHitWidth();
     });
     document.getElementById("reset").addEventListener("click", function () {
+      // Reset means "back to the default view": forget any remembered framing,
+      // drop the isolated ship and frame the default group on the full chart.
+      savedFullView = null;
+      if (selectedId || selectedEdge) {
+        selectedId = null;
+        selectedEdge = null;
+        syncComboValue();
+        requestView({ code: baseCode, full: true, selectedId: null });
+        return;
+      }
       if (!panZoom) return;
-      // Reset means "back to the default view": drop any isolated ship so the
-      // full chart comes back, then frame the default group on it.
-      if (selectedId || selectedEdge) { clearSelection(); return; }
       if (!focusDefaultGroup()) { panZoom.resetZoom(); panZoom.center(); scheduleHitWidth(); }
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
