@@ -47,8 +47,8 @@ body {
   box-shadow: 0 0 10px var(--accent);
 }
 .tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ship-select { position: relative; }
-.ship-select input {
+.combo { position: relative; }
+.combo input {
   width: 230px;
   max-width: 45vw;
   padding: 7px 11px;
@@ -58,11 +58,12 @@ body {
   border-radius: 7px;
   outline: none;
 }
-.ship-select input:focus { border-color: var(--accent); }
-.ship-select input::placeholder { color: var(--muted); }
+.combo input:focus { border-color: var(--accent); }
+.combo input::placeholder { color: var(--muted); }
+.edge-select input { width: 190px; }
 
 /* filterable dropdown of every ship name */
-.ship-select ul {
+.combo ul {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
@@ -79,7 +80,7 @@ body {
   border-radius: 8px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, .55);
 }
-.ship-select ul[hidden] { display: none; }
+.combo ul[hidden] { display: none; }
 .ship-option {
   padding: 6px 9px;
   border-radius: 5px;

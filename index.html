@@ -16,11 +16,17 @@
 <header class="topbar">
   <h1><span class="dot"></span>EVE Online — Ship Progression</h1>
   <div class="tools">
-    <div class="ship-select">
+    <div class="combo ship-select">
       <input id="ship-input" type="text" role="combobox" aria-expanded="false"
              aria-controls="ship-list" aria-autocomplete="list" autocomplete="off"
              spellcheck="false" placeholder="Select a ship…" aria-label="Select a ship">
       <ul id="ship-list" role="listbox" aria-label="Ships" hidden></ul>
+    </div>
+    <div class="combo edge-select">
+      <input id="edge-input" type="text" role="combobox" aria-expanded="false"
+             aria-controls="edge-list" aria-autocomplete="list" autocomplete="off"
+             spellcheck="false" placeholder="Connection type…" aria-label="Filter by connection type">
+      <ul id="edge-list" role="listbox" aria-label="Connection types" hidden></ul>
     </div>
     <div class="edge-mode" role="radiogroup" aria-label="What clicking an edge does">
       <label title="Clicking an edge narrows the chart to that connection type">
@@ -47,7 +53,7 @@
 </main>
 
 <footer class="statusbar">
-  <span>Drag to pan · Scroll to zoom · Pick or click a ship to isolate its line · Click an edge to highlight or filter by its connection type</span>
+  <span>Drag to pan · Scroll to zoom · Pick a ship to isolate its line or a connection type to filter the chart · Click an edge to highlight or filter by it</span>
 </footer>
 
 <script src="assets/app.js"></script>

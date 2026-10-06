@@ -13,6 +13,10 @@ connected to it, directly or through a chain of variants, so what remains is lai
 compact diagram of its own. Click the background to bring the full chart back, framed exactly
 as you had panned and zoomed it before filtering. Use **Reset** to return to the default view.
 
+The **Connection type** picker lists every bonus type or playstyle in the chart, such as
+`Projectile turrets`, `Scan` or `Tackle`. Choosing one narrows the whole chart to the ships joined
+by a direct or group connection of that type; clear it by clicking the background or **Reset**.
+
 The **Filter / Highlight** selector chooses what clicking an edge does. In **Filter** mode the
 click narrows the chart to that connection type: the remaining diagram keeps only links that
 share the clicked edge's label, so clicking a `Tackle` link leaves nothing but Tackle connections

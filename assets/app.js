@@ -1,10 +1,11 @@
-/* Renders the Mermaid diagram from README.md and adds pan / zoom / a ship picker.
-   Clicking a ship rebuilds the chart from just its connected component, so the
-   remaining ships are laid out as their own compact diagram; the two views
-   cross-fade. Clicking an edge either highlights it in place or narrows the
-   chart to links of the same connection type, depending on the Filter /
-   Highlight selector. Clicking the background brings the full chart back.
-   Libraries are vendored under assets/vendor; CDNs are only a fallback. */
+/* Renders the Mermaid diagram from README.md and adds pan / zoom, a ship picker
+   and a connection-type picker. Clicking a ship rebuilds the chart from just its
+   connected component, so the remaining ships are laid out as their own compact
+   diagram; picking a connection type keeps every ship joined by that type, direct
+   or group; the views cross-fade. Clicking an edge either highlights it in place
+   or narrows the chart to links of the same connection type, depending on the
+   Filter / Highlight selector. Clicking the background brings the full chart
+   back. Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
 
@@ -42,6 +43,7 @@
   var domIndex = null;    // rendered elements keyed by source id
   var selectedId = null;  // currently isolated ship, or null for the full chart
   var selectedEdge = null; // connection-type filter: { src, dst, label }, or null
+  var selectedType = null; // connection type picked from the edge combobox, or null
   var highlightedEdgeId = null; // rendered edge id highlighted in place (highlight mode)
   var filterOnEdgeClick = true; // true: edge click filters; false: it only highlights
   var displayNames = Object.create(null); // source id -> label shown on the chart
@@ -261,6 +263,19 @@
         if (!visible[key]) { visible[key] = true; queue.push(key); }
       }
     }
+    return visible;
+  }
+
+  /* Every ship that is an endpoint of at least one connection of this type,
+     whether the edge runs between two ships or between a ship and a group.
+     This is the whole graph for the combobox filter, not just one component. */
+  function nodesForLabel(label) {
+    var visible = Object.create(null);
+    parseRawEdges(baseCode).forEach(function (e) {
+      if (e.label !== label) return;
+      endpointNodes(e.src).forEach(function (id) { visible[id] = true; });
+      endpointNodes(e.dst).forEach(function (id) { visible[id] = true; });
+    });
     return visible;
   }
 
@@ -655,7 +670,9 @@
     if (!Object.keys(visible).length) return;
     highlightedEdgeId = null;
     selectedId = null;
+    selectedType = null;
     selectedEdge = { src: ends[0], dst: ends[1], label: label };
+    syncComboValues();
     requestView({
       code: buildFilteredCode(baseCode, visible, label),
       full: false,
@@ -667,6 +684,28 @@
   function sameEnds(sel, ends) {
     return (sel.src === ends[0] && sel.dst === ends[1]) ||
            (sel.src === ends[1] && sel.dst === ends[0]);
+  }
+
+  /* Filter the whole chart to one connection type chosen from the combobox:
+     every ship joined by a direct or group connection of that type is kept,
+     and every other edge is dropped. Unlike an edge click this is not tied to
+     one component, so a "Tackle" pick shows every Tackle connection at once. */
+  function selectEdgeType(label) {
+    if (!label || (selectedType === label && !selectedEdge)) return;
+    captureFullView();
+    highlightedEdgeId = null;
+    selectedId = null;
+    selectedEdge = null;
+    selectedType = label;
+    syncComboValues();
+    var visible = nodesForLabel(label);
+    if (!Object.keys(visible).length) { selectedType = null; syncComboValues(); return; }
+    requestView({
+      code: buildFilteredCode(baseCode, visible, label),
+      full: false,
+      selectedId: null,
+      edgeFilter: true
+    });
   }
 
   function renderedEdgeLabel(edgeId) {
@@ -906,7 +945,8 @@
     highlightedEdgeId = null;
     selectedId = id;
     selectedEdge = null;
-    syncComboValue();
+    selectedType = null;
+    syncComboValues();
     var visible = connectedComponent(id);
     requestView({
       code: buildFilteredCode(baseCode, visible),
@@ -916,12 +956,13 @@
   }
 
   function clearSelection() {
-    if (!selectedId && !selectedEdge && !highlightedEdgeId) return;
-    var wasFiltered = !!(selectedId || selectedEdge);
+    if (!selectedId && !selectedEdge && !selectedType && !highlightedEdgeId) return;
+    var wasFiltered = !!(selectedId || selectedEdge || selectedType);
     selectedId = null;
     selectedEdge = null;
+    selectedType = null;
     highlightedEdgeId = null;
-    syncComboValue();
+    syncComboValues();
     if (wasFiltered) {
       requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
     } else {
@@ -988,7 +1029,7 @@
      Only the full chart is captured; filtering one view from another keeps the
      view that was current before the first filter. */
   function captureFullView() {
-    if (!panZoom || selectedId || selectedEdge) return;
+    if (!panZoom || selectedId || selectedEdge || selectedType) return;
     savedFullView = { zoom: panZoom.getZoom(), pan: panZoom.getPan() };
   }
 
@@ -1002,171 +1043,217 @@
     return true;
   }
 
-  /* Filterable combobox listing every ship on the chart. Picking a name
-     isolates that ship's connected component, exactly like clicking its box. */
-  var comboInput = null;
-  var comboList = null;
-  var comboOptions = []; // [{ id, name, el }], sorted by name
-  var comboActive = -1;  // index of the keyboard-highlighted option
-  var comboOpen = false;
+  /* A filterable combobox: a text input plus a dropdown list. Typing narrows
+     the options; Arrow Up/Down move the highlight, Enter picks, Escape closes.
+     `config.options()` returns [{ id, label }] and `config.onPick(id)` receives
+     the chosen id. The same widget backs the ship picker and the connection-type
+     picker. */
+  var shipCombo = null;
+  var edgeCombo = null;
 
   function comboName(id) { return displayNames[id] || id; }
 
-  function buildComboOptions() {
-    comboOptions = Object.keys(graph.nodes)
-      .map(function (id) { return { id: id, name: comboName(id) }; })
-      .sort(function (a, b) {
-        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-      })
-      .map(function (o) {
+  function createCombobox(input, list, config) {
+    if (!input || !list) return null;
+    var options = []; // [{ id, label, el }]
+    var active = -1;  // index of the keyboard-highlighted option
+    var open = false;
+
+    function build() {
+      options = config.options().map(function (o, i) {
         var li = document.createElement("li");
         li.className = "ship-option";
-        li.id = "ship-option-" + o.id;
+        li.id = config.idPrefix + i;
         li.setAttribute("role", "option");
         li.setAttribute("aria-selected", "false");
-        li.dataset.shipId = o.id;
-        li.textContent = o.name;
+        li.dataset.value = o.id;
+        li.textContent = o.label;
         o.el = li;
         return o;
       });
-  }
-
-  function comboMatches() {
-    var q = comboInput.value.trim().toLowerCase();
-    if (!q) return comboOptions.slice();
-    return comboOptions.filter(function (o) {
-      return o.name.toLowerCase().indexOf(q) !== -1;
-    });
-  }
-
-  function renderComboOptions(matches) {
-    comboList.textContent = "";
-    if (!matches.length) {
-      var empty = document.createElement("li");
-      empty.className = "ship-option-empty";
-      empty.textContent = "No ships found";
-      comboList.appendChild(empty);
-      return;
     }
-    matches.forEach(function (o) { comboList.appendChild(o.el); });
-  }
 
-  function visibleComboOptions() {
-    return collect(comboList, ".ship-option");
-  }
+    function matches() {
+      var q = input.value.trim().toLowerCase();
+      if (!q) return options.slice();
+      return options.filter(function (o) {
+        return o.label.toLowerCase().indexOf(q) !== -1;
+      });
+    }
 
-  function openCombo() {
-    if (comboOpen) return;
-    comboOpen = true;
-    comboInput.setAttribute("aria-expanded", "true");
-    comboList.hidden = false;
-  }
-
-  function closeCombo() {
-    if (!comboOpen) return;
-    comboOpen = false;
-    comboInput.setAttribute("aria-expanded", "false");
-    comboList.hidden = true;
-    setComboActive(-1);
-  }
-
-  function setComboActive(index) {
-    comboActive = index;
-    var opts = visibleComboOptions();
-    opts.forEach(function (el, i) {
-      var active = i === index;
-      el.classList.toggle("is-active", active);
-      if (active) {
-        comboInput.setAttribute("aria-activedescendant", el.id);
-        if (el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+    function render(matched) {
+      list.textContent = "";
+      if (!matched.length) {
+        var empty = document.createElement("li");
+        empty.className = "ship-option-empty";
+        empty.textContent = config.emptyText || "No matches";
+        list.appendChild(empty);
+        return;
       }
-    });
-    if (index < 0) comboInput.removeAttribute("aria-activedescendant");
-  }
+      matched.forEach(function (o) { list.appendChild(o.el); });
+    }
 
-  function refreshCombo() {
-    renderComboOptions(comboMatches());
-    openCombo();
-    setComboActive(-1);
-  }
+    function visibleOptions() {
+      return collect(list, ".ship-option");
+    }
 
-  function chooseComboOption(optionEl) {
-    if (!optionEl) return;
-    var id = optionEl.dataset.shipId;
-    if (!id || !graph.nodes[id]) return;
-    comboInput.value = comboName(id);
-    closeCombo();
-    comboInput.blur();
-    if (selectedId !== id) selectShip(id);
-  }
+    function openList() {
+      if (open) return;
+      open = true;
+      input.setAttribute("aria-expanded", "true");
+      list.hidden = false;
+    }
 
-  /* Mirror the chart's current selection in the input, so the combobox stays
-     in step when a ship is picked by clicking the diagram or reset. */
-  function syncComboValue() {
-    if (!comboInput) return;
-    comboInput.value = selectedId ? comboName(selectedId) : "";
-    comboOptions.forEach(function (o) {
-      o.el.setAttribute("aria-selected", o.id === selectedId ? "true" : "false");
-    });
-  }
+    function closeList() {
+      if (!open) return;
+      open = false;
+      input.setAttribute("aria-expanded", "false");
+      list.hidden = true;
+      setActive(-1);
+    }
 
-  function wireCombobox() {
-    comboInput = document.getElementById("ship-input");
-    comboList = document.getElementById("ship-list");
-    if (!comboInput || !comboList) return;
-    buildComboOptions();
-    renderComboOptions(comboOptions);
+    function setActive(index) {
+      active = index;
+      visibleOptions().forEach(function (el, i) {
+        var isActive = i === index;
+        el.classList.toggle("is-active", isActive);
+        if (isActive) {
+          input.setAttribute("aria-activedescendant", el.id);
+          if (el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+        }
+      });
+      if (index < 0) input.removeAttribute("aria-activedescendant");
+    }
 
-    // Focusing opens the full list and selects the current name, so a new
+    function refresh() {
+      render(matches());
+      openList();
+      setActive(-1);
+    }
+
+    function choose(optionEl) {
+      if (!optionEl) return;
+      var id = optionEl.dataset.value;
+      input.value = optionEl.textContent;
+      closeList();
+      input.blur();
+      config.onPick(id);
+    }
+
+    // Focusing opens the full list and selects the current value, so a new
     // query can be typed straight away.
-    comboInput.addEventListener("focus", function () {
-      comboInput.select();
-      renderComboOptions(comboOptions);
-      openCombo();
-      setComboActive(-1);
+    input.addEventListener("focus", function () {
+      input.select();
+      render(options);
+      openList();
+      setActive(-1);
     });
-    comboInput.addEventListener("input", refreshCombo);
-    comboInput.addEventListener("keydown", function (e) {
+    input.addEventListener("input", refresh);
+    input.addEventListener("keydown", function (e) {
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
-        if (!comboOpen) { refreshCombo(); return; }
-        var opts = visibleComboOptions();
+        if (!open) { refresh(); return; }
+        var opts = visibleOptions();
         if (!opts.length) return;
-        var next = comboActive + (e.key === "ArrowDown" ? 1 : -1);
+        var next = active + (e.key === "ArrowDown" ? 1 : -1);
         if (next < 0) next = opts.length - 1;
         if (next >= opts.length) next = 0;
-        setComboActive(next);
+        setActive(next);
       } else if (e.key === "Enter") {
-        if (!comboOpen) return;
-        var opts = visibleComboOptions();
-        var target = comboActive >= 0 ? opts[comboActive] : null;
+        if (!open) return;
+        var opts = visibleOptions();
+        var target = active >= 0 ? opts[active] : null;
         if (!target) {
-          // No arrow-key highlight yet: accept an exact name match, or the
-          // only remaining option, so typing a full name and pressing Enter works.
-          var typed = comboInput.value.trim().toLowerCase();
+          // No arrow-key highlight yet: accept an exact match, or the only
+          // remaining option, so typing a full value and pressing Enter works.
+          var typed = input.value.trim().toLowerCase();
           target = opts.filter(function (el) {
             return el.textContent.trim().toLowerCase() === typed;
           })[0] || (opts.length === 1 ? opts[0] : null);
         }
-        if (target) { e.preventDefault(); chooseComboOption(target); }
+        if (target) { e.preventDefault(); choose(target); }
       } else if (e.key === "Escape") {
-        if (comboOpen) { e.preventDefault(); closeCombo(); }
+        if (open) { e.preventDefault(); closeList(); }
       }
     });
     // Pick on click, not mousedown: hiding the list on mousedown removes the
     // option from under the cursor, so the trailing click would land on the
     // graph behind the toolbar and be read as "click background" (resetting the
     // view). Keeping the list up until click makes the option the click target.
-    comboList.addEventListener("click", function (e) {
+    list.addEventListener("click", function (e) {
       var optionEl = e.target.closest ? e.target.closest(".ship-option") : null;
       if (!optionEl) return;
       e.preventDefault();
       e.stopPropagation();
-      chooseComboOption(optionEl);
+      choose(optionEl);
     });
     document.addEventListener("mousedown", function (e) {
-      if (!e.target.closest || !e.target.closest(".ship-select")) closeCombo();
+      if (!e.target.closest || !e.target.closest(config.scopeSelector)) closeList();
     });
+
+    build();
+
+    return {
+      /* Mirror an external selection: show `label` and flag the matching option. */
+      setValue: function (id, label) {
+        input.value = label || "";
+        options.forEach(function (o) {
+          o.el.setAttribute("aria-selected", o.id === id ? "true" : "false");
+        });
+      }
+    };
+  }
+
+  /* Every distinct connection type in the chart, e.g. "Projectile turrets",
+     "Scan" or "Tackle". Group paths are not part of a label, so only the bonus
+     type or playstyle shows up here. */
+  var connectionTypeCache = null;
+  function connectionTypes() {
+    if (!connectionTypeCache) {
+      var seen = Object.create(null);
+      parseRawEdges(baseCode).forEach(function (e) {
+        var label = (e.label || "").trim();
+        if (label) seen[label] = true;
+      });
+      connectionTypeCache = Object.keys(seen).sort(function (a, b) {
+        return a.localeCompare(b, undefined, { sensitivity: "base" });
+      });
+    }
+    return connectionTypeCache;
+  }
+
+  function wireComboboxes() {
+    shipCombo = createCombobox(document.getElementById("ship-input"), document.getElementById("ship-list"), {
+      idPrefix: "ship-option-",
+      scopeSelector: ".ship-select",
+      emptyText: "No ships found",
+      options: function () {
+        return Object.keys(graph.nodes)
+          .map(function (id) { return { id: id, label: comboName(id) }; })
+          .sort(function (a, b) {
+            return a.label.localeCompare(b.label, undefined, { sensitivity: "base" });
+          });
+      },
+      onPick: function (id) { if (selectedId !== id) selectShip(id); }
+    });
+
+    edgeCombo = createCombobox(document.getElementById("edge-input"), document.getElementById("edge-list"), {
+      idPrefix: "edge-option-",
+      scopeSelector: ".edge-select",
+      emptyText: "No connection types found",
+      options: function () {
+        return connectionTypes().map(function (label) { return { id: label, label: label }; });
+      },
+      onPick: selectEdgeType
+    });
+  }
+
+  /* Keep both comboboxes in step with the chart's current selection, however it
+     was made (diagram click, picker, reset). */
+  function syncComboValues() {
+    if (shipCombo) shipCombo.setValue(selectedId, selectedId ? comboName(selectedId) : "");
+    var type = selectedEdge ? selectedEdge.label : selectedType;
+    if (edgeCombo) edgeCombo.setValue(type, type || "");
   }
 
   function downloadSvg() {
@@ -1238,10 +1325,11 @@
       // drop the isolated ship and frame the default group on the full chart.
       savedFullView = null;
       highlightedEdgeId = null;
-      if (selectedId || selectedEdge) {
+      if (selectedId || selectedEdge || selectedType) {
         selectedId = null;
         selectedEdge = null;
-        syncComboValue();
+        selectedType = null;
+        syncComboValues();
         requestView({ code: baseCode, full: true, selectedId: null });
         return;
       }
@@ -1305,7 +1393,7 @@
     wireSelection();
     wireControls();
     wireEdgeTooltip();
-    wireCombobox();
+    wireComboboxes();
     requestView({ code: baseCode, full: true, selectedId: null });
   }
 
