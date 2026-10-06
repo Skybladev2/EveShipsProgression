@@ -13,12 +13,15 @@ connected to it, directly or through a chain of variants, so what remains is lai
 compact diagram of its own. Click the background to bring the full chart back, framed exactly
 as you had panned and zoomed it before filtering. Use **Reset** to return to the default view.
 
-Click an edge to highlight that single connection and narrow the chart to its connection type.
-The remaining diagram keeps only links that share the clicked edge's label, so clicking a
-`Tackle` link leaves nothing but Tackle connections and clicking a `Projectile turrets` link
-leaves nothing but Projectile turrets. This is stricter than isolating a ship, which follows
-every connection regardless of type. Click the same edge again, or the background, to bring
-the full chart back, framed as you had panned and zoomed it before filtering.
+The **Filter on edge click** checkbox chooses what clicking an edge does. With it on, the click
+narrows the chart to that connection type: the remaining diagram keeps only links that share the
+clicked edge's label, so clicking a `Tackle` link leaves nothing but Tackle connections and
+clicking a `Projectile turrets` link leaves nothing but Projectile turrets. This is stricter than
+isolating a ship, which follows every connection regardless of type. Click the same edge again,
+or the background, to bring the full chart back, framed as you had panned and zoomed it before
+filtering. With the checkbox off, clicking an edge only highlights that single connection in
+place and leaves the diagram as it is; click the edge again, or the background, to clear the
+highlight.
 
 Hover an edge to see what it connects, in the form `edge label → connecting ship`; group
 targets use their full path, e.g. `Missiles → Cruisers/Missiles`.

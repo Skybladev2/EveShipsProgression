@@ -22,6 +22,10 @@
              spellcheck="false" placeholder="Select a ship…" aria-label="Select a ship">
       <ul id="ship-list" role="listbox" aria-label="Ships" hidden></ul>
     </div>
+    <label class="edge-mode" title="On: clicking an edge narrows the chart to that connection type. Off: clicking an edge only highlights it.">
+      <input id="edge-filter-mode" type="checkbox" checked>
+      <span>Filter on edge click</span>
+    </label>
     <div class="buttons">
       <button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
       <button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
@@ -37,7 +41,7 @@
 </main>
 
 <footer class="statusbar">
-  <span>Drag to pan · Scroll to zoom · Pick or click a ship to isolate its line · Click an edge to show only its connection type</span>
+  <span>Drag to pan · Scroll to zoom · Pick or click a ship to isolate its line · Click an edge to highlight or filter by its connection type</span>
 </footer>
 
 <script src="assets/app.js"></script>

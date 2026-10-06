@@ -102,6 +102,31 @@ body {
   cursor: default;
 }
 .buttons { display: flex; gap: 6px; }
+
+/* checkbox that switches what clicking an edge does */
+.edge-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  color: var(--text);
+  background: #171f2c;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.edge-mode:hover { background: #1e2838; border-color: #35435a; }
+.edge-mode input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 button {
   min-width: 34px;
   padding: 7px 11px;

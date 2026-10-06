@@ -1,8 +1,9 @@
 /* Renders the Mermaid diagram from README.md and adds pan / zoom / a ship picker.
    Clicking a ship rebuilds the chart from just its connected component, so the
    remaining ships are laid out as their own compact diagram; the two views
-   cross-fade. Clicking an edge highlights it and narrows the chart to links of
-   the same connection type. Clicking the background brings the full chart back.
+   cross-fade. Clicking an edge either highlights it in place or narrows the
+   chart to links of the same connection type, depending on the "Filter on edge
+   click" checkbox. Clicking the background brings the full chart back.
    Libraries are vendored under assets/vendor; CDNs are only a fallback. */
 (function () {
   "use strict";
@@ -41,6 +42,8 @@
   var domIndex = null;    // rendered elements keyed by source id
   var selectedId = null;  // currently isolated ship, or null for the full chart
   var selectedEdge = null; // connection-type filter: { src, dst, label }, or null
+  var highlightedEdgeId = null; // rendered edge id highlighted in place (highlight mode)
+  var filterOnEdgeClick = true; // true: edge click filters; false: it only highlights
   var displayNames = Object.create(null); // source id -> label shown on the chart
   var tooltipEl = null;   // floating tooltip for the edge under the cursor
   var tooltipEdgeId = null; // edge the tooltip currently describes
@@ -514,13 +517,26 @@
     if (domIndex && selectedId && domIndex.byId[selectedId]) {
       domIndex.byId[selectedId].el.classList.add("ship-selected");
     }
-    if (domIndex && selectedEdge) {
-      var id = findEdgePathId(selectedEdge.src, selectedEdge.dst);
-      var path = id && domIndex.pathByEdgeId[id];
-      var label = id && domIndex.labelByEdgeId[id];
-      if (path) path.classList.add("edge-selected");
-      if (label) label.classList.add("edge-selected");
-    }
+    if (selectedEdge) paintEdgeHighlight(findEdgePathId(selectedEdge.src, selectedEdge.dst));
+  }
+
+  /* Brighten one rendered edge's line and label. */
+  function paintEdgeHighlight(id) {
+    if (!domIndex || !id) return;
+    var path = domIndex.pathByEdgeId[id];
+    var label = domIndex.labelByEdgeId[id];
+    if (path) path.classList.add("edge-selected");
+    if (label) label.classList.add("edge-selected");
+  }
+
+  /* Recompute the in-place edge highlight on the layer that is already shown,
+     without rebuilding the diagram (highlight mode). */
+  function refreshEdgeHighlight() {
+    if (!domIndex || !svgEl) return;
+    collect(svgEl, "path.edge-selected, g.edgeLabel.edge-selected").forEach(function (el) {
+      el.classList.remove("edge-selected");
+    });
+    paintEdgeHighlight(highlightedEdgeId);
   }
 
   /* Find the rendered edge joining two source endpoints, so the highlight can
@@ -611,22 +627,33 @@
     });
   }
 
-  /* Clicking an edge highlights it and narrows the diagram to its connection
-     type: only links that share the clicked edge's label survive, so a "Tackle"
+  /* Clicking an edge does one of two things, set by the "Filter on edge click"
+     checkbox. In filter mode it narrows the diagram to the clicked edge's
+     connection type: only links that share its label survive, so a "Tackle"
      click leaves nothing but Tackle and a "Projectile turrets" click nothing
-     but Projectile turrets. Clicking the same edge again restores the full
-     chart. The text is read from the rendered label, which is reliable for
-     group edges and for edges that only exist in a filtered view. */
+     but Projectile turrets; clicking the same edge again restores the full
+     chart. In highlight mode it just marks that one link in place, leaving the
+     diagram untouched. The label is read from the rendered edge, which is
+     reliable for group edges and for edges that only exist in a filtered view. */
   function selectEdge(edgeId) {
     if (!graph || !domIndex) return;
     var ends = edgeEndpoints(edgeId);
     if (!ends) return;
+
+    if (!filterOnEdgeClick) {
+      // Highlight mode: toggle that exact link in place, no rebuild.
+      highlightedEdgeId = highlightedEdgeId === edgeId ? null : edgeId;
+      refreshEdgeHighlight();
+      return;
+    }
+
     if (selectedEdge && sameEnds(selectedEdge, ends)) { clearSelection(); return; }
     captureFullView();
     var label = renderedEdgeLabel(edgeId);
     var seeds = endpointNodes(ends[0]).concat(endpointNodes(ends[1]));
     var visible = sameTypeComponent(seeds, label);
     if (!Object.keys(visible).length) return;
+    highlightedEdgeId = null;
     selectedId = null;
     selectedEdge = { src: ends[0], dst: ends[1], label: label };
     requestView({
@@ -876,6 +903,7 @@
   function selectShip(id) {
     if (!graph.nodes[id] || selectedId === id) return;
     captureFullView();
+    highlightedEdgeId = null;
     selectedId = id;
     selectedEdge = null;
     syncComboValue();
@@ -888,11 +916,18 @@
   }
 
   function clearSelection() {
-    if (!selectedId && !selectedEdge) return;
+    if (!selectedId && !selectedEdge && !highlightedEdgeId) return;
+    var wasFiltered = !!(selectedId || selectedEdge);
     selectedId = null;
     selectedEdge = null;
+    highlightedEdgeId = null;
     syncComboValue();
-    requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
+    if (wasFiltered) {
+      requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
+    } else {
+      // Highlight mode never rebuilt the chart, so just drop the in-place highlight.
+      refreshEdgeHighlight();
+    }
   }
 
   /* Find a rendered subgraph by its visible label, e.g. "Empire Faction
@@ -1202,6 +1237,7 @@
       // Reset means "back to the default view": forget any remembered framing,
       // drop the isolated ship and frame the default group on the full chart.
       savedFullView = null;
+      highlightedEdgeId = null;
       if (selectedId || selectedEdge) {
         selectedId = null;
         selectedEdge = null;
@@ -1209,6 +1245,7 @@
         requestView({ code: baseCode, full: true, selectedId: null });
         return;
       }
+      refreshEdgeHighlight();
       if (!panZoom) return;
       if (!focusDefaultGroup()) { panZoom.resetZoom(); panZoom.center(); scheduleHitWidth(); }
     });
@@ -1219,6 +1256,17 @@
       if (!selectedId && focusDefaultGroup()) return;
       scheduleHitWidth();
     });
+
+    // Choose what clicking an edge does. Switching modes drops the current
+    // selection so the two kinds of highlight never linger out of step.
+    var edgeMode = document.getElementById("edge-filter-mode");
+    if (edgeMode) {
+      filterOnEdgeClick = edgeMode.checked;
+      edgeMode.addEventListener("change", function () {
+        filterOnEdgeClick = edgeMode.checked;
+        clearSelection();
+      });
+    }
   }
 
   function boot(code) {
