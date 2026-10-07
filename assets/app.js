@@ -873,6 +873,10 @@
       zoomScaleSensitivity: 0.25,
       dblClickZoomEnabled: false,
       mouseWheelZoomEnabled: true,
+      // Drag panning is handled in wirePan so a held button keeps panning even
+      // after the pointer leaves the canvas. The library's own drag would stop
+      // at the SVG edge (its mouseleave handler ends the gesture).
+      panEnabled: false,
       onZoom: onViewChanged,
       onPan: onViewChanged,
       beforePan: clampPan,
@@ -1173,10 +1177,11 @@
     minimapView.setAttribute("height", h / m.d);
   }
 
-  /* Keep the diagram from being dragged off into empty space: a pan is only
-     accepted while the content still covers the viewport. Along an axis where
-     the content is already smaller than the viewport (letterboxed at fit), the
-     view is pinned to the content centre instead. */
+  /* Keep the diagram reachable without letting it be dragged entirely off the
+     screen. The viewport centre is allowed to reach any point of the content,
+     so any ship can be centred at any zoom level — including when the whole
+     chart is smaller than the viewport. The pan is limited to the range that
+     keeps the viewport centre inside the content bounds. */
   function clampPan(oldPan, newPan) {
     if (!contentBounds || !svgEl || !panZoom) return newPan;
     var w = svgEl.clientWidth;
@@ -1188,13 +1193,13 @@
     // content look smaller than the viewport and wrongly re-centre it.
     var scale = Math.min(w / b.width, h / b.height) * panZoom.getZoom();
     if (!scale) return newPan;
-    var minX = w - scale * (b.x + b.width);
-    var maxX = -scale * b.x;
-    var minY = h - scale * (b.y + b.height);
-    var maxY = -scale * b.y;
+    var minX = w / 2 - scale * (b.x + b.width);
+    var maxX = w / 2 - scale * b.x;
+    var minY = h / 2 - scale * (b.y + b.height);
+    var maxY = h / 2 - scale * b.y;
     return {
-      x: minX <= maxX ? Math.min(maxX, Math.max(minX, newPan.x)) : w / 2 - scale * (b.x + b.width / 2),
-      y: minY <= maxY ? Math.min(maxY, Math.max(minY, newPan.y)) : h / 2 - scale * (b.y + b.height / 2)
+      x: Math.min(maxX, Math.max(minX, newPan.x)),
+      y: Math.min(maxY, Math.max(minY, newPan.y))
     };
   }
 
@@ -1494,6 +1499,60 @@
   var pointerDown = null;
   var movedFar = false;
 
+  /* Drag to pan, driven by pointer events with pointer capture. svg-pan-zoom
+     ends its own drag as soon as the cursor leaves the SVG, so the view stops
+     following the pointer at the canvas edge. Capturing the pointer keeps the
+     gesture alive anywhere on the page (and outside the window) until the
+     button is released. Capture starts only once the drag leaves a small
+     threshold, so a plain click still reaches nodes and edges normally. */
+  var panDrag = null;
+
+  function wirePan() {
+    viewport.addEventListener("pointerdown", function (e) {
+      if (!panZoom || panDrag) return;
+      // Left and right button; touch and pen report button 0.
+      if (e.button !== 0 && e.button !== 2) return;
+      // The minimap runs its own drag-to-jump gesture.
+      if (e.target && e.target.closest && e.target.closest("#minimap")) return;
+      panDrag = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startPan: panZoom.getPan(),
+        captured: false
+      };
+    });
+
+    viewport.addEventListener("pointermove", function (e) {
+      if (!panDrag || e.pointerId !== panDrag.pointerId || !panZoom) return;
+      var dx = e.clientX - panDrag.startX;
+      var dy = e.clientY - panDrag.startY;
+      if (!panDrag.captured) {
+        // Wait until it is clearly a drag, so a click is not turned into one.
+        if (Math.abs(dx) + Math.abs(dy) <= 3) return;
+        panDrag.captured = true;
+        if (viewport.setPointerCapture) {
+          try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        }
+      }
+      panZoom.pan({ x: panDrag.startPan.x + dx, y: panDrag.startPan.y + dy });
+    });
+
+    function endPan(e) {
+      if (!panDrag || (e && e.pointerId !== panDrag.pointerId)) return;
+      if (panDrag.captured && viewport.releasePointerCapture) {
+        try { viewport.releasePointerCapture(panDrag.pointerId); } catch (err) { /* ignore */ }
+      }
+      panDrag = null;
+    }
+    // The window listeners catch a release outside the viewport even when the
+    // pointer was never captured (it left before passing the drag threshold).
+    viewport.addEventListener("pointerup", endPan);
+    viewport.addEventListener("pointercancel", endPan);
+    window.addEventListener("pointerup", endPan);
+    window.addEventListener("pointercancel", endPan);
+  }
+
   function wireSelection() {
     viewport.addEventListener("mousedown", function (e) {
       pointerDown = { x: e.clientX, y: e.clientY };
@@ -1505,6 +1564,12 @@
         movedFar = true;
       }
     }, true);
+
+    // A right-button drag pans the diagram (see wirePan), so suppress the
+    // browser context menu over it; the toolbar keeps its normal menu.
+    viewport.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
 
     document.addEventListener("click", function (e) {
       if (movedFar) { pointerDown = null; return; }
@@ -1617,6 +1682,7 @@
     });
 
     wireSelection();
+    wirePan();
     wireControls();
     wireEdgeTooltip();
     wireComboboxes();

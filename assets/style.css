@@ -157,7 +157,15 @@ button:active { transform: translateY(1px); }
     radial-gradient(circle at 20% 0%, #141b27 0%, var(--bg) 55%);
 }
 #graph { position: absolute; inset: 0; }
-#graph svg { display: block; width: 100%; height: 100%; }
+#graph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Pointer-driven panning owns touch gestures; stop the browser from
+     scrolling or selecting while dragging the diagram. */
+  touch-action: none;
+  user-select: none;
+}
 
 /* Minimap: a scaled-down copy of the current diagram with a box marking the
    visible region. Clicking or dragging inside it re-centres the main view. */
