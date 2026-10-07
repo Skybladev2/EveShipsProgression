@@ -535,6 +535,7 @@ flowchart
 		n_Gnosis["Gnosis"]
 	end
 	subgraph s67["Pirate Faction Battlecruisers"]
+		n_Akoman["Akoman"]
 		n_Alligator["Alligator"]
 		n_Cenotaph["Cenotaph"]
 		n_Khizriel["Khizriel"]
@@ -777,7 +778,9 @@ flowchart
 	n_Vexor -->|"Drones"| n_Ishtar
 	n_Stabber_Fleet_Issue -->|"Projectile turrets"| n_Cynabal
 	n_Stabber_Fleet_Issue -->|"Projectile turrets"| n_Loki
-	n_Ashimmu -->|"Energy turrets"| n_Bhaalgorn
+	n_Oracle -->|"Energy turrets"| n_Akoman
+	n_Ashimmu -->|"Energy turrets"| n_Akoman
+	n_Akoman -->|"Energy turrets"| n_Bhaalgorn
 	n_Cynabal -->|"Projectile turrets"| n_Khizriel
 	n_Gila -->|"Missiles"| n_Alligator
 	n_Orthrus -->|"Missiles"| n_Barghest
