@@ -43,6 +43,7 @@
       <button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
       <button id="fit" title="Fit to screen">Fit</button>
       <button id="reset" title="Reset view">Reset</button>
+      <button id="minimap-toggle" title="Show / hide the minimap" aria-pressed="true">Map</button>
       <button id="download" title="Download as SVG">SVG</button>
     </div>
   </div>
@@ -50,10 +51,16 @@
 
 <main id="viewport">
   <div id="graph" aria-live="polite"><div class="loading">Loading diagram…</div></div>
+  <!-- Overview of the whole chart with a draggable viewport box, so the wide
+       diagram can be navigated without losing track of where you are. -->
+  <div id="minimap" class="minimap" role="presentation">
+    <svg id="minimap-svg" class="minimap-svg" preserveAspectRatio="none"
+         aria-hidden="true" focusable="false"></svg>
+  </div>
 </main>
 
 <footer class="statusbar">
-  <span>Drag to pan · Scroll to zoom · Pick a ship to isolate its line or a connection type to filter the chart · Click an edge to highlight or filter by it</span>
+  <span>Drag to pan · Scroll to zoom · Drag the minimap to jump around · Pick a ship to isolate its line or a connection type to filter the chart · Click an edge to highlight or filter by it</span>
 </footer>
 
 <script src="assets/app.js"></script>

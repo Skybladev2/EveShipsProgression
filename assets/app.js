@@ -25,6 +25,14 @@
   var panZoomSvg = null;  // svg element the current panZoom instance controls
   var svgEl = null;
 
+  var SVG_NS = "http://www.w3.org/2000/svg";
+  var minimap = document.getElementById("minimap");
+  var minimapSvg = document.getElementById("minimap-svg");
+  var minimapView = null;    // rectangle marking the visible region
+  var minimapDragging = false;
+  var minimapEnabled = true; // toggled from the toolbar
+  var contentBounds = null;  // tight diagram bounds, used to clamp panning
+
   /* Mermaid builds the diagram inside a temporary element before handing back
      the SVG string. Left in the normal document flow, that element briefly
      shows up as a full-width strip at the bottom of the page while a large
@@ -858,16 +866,30 @@
       controlIconsEnabled: false,
       fit: true,
       center: true,
-      minZoom: 0.02,
-      maxZoom: 25,
+      // Zoom is relative to the fit of the whole diagram: 1 shows all of it,
+      // so there is nothing smaller to reach and no reason to allow it.
+      minZoom: 1,
+      maxZoom: 16,
       zoomScaleSensitivity: 0.25,
       dblClickZoomEnabled: false,
       mouseWheelZoomEnabled: true,
-      onZoom: scheduleHitWidth,
-      onPan: scheduleHitWidth
+      onZoom: onViewChanged,
+      onPan: onViewChanged,
+      beforePan: clampPan,
+      // Fires once the new CTM has actually been applied, which onZoom/onPan
+      // do not guarantee: keeps the minimap box from lagging a step behind and
+      // pulls programmatic pans (focus, fit, restore) back inside the bounds.
+      onUpdatedCTM: handleCTM
     });
     panZoomSvg = svg;
     updateHitWidth();
+    updateMinimapView();
+  }
+
+  /* Pan/zoom moved the view: refresh the edge hit widths and the minimap box. */
+  function onViewChanged() {
+    scheduleHitWidth();
+    updateMinimapView();
   }
 
   /* Put a freshly rendered SVG on top of the current one and cross-fade. When
@@ -890,11 +912,14 @@
     // Let the new layer take layout before initialising pan/zoom on it.
     svg.getBoundingClientRect();
     initPanZoom(svg);
+    // Bounds for the pan clamp; measured from the new layer before it is framed.
+    contentBounds = diagramBounds();
     // The full chart opens framed on the default group; isolated components are
     // left fitted to their own bounds.
     if (!filtered && !(restoreView && restoreFullView())) focusDefaultGroup();
 
     if (old) old.style.pointerEvents = "none";
+    setupMinimap();
     requestAnimationFrame(function () {
       svg.style.opacity = "1";
       if (old) old.style.opacity = "0";
@@ -1041,6 +1066,200 @@
     panZoom.pan(savedFullView.pan);
     scheduleHitWidth();
     return true;
+  }
+
+  /* ---- Minimap ---------------------------------------------------------
+     A small picture of the whole diagram with a box around the region that is
+     currently on screen. It is redrawn whenever a new diagram layer is built
+     and only its box moves while panning or zooming. Dragging inside it
+     re-centres the main view, so the wide chart can be navigated directly. */
+
+  /* svg-pan-zoom moves the diagram by transforming a wrapper group instead of
+     the svg's viewBox, so all coordinates here come from that group: its bbox
+     is the diagram in its own units, and its CTM maps those units to the
+     screen. */
+  function pzViewportGroup(svg) {
+    return svg && svg.querySelector ? svg.querySelector("g.svg-pan-zoom_viewport") : null;
+  }
+
+  /* Tight bounds of the diagram in its own units. */
+  function diagramBounds() {
+    var source = pzViewportGroup(svgEl) || svgEl;
+    if (!source) return null;
+    var bbox;
+    try { bbox = source.getBBox(); } catch (e) { return null; }
+    if (!bbox || !bbox.width || !bbox.height) return null;
+    return { x: bbox.x, y: bbox.y, width: bbox.width, height: bbox.height };
+  }
+
+  /* The region the viewport can move over — the diagram bounds with no extra
+     margin, so the visible-area box reaches the minimap edges at the limits. */
+  function movementBounds() {
+    return diagramBounds();
+  }
+
+  /* Rebuild the minimap picture from the current SVG layer and fit the whole
+     diagram into it. The minimap's viewBox is the diagram bounds, so the
+     viewport rectangle is drawn directly in diagram units. */
+  function setupMinimap() {
+    if (!minimap || !minimapSvg) return;
+    if (!minimapEnabled || !panZoom || !svgEl) { minimap.hidden = true; return; }
+    var box = movementBounds();
+    if (!box) { minimap.hidden = true; return; }
+    minimap.hidden = false;
+    minimapSvg.setAttribute("viewBox", box.x + " " + box.y + " " + box.width + " " + box.height);
+
+    while (minimapSvg.firstChild) minimapSvg.removeChild(minimapSvg.firstChild);
+
+    // Copy the diagram's contents into a plain group so they render in the
+    // parent's diagram coordinates. The pan/zoom wrapper is stripped of its
+    // transform (svg-pan-zoom writes it as both an attribute and an inline
+    // style) so the copy shows the whole chart, not just the region on screen.
+    // The group takes over the svg's id so Mermaid's id-scoped styles still
+    // apply; only the minimap svg itself handles pointer events.
+    var source = svgEl.cloneNode(true);
+    var sourceViewport = pzViewportGroup(source);
+    if (sourceViewport) {
+      sourceViewport.removeAttribute("transform");
+      sourceViewport.style.transform = "";
+      if (!sourceViewport.getAttribute("style")) sourceViewport.removeAttribute("style");
+    }
+    var copy = document.createElementNS(SVG_NS, "g");
+    copy.setAttribute("id", svgEl.id);
+    copy.setAttribute("aria-hidden", "true");
+    while (source.firstChild) copy.appendChild(source.firstChild);
+    minimapSvg.appendChild(copy);
+
+    minimapView = document.createElementNS(SVG_NS, "rect");
+    minimapView.setAttribute("class", "minimap-view");
+    minimapSvg.appendChild(minimapView);
+
+    updateMinimapView();
+  }
+
+  /* The pan/zoom matrix as { a, d, e, f } (scale and translate; svg-pan-zoom
+     never rotates). Read from computed style so it is current even on the same
+     tick the transform was written, which getCTM is not. */
+  function viewportMatrix() {
+    var group = pzViewportGroup(svgEl);
+    if (!group) return null;
+    var value = window.getComputedStyle ? getComputedStyle(group).transform : "";
+    if (value && value !== "none") {
+      var m = value.match(/matrix\(([^)]+)\)/);
+      if (m) {
+        var v = m[1].split(",").map(function (n) { return parseFloat(n); });
+        if (v.length === 6) return { a: v[0], d: v[3], e: v[4], f: v[5] };
+      }
+      var m3 = value.match(/matrix3d\(([^)]+)\)/);
+      if (m3) {
+        var v3 = m3[1].split(",").map(function (n) { return parseFloat(n); });
+        if (v3.length === 16) return { a: v3[0], d: v3[5], e: v3[12], f: v3[13] };
+      }
+    }
+    var ctm = group.getCTM ? group.getCTM() : null;
+    return ctm ? { a: ctm.a, d: ctm.d, e: ctm.e, f: ctm.f } : null;
+  }
+
+  /* Move the viewport rectangle to match the region currently on screen. */
+  function updateMinimapView() {
+    if (!minimapView || !svgEl) return;
+    var m = viewportMatrix();
+    if (!m || !m.a || !m.d) return;
+    var w = svgEl.clientWidth || svgEl.getBoundingClientRect().width || 1;
+    var h = svgEl.clientHeight || svgEl.getBoundingClientRect().height || 1;
+    minimapView.setAttribute("x", -m.e / m.a);
+    minimapView.setAttribute("y", -m.f / m.d);
+    minimapView.setAttribute("width", w / m.a);
+    minimapView.setAttribute("height", h / m.d);
+  }
+
+  /* Keep the diagram from being dragged off into empty space: a pan is only
+     accepted while the content still covers the viewport. Along an axis where
+     the content is already smaller than the viewport (letterboxed at fit), the
+     view is pinned to the content centre instead. */
+  function clampPan(oldPan, newPan) {
+    if (!contentBounds || !svgEl || !panZoom) return newPan;
+    var w = svgEl.clientWidth;
+    var h = svgEl.clientHeight;
+    var b = contentBounds;
+    if (!w || !h || !b.width || !b.height) return newPan;
+    // Scale from svg-pan-zoom's own state, not the rendered transform: the
+    // transform lags a frame behind a programmatic zoom, which would make the
+    // content look smaller than the viewport and wrongly re-centre it.
+    var scale = Math.min(w / b.width, h / b.height) * panZoom.getZoom();
+    if (!scale) return newPan;
+    var minX = w - scale * (b.x + b.width);
+    var maxX = -scale * b.x;
+    var minY = h - scale * (b.y + b.height);
+    var maxY = -scale * b.y;
+    return {
+      x: minX <= maxX ? Math.min(maxX, Math.max(minX, newPan.x)) : w / 2 - scale * (b.x + b.width / 2),
+      y: minY <= maxY ? Math.min(maxY, Math.max(minY, newPan.y)) : h / 2 - scale * (b.y + b.height / 2)
+    };
+  }
+
+  /* After any view transform change, refresh the minimap box and pull the pan
+     back inside the bounds. Programmatic pan()/zoom() calls skip beforePan, so
+     this is what keeps framed and restored views tidy. */
+  function handleCTM() {
+    updateMinimapView();
+    if (!panZoom || !contentBounds) return;
+    var pan = panZoom.getPan();
+    var clamped = clampPan(pan, pan);
+    if (clamped && (Math.abs(clamped.x - pan.x) > 0.5 || Math.abs(clamped.y - pan.y) > 0.5)) {
+      panZoom.pan(clamped);
+    }
+  }
+
+  /* Centre the main view on a point in the minimap (given in screen pixels). */
+  function panToMinimapPoint(clientX, clientY) {
+    if (!panZoom || panZoomSvg !== svgEl || !minimapSvg || !minimapSvg.getScreenCTM || !svgEl.createSVGPoint) return;
+    var ctm = minimapSvg.getScreenCTM();
+    if (!ctm) return;
+    var point = minimapSvg.createSVGPoint();
+    point.x = clientX;
+    point.y = clientY;
+    point = point.matrixTransform(ctm.inverse()); // diagram units
+
+    // Where that diagram point sits on screen right now, and how far it must
+    // move to reach the centre of the main viewport.
+    var m = viewportMatrix();
+    if (!m || !m.a || !m.d) return;
+    var rect = svgEl.getBoundingClientRect();
+    var dx = rect.left + rect.width / 2 - (rect.left + m.a * point.x + m.e);
+    var dy = rect.top + rect.height / 2 - (rect.top + m.d * point.y + m.f);
+    panZoom.panBy({ x: dx, y: dy });
+    scheduleHitWidth();
+    updateMinimapView();
+  }
+
+  function wireMinimap() {
+    if (!minimapSvg) return;
+    minimapSvg.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0 || !panZoom) return;
+      minimapDragging = true;
+      if (minimapSvg.setPointerCapture) {
+        try { minimapSvg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      }
+      panToMinimapPoint(e.clientX, e.clientY);
+      e.preventDefault();
+    });
+    minimapSvg.addEventListener("pointermove", function (e) {
+      if (!minimapDragging) return;
+      panToMinimapPoint(e.clientX, e.clientY);
+    });
+    var stop = function () { minimapDragging = false; };
+    minimapSvg.addEventListener("pointerup", stop);
+    window.addEventListener("pointerup", stop);
+    window.addEventListener("pointercancel", stop);
+  }
+
+  function setMinimapEnabled(on) {
+    minimapEnabled = !!on;
+    var toggle = document.getElementById("minimap-toggle");
+    if (toggle) toggle.setAttribute("aria-pressed", minimapEnabled ? "true" : "false");
+    if (minimapEnabled) setupMinimap();
+    else if (minimap) minimap.hidden = true;
   }
 
   /* A filterable combobox: a text input plus a dropdown list. Typing narrows
@@ -1292,6 +1511,9 @@
       pointerDown = null;
       var target = e.target;
 
+      // Clicks in the minimap pan the view; they must not reset the selection.
+      if (target && target.closest && target.closest("#minimap")) return;
+
       // Edges are checked first: clicking one highlights it and narrows the
       // chart to its connection type.
       var edgeId = edgeIdFromTarget(target);
@@ -1338,11 +1560,15 @@
       if (!focusDefaultGroup()) { panZoom.resetZoom(); panZoom.center(); scheduleHitWidth(); }
     });
     document.getElementById("download").addEventListener("click", downloadSvg);
+    document.getElementById("minimap-toggle").addEventListener("click", function () {
+      setMinimapEnabled(!minimapEnabled);
+    });
     window.addEventListener("resize", function () {
       if (!panZoom) return;
       panZoom.resize(); panZoom.fit(); panZoom.center();
-      if (!selectedId && focusDefaultGroup()) return;
+      if (!selectedId && focusDefaultGroup()) { updateMinimapView(); return; }
       scheduleHitWidth();
+      updateMinimapView();
     });
 
     // Choose what clicking an edge does. Switching modes drops the current
@@ -1394,6 +1620,7 @@
     wireControls();
     wireEdgeTooltip();
     wireComboboxes();
+    wireMinimap();
     requestView({ code: baseCode, full: true, selectedId: null });
   }
 
