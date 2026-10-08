@@ -29,7 +29,10 @@ rewards) are not in the SDE type list, so they are never highlighted either way.
 Click any ship to isolate its progression line: the chart is redrawn from just the ships
 connected to it, directly or through a chain of variants, so what remains is laid out as a
 compact diagram of its own. Click the background to bring the full chart back, framed exactly
-as you had panned and zoomed it before filtering. Use **Reset** to return to the default view.
+as you had panned and zoomed it before filtering. While **Only flyable** is active, isolation
+and connection-type filters stay inside the ships you can fly — the chart never widens past
+the filter — and the ship picker lists only those hulls too. Use **Reset** to return to the
+default view.
 
 The **Connection type** picker lists every bonus type or playstyle in the chart, such as
 `Projectile turrets`, `Scan` or `Tackle`. Choosing one narrows the whole chart to the ships joined

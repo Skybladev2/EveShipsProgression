@@ -292,16 +292,18 @@
   /* Ships reachable from the seed ships using only edges whose label matches
      the selected connection type. This is the stricter counterpart of
      connectedComponent, which follows every edge regardless of type. */
-  function sameTypeComponent(seedIds, label) {
+  function sameTypeComponent(seedIds, label, allow) {
     var adjacency = graph.labelAdj[label] || Object.create(null);
     var visible = Object.create(null);
     var queue = [];
     seedIds.forEach(function (id) {
+      if (allow && !allow(id)) return;
       if (!visible[id]) { visible[id] = true; queue.push(id); }
     });
     while (queue.length) {
       var neighbours = adjacency[queue.pop()] || {};
       for (var key in neighbours) {
+        if (allow && !allow(key)) continue;
         if (!visible[key]) { visible[key] = true; queue.push(key); }
       }
     }
@@ -311,12 +313,21 @@
   /* Every ship that is an endpoint of at least one connection of this type,
      whether the edge runs between two ships or between a ship and a group.
      This is the whole graph for the combobox filter, not just one component. */
-  function nodesForLabel(label) {
+  function nodesForLabel(label, allow) {
     var visible = Object.create(null);
     parseRawEdges(baseCode).forEach(function (e) {
       if (e.label !== label) return;
-      endpointNodes(e.src).forEach(function (id) { visible[id] = true; });
-      endpointNodes(e.dst).forEach(function (id) { visible[id] = true; });
+      var from = endpointNodes(e.src);
+      var to = endpointNodes(e.dst);
+      if (allow) {
+        // Keep the connection only while it still joins two flyable ships;
+        // otherwise a flyable hull would surface as a lone, disconnected node.
+        from = from.filter(allow);
+        to = to.filter(allow);
+        if (!from.length || !to.length) return;
+      }
+      from.forEach(function (id) { visible[id] = true; });
+      to.forEach(function (id) { visible[id] = true; });
     });
     return visible;
   }
@@ -333,7 +344,7 @@
     return names;
   }
 
-  function connectedComponent(id) {
+  function connectedComponent(id, allow) {
     var visible = Object.create(null);
     visible[id] = true;
 
@@ -343,6 +354,7 @@
         var current = queue.pop();
         var neighbours = adjacency[current] || {};
         for (var key in neighbours) {
+          if (allow && !allow(key)) continue;
           if (!visible[key]) { visible[key] = true; queue.push(key); }
         }
       }
@@ -351,6 +363,24 @@
     walk(graph.outAdj);  // ships reachable from `id`
     walk(graph.inAdj);   // ships that can reach `id`
     return visible;
+  }
+
+  /* True when the character can fly at least one ship that appears on the
+     chart. A fresh pilot may qualify for none of them, in which case the
+     flyable view falls back to the full chart (see requestFlyableView). */
+  function hasFlyableShips() {
+    if (!graph) return false;
+    return Object.keys(sso.flyable || {}).some(function (id) { return !!graph.nodes[id]; });
+  }
+
+  /* While the "Only flyable" view is active, isolation and connection-type
+     filters must stay inside the flyable subgraph; otherwise picking one hull
+     would pull in every ship it links to, including ones the pilot cannot fly.
+     Returns a predicate matching only flyable ships, or null when the full
+     chart is in play. */
+  function flyableOnly() {
+    if (!sso.filterFlyable || !hasFlyableShips()) return null;
+    return function (id) { return !!sso.flyable[id]; };
   }
 
   /* Deepest subgraph a ship lives in, e.g. n_Hurricane -> bc_proj. Used to
@@ -617,8 +647,11 @@
     });
   }
 
-  /* Rebuild the chart showing only ships the character can fly. */
-  function requestFlyableView() {
+  /* Rebuild the chart showing only ships the character can fly. `restoreView`
+     re-applies the framing captured before the pilot isolated a ship, so
+     clearing a selection drops back to the flyable chart they were on. */
+  function requestFlyableView(opts) {
+    var restore = !!(opts && opts.restoreView);
     var visible = Object.create(null);
     Object.keys(sso.flyable || {}).forEach(function (id) {
       if (graph.nodes[id]) visible[id] = true;
@@ -634,7 +667,12 @@
     selectedType = null;
     highlightedEdgeId = null;
     syncComboValues();
-    requestView({ code: buildFilteredCode(baseCode, visible, null), full: false, selectedId: null });
+    requestView({
+      code: buildFilteredCode(baseCode, visible, null),
+      full: false,
+      selectedId: null,
+      restoreView: restore
+    });
   }
 
   /* Clear the flyable filter, the edge filter and any isolation: the regular
@@ -823,6 +861,7 @@
     if (menu) menu.hidden = true;
     if (message) showSsoMessage(message);
     markFlyability();
+    refreshShipPicker();
   }
 
   /* Sign the pilot out: forget the session and drop the flyability view. */
@@ -901,6 +940,7 @@
     var hlInput = document.getElementById("fly-highlight");
     if (filterInput) filterInput.checked = filter;
     if (hlInput) hlInput.checked = !filter;
+    refreshShipPicker();
     if (filter) {
       if (sso.session && sso.flyable) requestFlyableView();
     } else {
@@ -1195,7 +1235,7 @@
     captureFullView();
     var label = renderedEdgeLabel(edgeId);
     var seeds = endpointNodes(ends[0]).concat(endpointNodes(ends[1]));
-    var visible = sameTypeComponent(seeds, label);
+    var visible = sameTypeComponent(seeds, label, flyableOnly());
     if (!Object.keys(visible).length) return;
     highlightedEdgeId = null;
     selectedId = null;
@@ -1227,7 +1267,7 @@
     selectedEdge = null;
     selectedType = label;
     syncComboValues();
-    var visible = nodesForLabel(label);
+    var visible = nodesForLabel(label, flyableOnly());
     if (!Object.keys(visible).length) { selectedType = null; syncComboValues(); return; }
     requestView({
       code: buildFilteredCode(baseCode, visible, label),
@@ -1493,13 +1533,17 @@
 
   function selectShip(id) {
     if (!graph.nodes[id] || selectedId === id) return;
+    // The "Only flyable" view never draws a hull the pilot cannot fly, so a
+    // selection that arrives from elsewhere (e.g. a stale picker) must not
+    // widen the chart past the active filter.
+    if (sso.filterFlyable && hasFlyableShips() && !sso.flyable[id]) return;
     captureFullView();
     highlightedEdgeId = null;
     selectedId = id;
     selectedEdge = null;
     selectedType = null;
     syncComboValues();
-    var visible = connectedComponent(id);
+    var visible = connectedComponent(id, flyableOnly());
     requestView({
       code: buildFilteredCode(baseCode, visible),
       full: false,
@@ -1516,7 +1560,10 @@
     highlightedEdgeId = null;
     syncComboValues();
     if (wasFiltered) {
-      requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
+      // Clearing an isolation returns to whatever the base view was: the
+      // flyable-only chart when that filter is active, the full chart otherwise.
+      if (sso.filterFlyable && hasFlyableShips()) requestFlyableView({ restoreView: true });
+      else requestView({ code: baseCode, full: true, selectedId: null, restoreView: true });
     } else {
       // Highlight mode never rebuilt the chart, so just drop the in-place highlight.
       refreshEdgeHighlight();
@@ -1948,6 +1995,12 @@
         options.forEach(function (o) {
           o.el.setAttribute("aria-selected", o.id === id ? "true" : "false");
         });
+      },
+      /* Re-evaluate config.options() (e.g. after the flyable filter changes)
+         and redraw the list if it is currently open. */
+      rebuild: function () {
+        build();
+        if (open) { render(matches()); setActive(-1); }
       }
     };
   }
@@ -1976,7 +2029,13 @@
       scopeSelector: ".ship-select",
       emptyText: "No ships found",
       options: function () {
-        return Object.keys(graph.nodes)
+        var ids = Object.keys(graph.nodes);
+        // While the "Only flyable" view is active the picker should only offer
+        // the hulls that are actually on the chart.
+        if (sso.filterFlyable && hasFlyableShips()) {
+          ids = ids.filter(function (id) { return !!sso.flyable[id]; });
+        }
+        return ids
           .map(function (id) {
             return { id: id, label: comboName(id), omega: !!omegaShips[id] };
           })
@@ -2004,6 +2063,12 @@
     if (shipCombo) shipCombo.setValue(selectedId, selectedId ? comboName(selectedId) : "");
     var type = selectedEdge ? selectedEdge.label : selectedType;
     if (edgeCombo) edgeCombo.setValue(type, type || "");
+  }
+
+  /* The ship picker's options depend on the flyable filter, so rebuild them
+     whenever the signed-in state or the chosen flyability view changes. */
+  function refreshShipPicker() {
+    if (shipCombo) shipCombo.rebuild();
   }
 
   function downloadSvg() {
