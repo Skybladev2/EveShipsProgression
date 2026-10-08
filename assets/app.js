@@ -55,6 +55,11 @@
   var highlightedEdgeId = null; // rendered edge id highlighted in place (highlight mode)
   var filterOnEdgeClick = true; // true: edge click filters; false: it only highlights
   var displayNames = Object.create(null); // source id -> label shown on the chart
+  // Node ids that can only be flown by an Omega clone. Generated offline from
+  // the EVE SDE (see tools/generate_omega_ships.py) and merely read here, so
+  // no skill data has to be shipped to or processed by the browser.
+  var omegaShips = Object.create(null);
+  (window.OMEGA_SHIP_IDS || []).forEach(function (id) { omegaShips[id] = true; });
   var tooltipEl = null;   // floating tooltip for the edge under the cursor
   var tooltipEdgeId = null; // edge the tooltip currently describes
 
@@ -543,6 +548,30 @@
     if (selectedEdge) paintEdgeHighlight(findEdgePathId(selectedEdge.src, selectedEdge.dst));
   }
 
+  /* Mark every ship that needs an Omega clone: a distinct outline plus a small
+     "Ω" in the corner of the hull, so the restriction is visible without
+     hovering. The list is static (assets/omega-ships.js), so this only tags
+     the nodes Mermaid just rendered. */
+  function markOmegaShips() {
+    if (!domIndex) return;
+    domIndex.nodes.forEach(function (item) {
+      if (!omegaShips[item.id]) return;
+      item.el.classList.add("ship-omega");
+      if (item.el.querySelector(".omega-badge")) return;
+      var shape = item.el.querySelector("rect, polygon, circle, ellipse");
+      var box;
+      try { box = (shape || item.el).getBBox(); } catch (e) { return; }
+      if (!box || !box.width) return;
+      var badge = document.createElementNS(SVG_NS, "text");
+      badge.setAttribute("class", "omega-badge");
+      badge.setAttribute("x", box.x + box.width - 4);
+      badge.setAttribute("y", box.y + 14);
+      badge.setAttribute("text-anchor", "end");
+      badge.textContent = "Ω";
+      item.el.appendChild(badge);
+    });
+  }
+
   /* Brighten one rendered edge's line and label. */
   function paintEdgeHighlight(id) {
     if (!domIndex || !id) return;
@@ -913,6 +942,7 @@
     buildDomIndex();
     addEdgeHitAreas();
     markSelected();
+    markOmegaShips();
     // Let the new layer take layout before initialising pan/zoom on it.
     svg.getBoundingClientRect();
     initPanZoom(svg);
@@ -1287,6 +1317,7 @@
       options = config.options().map(function (o, i) {
         var li = document.createElement("li");
         li.className = "ship-option";
+        if (o.omega) li.classList.add("is-omega");
         li.id = config.idPrefix + i;
         li.setAttribute("role", "option");
         li.setAttribute("aria-selected", "false");
@@ -1453,7 +1484,9 @@
       emptyText: "No ships found",
       options: function () {
         return Object.keys(graph.nodes)
-          .map(function (id) { return { id: id, label: comboName(id) }; })
+          .map(function (id) {
+            return { id: id, label: comboName(id), omega: !!omegaShips[id] };
+          })
           .sort(function (a, b) {
             return a.label.localeCompare(b.label, undefined, { sensitivity: "base" });
           });

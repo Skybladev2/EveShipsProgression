@@ -7,6 +7,7 @@
   --accent: #ffd54a;
   --node-border: #c8d2e2;
   --cluster-border: #46566e;
+  --omega: #f0a63c;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; }
@@ -199,6 +200,12 @@ button:active { transform: translateY(1px); }
 .minimap-svg .edgePaths .path {
   vector-effect: non-scaling-stroke;
 }
+.minimap-svg .node.ship-omega rect,
+.minimap-svg .node.ship-omega polygon,
+.minimap-svg .node.ship-omega circle,
+.minimap-svg .node.ship-omega ellipse {
+  stroke: var(--omega) !important;
+}
 .minimap-view {
   fill: rgba(255, 213, 74, .12);
   stroke: var(--accent);
@@ -223,6 +230,20 @@ button:active { transform: translateY(1px); }
   stroke-width: 2px !important;
   vector-effect: non-scaling-stroke;
 }
+
+/* Omega-only ships: a warm outline and a corner "Ω", matching the legend. */
+#graph svg .node.ship-omega rect,
+#graph svg .node.ship-omega polygon,
+#graph svg .node.ship-omega circle,
+#graph svg .node.ship-omega ellipse {
+  stroke: var(--omega) !important;
+}
+.omega-badge {
+  fill: var(--omega);
+  font-size: 15px;
+  font-weight: 700;
+  pointer-events: none;
+}
 #graph svg .cluster rect {
   stroke: var(--cluster-border) !important;
   stroke-width: 2px !important;
@@ -239,12 +260,37 @@ button:active { transform: translateY(1px); }
 .statusbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 6px 16px;
   font-size: 12px;
   color: var(--muted);
   background: var(--bg-soft);
   border-top: 1px solid var(--line);
+}
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.legend-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--omega);
+  border: 1px solid var(--omega);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+}
+.ship-option.is-omega::after {
+  content: " Ω";
+  color: var(--omega);
+  font-weight: 700;
 }
 
 .loading, .error {

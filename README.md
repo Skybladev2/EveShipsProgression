@@ -8,6 +8,12 @@ Corvettes, shuttles and Special Edition ships are not included.
 Arrows lead from a base hull to its advanced, faction or pirate variants; the edge label names
 the weapon system or role the source hull is bonused for (per the E-Uni wiki).
 
+Ships an Alpha clone cannot fly are outlined in amber and carry a small **Ω** in the corner of
+the hull; the ship picker marks them the same way. The flag is derived from the required
+skills (a ship needs Omega when it needs a skill outside the Alpha set or above an Alpha level
+cap) and is baked in offline, so the page never reads skill data itself. See
+`tools/generate_omega_ships.py` for how the list is produced from the EVE SDE.
+
 Click any ship to isolate its progression line: the chart is redrawn from just the ships
 connected to it, directly or through a chain of variants, so what remains is laid out as a
 compact diagram of its own. Click the background to bring the full chart back, framed exactly
@@ -366,7 +372,6 @@ flowchart
 			n_Sigil["Sigil"]
 			n_Squall["Squall"]
 			n_Tayra["Tayra"]
-			n_Visitant["Visitant"]
 			n_Wreathe["Wreathe"]
 		end
 		subgraph s49["Salvage"]
