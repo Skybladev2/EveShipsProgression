@@ -14,6 +14,18 @@ skills (a ship needs Omega when it needs a skill outside the Alpha set or above 
 cap) and is baked in offline, so the page never reads skill data itself. See
 `tools/generate_omega_ships.py` for how the list is produced from the EVE SDE.
 
+**Sign in with EVE** connects the chart to your account through EVE Online SSO. After you
+authorise with the `esi-skills.read_skills.v1` scope, the page reads your character's skills
+from ESI directly in the browser (there is no back-end — the token only ever goes to EVE's
+own endpoints) and marks every ship you can currently fly in green, greyed out the ones you
+cannot. A pair of radio buttons then switches the view: **Highlight flyability** colours the
+full chart green/locked, while **Only flyable** narrows the chart to just the ships you can
+fly. The minimum skills for each ship are baked into
+`assets/ship-skills.js` by the SDE tool; you are flagged as able to fly a ship when you hold
+every required skill at or above its level. Special-edition ships (e.g. the Jovian Directorate
+rewards) are not in the SDE type list, so they are never highlighted either way. See
+**EVE SSO setup** at the bottom of this file.
+
 Click any ship to isolate its progression line: the chart is redrawn from just the ships
 connected to it, directly or through a chain of variants, so what remains is laid out as a
 compact diagram of its own. Click the background to bring the full chart back, framed exactly
@@ -976,4 +988,60 @@ flowchart
 	s25 ==>|"Entropic disintegrator"| s17
 	s36 ==>|"Energy turrets"| n_Cruor
 	s72 ==>|"Projectile turrets"| bs_proj
+```
+
+---
+
+## EVE SSO setup
+
+The login is an OAuth 2.0 **Authorization Code flow with PKCE**, so it runs entirely in the
+browser and needs no back-end. PKCE never uses the Client Secret and, unlike the implicit
+flow (`response_type=token`), it is a flow EVE's SSO actually supports. You still have to
+register an application with CCP so EVE knows who is asking:
+
+1. Create an application at <https://developers.eveonline.com/applications>. The **EVE SSO**
+   type is fine; because PKCE verifies the request with a one-time code verifier, the Client
+   Secret stays unused — never put a secret in a file the browser can read. Register one
+   application for each environment (or a single one with several Callback URLs if you'd
+   rather share a Client ID).
+2. Set each **Callback URL** to the exact address the chart runs at. The address must match
+   exactly, including the port: `http://localhost:8000/` while testing and
+   `https://skybladev2.github.io/EveShipsProgression/` for the live site.
+3. Fill in the matching **Client IDs** in `assets/config.js`. The hostname picks the right
+   entry automatically — `localhost` / `127.0.0.1` use `local`, everything else uses
+   `production`:
+
+   ```js
+   window.EVE_SSO_CONFIG = (function () {
+     var here = location.origin + location.pathname.replace(/index\.html?$/i, "");
+     var environments = {
+       local:      { client_id: "<local-client-id>",      redirect_uri: here },
+       production: { client_id: "<github-pages-client-id>", redirect_uri: null }
+     };
+     var picked = /^(localhost|127\.0\.0\.1|::1|)$/.test(location.hostname)
+       ? environments.local : environments.production;
+     return { client_id: picked.client_id, redirect_uri: picked.redirect_uri || here,
+              scope: "esi-skills.read_skills.v1" };
+   })();
+   ```
+
+   Leave an entry's `client_id` as `""` to hide the login button in that environment.
+   `redirect_uri` defaults to the page's own URL when left `null`, and deployments that can't
+   edit a source file can pass `?sso_client_id=…&sso_redirect_uri=…` in the page URL instead.
+
+When login starts, EVE opens a small popup (or navigates the tab if popups are blocked), you
+approve the `esi-skills.read_skills.v1` scope, and the app exchanges the returned code at
+EVE's token endpoint for an access token, then fetches your character's skills from ESI. The
+access and refresh tokens are kept in `localStorage` so you stay signed in across reloads —
+an expired access token is refreshed silently. While signed in the toolbar button reads
+**Logout** and clears the session (and the stored tokens) when clicked.
+
+## Regenerating the ship data
+
+`assets/omega-ships.js` and `assets/ship-skills.js` are both produced offline from the EVE
+Static Data Export by `tools/generate_omega_ships.py`. Run it against an unzipped current SDE
+to refresh the lists after EVE balance changes:
+
+```bash
+python3 tools/generate_omega_ships.py /path/to/unzipped-sde
 ```

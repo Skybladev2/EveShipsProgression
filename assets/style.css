@@ -397,3 +397,115 @@ button:active { transform: translateY(1px); }
   box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
 }
 .edge-tooltip[hidden] { display: none; }
+
+/* ------- EVE SSO sign-in + flyability ------- */
+.sso { position: relative; display: inline-flex; align-items: center; gap: 8px; }
+.sso button {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sso button:hover { border-color: #35435a; }
+#sso-login { color: #0b0e13; background: var(--accent); border-color: var(--accent); font-weight: 600; }
+#sso-login:hover { background: #ffdf7a; border-color: #ffdf7a; }
+.sso-name {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 170px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.sso-name[hidden] { display: none; }
+.sso ul {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  margin: 0;
+  padding: 4px;
+  min-width: 100%;
+  max-width: 320px;
+  list-style: none;
+  background: #0e131c;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .55);
+}
+.sso ul[hidden] { display: none; }
+.sso li {
+  padding: 6px 9px;
+  border-radius: 5px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sso li:hover { background: #1e2838; }
+.sso li.sso-error { color: #ff9d9d; cursor: default; white-space: normal; }
+
+/* flyability toggles shown when signed in */
+.flyctl { display: inline-flex; align-items: center; gap: 12px; }
+.flyctl[hidden] { display: none; }
+.fly-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+}
+.fly-check:hover { color: var(--text); }
+.fly-check input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Flyable ships: a green outline. Locked ships are greyed out so the overall
+   shape of the chart stays visible while the pilot's options stand out. */
+#graph svg .node.ship-flyable rect,
+#graph svg .node.ship-flyable polygon,
+#graph svg .node.ship-flyable circle,
+#graph svg .node.ship-flyable ellipse {
+  stroke: #6fdc8a !important;
+  stroke-width: 2.5px !important;
+}
+#graph svg .node.ship-locked rect,
+#graph svg .node.ship-locked polygon,
+#graph svg .node.ship-locked circle,
+#graph svg .node.ship-locked ellipse {
+  stroke: #626b7d !important;
+  opacity: .42;
+}
+#graph svg .node.ship-locked { filter: grayscale(.7); }
+
+/* Keep the minimap in step with the main diagram. */
+.minimap-svg .node.ship-flyable rect,
+.minimap-svg .node.ship-flyable polygon,
+.minimap-svg .node.ship-flyable circle,
+.minimap-svg .node.ship-flyable ellipse {
+  stroke: #6fdc8a !important;
+}
+.minimap-svg .node.ship-locked rect,
+.minimap-svg .node.ship-locked polygon,
+.minimap-svg .node.ship-locked circle,
+.minimap-svg .node.ship-locked ellipse {
+  stroke: #626b7d !important;
+  opacity: .42;
+}
+
+/* A locked ship that is also the current selection must stay readable, so the
+   selection inversion wins. */
+#graph svg .node.ship-locked.ship-selected { filter: invert(1) grayscale(0); opacity: 1; }
+#graph svg .node.ship-flyable.ship-selected { filter: invert(1); }
+
+/* legend badges for the footer */
+.legend .fly-badge { color: #6fdc8a; border-color: #6fdc8a; }
+.legend .locked-badge { color: #626b7d; border-color: #626b7d; }
+.legend-sep { opacity: .6; }

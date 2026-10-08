@@ -60,6 +60,35 @@
   // no skill data has to be shipped to or processed by the browser.
   var omegaShips = Object.create(null);
   (window.OMEGA_SHIP_IDS || []).forEach(function (id) { omegaShips[id] = true; });
+
+  /* EVE SSO + flyability. Ships are classified offline into
+     assets/ship-skills.js (skill type id -> required level, see
+     tools/generate_omega_ships.py); after the pilot signs in through EVE SSO
+     their skills are fetched from ESI and each ship is marked flyable when the
+     character has every required skill at or above its level. Alpha/Omega is
+     captured by the skill levels themselves, because EVE enforces training
+     caps server-side, so no clone-state flag is needed. */
+  var SSO_STORAGE_KEY = "eve.sso.session.v1";
+  var EVE_AUTH = "https://login.eveonline.com/v2/oauth/authorize";
+  var EVE_TOKEN = "https://login.eveonline.com/v2/oauth/token";
+  var EVE_ESI = "https://esi.evetech.net/";
+  var ssoConfig = Object.assign({ client_id: "", redirect_uri: null, scope: "esi-skills.read_skills.v1" }, window.EVE_SSO_CONFIG || {});
+  // allow per-deployment overrides without editing config.js
+  var ssoQuery = new URLSearchParams(location.search);
+  if (ssoQuery.get("sso_client_id")) ssoConfig.client_id = ssoQuery.get("sso_client_id");
+  if (ssoQuery.get("sso_redirect_uri")) ssoConfig.redirect_uri = ssoQuery.get("sso_redirect_uri");
+
+  var shipSkills = Object.create(null); // node id -> [[skillTypeID, level], ...]
+  var shipSkillsRaw = window.SHIP_SKILLS || {};
+  Object.keys(shipSkillsRaw).forEach(function (id) { shipSkills[id] = shipSkillsRaw[id]; });
+
+  var sso = {
+    session: null,        // { accessToken, exp, charId, charName, skills }
+    flyable: null,        // node id -> true for ships the character can fly
+    filterFlyable: false, // chart narrowed to flyable ships
+    highlightFlyable: true
+  };
+
   var tooltipEl = null;   // floating tooltip for the edge under the cursor
   var tooltipEdgeId = null; // edge the tooltip currently describes
 
@@ -572,6 +601,469 @@
     });
   }
 
+  var SSO_POPUP_KEY = "eve.sso.popup.v1";
+  /* Add flyable / locked styling to every rendered ship node. Kept separate
+     from the Omega badge so a signed-in pilot sees their options at a glance. */
+  function markFlyability() {
+    if (!sso.session || !domIndex) return;
+    var active = !!document.getElementById("fly-highlight") && sso.highlightFlyable;
+    domIndex.nodes.forEach(function (item) {
+      item.el.classList.remove("ship-flyable");
+      item.el.classList.remove("ship-locked");
+      if (!active) return;
+      if (sso.flyable && sso.flyable[item.id]) item.el.classList.add("ship-flyable");
+      else if (shipSkills[item.id]) item.el.classList.add("ship-locked");
+      // ships with no recorded requirements stay unstyled
+    });
+  }
+
+  /* Rebuild the chart showing only ships the character can fly. */
+  function requestFlyableView() {
+    var visible = Object.create(null);
+    Object.keys(sso.flyable || {}).forEach(function (id) {
+      if (graph.nodes[id]) visible[id] = true;
+    });
+    var keys = Object.keys(visible);
+    if (!keys.length) {
+      // Nothing flyable yet: keep the full chart so the locked state is visible.
+      restoreFullChart();
+      return;
+    }
+    selectedId = null;
+    selectedEdge = null;
+    selectedType = null;
+    highlightedEdgeId = null;
+    syncComboValues();
+    requestView({ code: buildFilteredCode(baseCode, visible, null), full: false, selectedId: null });
+  }
+
+  /* Clear the flyable filter, the edge filter and any isolation: the regular
+     "back to the full chart" path. */
+  function restoreFullChart() {
+    selectedId = null;
+    selectedEdge = null;
+    selectedType = null;
+    highlightedEdgeId = null;
+    syncComboValues();
+    requestView({ code: baseCode, full: true, selectedId: null });
+  }
+
+  function ssoRedirectUri() {
+    return ssoConfig.redirect_uri || (location.origin + location.pathname);
+  }
+
+  /* --- PKCE helpers (RFC 7636) -------------------------------------------
+     EVE SSO supports the Authorization Code flow and the Authorization Code
+     flow with PKCE; it does NOT support the implicit flow (`response_type=
+     token`), which older builds of this page used. PKCE needs no Client
+     Secret, so it still runs entirely in the browser. */
+  function ssoRandomBytes(n) {
+    var buf = new Uint8Array(n);
+    if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(buf);
+    else for (var i = 0; i < n; i++) buf[i] = Math.floor(Math.random() * 256);
+    return buf;
+  }
+  function base64Url(bytes) {
+    var s = "";
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function createCodeVerifier() { return base64Url(ssoRandomBytes(32)); }
+  function ssoRandomState() { return base64Url(ssoRandomBytes(16)); }
+  function createCodeChallenge(verifier) {
+    // crypto.subtle needs a secure context: https (GitHub Pages) or localhost.
+    if (!(window.crypto && crypto.subtle && crypto.subtle.digest)) {
+      return Promise.reject(new Error("EVE login needs a secure context (https or localhost)"));
+    }
+    var data = new TextEncoder().encode(verifier);
+    return crypto.subtle.digest("SHA-256", data).then(function (digest) {
+      return base64Url(new Uint8Array(digest));
+    });
+  }
+
+  /* The verifier + state are kept for the round trip; the popup/reload reads
+     them back to prove the returned code belongs to the login we started. */
+  function readPkceState() {
+    try { return JSON.parse(sessionStorage.getItem(SSO_POPUP_KEY) || "null"); } catch (e) { return null; }
+  }
+  function clearPkceState() {
+    try { sessionStorage.removeItem(SSO_POPUP_KEY); } catch (e) {}
+  }
+
+  /* POST a form-encoded body to EVE's token endpoint. That endpoint answers
+     cross-origin requests (Access-Control-Allow-Origin: *), so the whole flow
+     works from the browser without any backend. Resolves with the token
+     response, or rejects with EVE's own error text. */
+  function postTokenRequest(fields) {
+    return fetch(EVE_TOKEN, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(fields).toString()
+    }).then(function (res) {
+      return res.json().catch(function () { return {}; }).then(function (data) {
+        if (!res.ok || !data.access_token) {
+          throw new Error(data.error_description || data.error || ("HTTP " + res.status));
+        }
+        return data;
+      });
+    });
+  }
+
+  /* Exchange the authorization code for an access token (PKCE, no secret). */
+  function exchangeCodeForToken(code, verifier) {
+    return postTokenRequest({
+      grant_type: "authorization_code",
+      code: code,
+      client_id: ssoConfig.client_id,
+      code_verifier: verifier
+    }).catch(function (err) {
+      throw new Error("EVE token exchange failed: " + err.message);
+    });
+  }
+
+  /* Swap a stored refresh token for a fresh access token (no secret needed). */
+  function refreshAccessToken(refreshToken) {
+    return postTokenRequest({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: ssoConfig.client_id
+    }).then(function (data) {
+      return sessionFromToken(data.access_token, data.refresh_token || refreshToken);
+    }).catch(function (err) {
+      throw new Error("EVE token refresh failed: " + err.message);
+    });
+  }
+
+  function decodeIdToken(jwt) {
+    var part = jwt.split(".")[1];
+    if (!part) return null;
+    try {
+      var base64 = part.replace(/-/g, "+").replace(/_/g, "/");
+      while (base64.length % 4) base64 += "=";
+      var json = decodeURIComponent(escape(atob(base64)));
+      return JSON.parse(json);
+    } catch (e) { return null; }
+  }
+
+  /* Set `flyable` from the character's skill levels. A ship is flyable when
+     the pilot holds every required skill at or above its level; the cloaking /
+     Omega distinction is already baked into those levels by EVE. */
+  function computeFlyable(skills) {
+    var out = Object.create(null);
+    Object.keys(shipSkills).forEach(function (id) {
+      var req = shipSkills[id];
+      var ok = true;
+      for (var i = 0; i < req.length; i++) {
+        var need = req[i];
+        if ((skills[need[0]] || 0) < need[1]) { ok = false; break; }
+      }
+      if (ok) out[id] = true;
+    });
+    return out;
+  }
+
+  function fetchCharacterSkills(session) {
+    return fetch(EVE_ESI + "latest/characters/" + session.charId + "/skills/?datasource=tranquility", {
+      headers: { Authorization: "Bearer " + session.accessToken }
+    }).then(function (res) {
+      if (res.status === 401) {
+        var err = new Error("Session expired");
+        err.status = 401;
+        throw err;
+      }
+      if (!res.ok) throw new Error("ESI returned HTTP " + res.status);
+      return res.json();
+    }).then(function (data) {
+      if (!data || !Array.isArray(data.skills)) return null;
+      var map = Object.create(null);
+      data.skills.forEach(function (skill) {
+        map[skill.skill_id] = skill.active_skill_level;
+      });
+      return map;
+    });
+  }
+
+  function saveSsoSession(session) {
+    sso.session = session;
+    try { localStorage.setItem(SSO_STORAGE_KEY, JSON.stringify(session)); } catch (e) {}
+    sso.flyable = computeFlyable(session.skills || {});
+  }
+
+  function clearSsoSession() {
+    sso.session = null;
+    sso.flyable = null;
+    sso.filterFlyable = false;
+    try { localStorage.removeItem(SSO_STORAGE_KEY); } catch (e) {}
+  }
+
+  /* Apply the signed-in / signed-out toolbar state and flyability highlight.
+     The single button reads "Sign in with EVE" when signed out and "Logout"
+     when signed in; the character name (when known) sits beside it. */
+  function applySsoUi(message) {
+    var loginBtn = document.getElementById("sso-login");
+    var nameEl = document.getElementById("sso-name");
+    var flyctl = document.getElementById("flyctl");
+    var menu = document.getElementById("sso-menu");
+    var signedIn = !!sso.session;
+    if (loginBtn) {
+      loginBtn.hidden = !ssoConfig.client_id;
+      loginBtn.textContent = signedIn ? "Logout" : "Sign in with EVE";
+    }
+    if (nameEl) {
+      nameEl.hidden = !signedIn || !sso.session.charName;
+      nameEl.textContent = signedIn ? (sso.session.charName || "") : "";
+    }
+    if (flyctl) flyctl.hidden = !signedIn;
+    if (flyctl) {
+      var filter = document.getElementById("fly-filter");
+      var hl = document.getElementById("fly-highlight");
+      if (filter) filter.checked = sso.filterFlyable;
+      if (hl) hl.checked = !sso.filterFlyable;
+    }
+    if (menu) menu.hidden = true;
+    if (message) showSsoMessage(message);
+    markFlyability();
+  }
+
+  /* Sign the pilot out: forget the session and drop the flyability view. */
+  function logout() {
+    clearSsoSession();
+    sso.filterFlyable = false;
+    sso.highlightFlyable = true;
+    applySsoUi(null);
+    restoreFullChart();
+  }
+
+  function showSsoMessage(msg) {
+    var menu = document.getElementById("sso-menu");
+    if (!menu) return;
+    menu.textContent = "";
+    var li = document.createElement("li");
+    li.className = "sso-error";
+    li.textContent = msg;
+    menu.appendChild(li);
+    menu.hidden = false;
+    // let the error clear itself but keep the dropdown dismissible
+    setTimeout(function () {
+      if (menu.querySelector(".sso-error") && menu.childNodes.length === 1) menu.hidden = true;
+    }, 4000);
+  }
+
+  /* Build the in-memory session from the token response. EVE returns a JWT
+     access token whose `sub` is `CHARACTER:EVE:<id>` and whose `name` is the
+     character name — there is no separate `id_token` to decode. */
+  function sessionFromToken(accessToken, refreshToken) {
+    if (!accessToken) throw new Error("EVE login returned no access token");
+    var payload = decodeIdToken(accessToken);
+    if (!payload) throw new Error("Could not read the EVE token");
+    var charId = String(payload.sub || "").split(":").pop();
+    if (!charId) throw new Error("EVE token does not identify a character");
+    var charName = payload.name || ("Character " + charId);
+    return {
+      accessToken: accessToken,
+      refreshToken: refreshToken || null,
+      charId: charId,
+      charName: charName,
+      exp: payload.exp ? payload.exp * 1000 : (Date.now() + 20 * 60 * 1000),
+      skills: null
+    };
+  }
+
+  /* Called once the token has been obtained, from either the popup relay or a
+     same-window redirect. Fetches skills, saves the session and updates UI. */
+  function completeLogin(session) {
+    applySsoUi("Fetching skills…");
+    fetchCharacterSkills(session).then(function (skills) {
+      if (skills) session.skills = skills;
+      saveSsoSession(session);
+      sso.filterFlyable = false;
+      sso.highlightFlyable = true;
+      applySsoUi(null);
+      // if a flyable-only view was requested through the URL, honour it
+      var q = new URLSearchParams(location.search);
+      if (q.get("fly") === "1") setFlyMode("filter");
+      else markFlyability();
+    }).catch(function (err) {
+      applySsoUi(err && err.status === 401
+        ? "EVE session expired — sign in again"
+        : "Could not load skills: " + (err && err.message ? err.message : "unknown error"));
+    });
+  }
+
+  /* The two flyability views are mutually exclusive (a radio group): "filter"
+     narrows the chart to ships the character can fly, "highlight" colours the
+     full chart. Switching rebuilds the diagram so the change is visible. */
+  function setFlyMode(mode) {
+    var filter = mode === "filter";
+    sso.filterFlyable = filter;
+    sso.highlightFlyable = !filter;
+    var filterInput = document.getElementById("fly-filter");
+    var hlInput = document.getElementById("fly-highlight");
+    if (filterInput) filterInput.checked = filter;
+    if (hlInput) hlInput.checked = !filter;
+    if (filter) {
+      if (sso.session && sso.flyable) requestFlyableView();
+    } else {
+      restoreFullChart();
+    }
+  }
+
+  function wireSso() {
+    var loginBtn = document.getElementById("sso-login");
+    var menu = document.getElementById("sso-menu");
+    var flyctl = document.getElementById("flyctl");
+
+    if (ssoConfig.client_id && loginBtn) loginBtn.hidden = false;
+
+    if (loginBtn) loginBtn.addEventListener("click", function () {
+      if (sso.session) { logout(); return; }
+      if (!ssoConfig.client_id) { showSsoMessage("EVE SSO is not configured — set a Client ID in assets/config.js"); return; }
+      startSsoProcess();
+    });
+
+    // The active browser window acts as the relay: it keeps a listener open
+    // (see listenForPopup) while the EVE popup does the redirect dance.
+    function startSsoProcess() {
+      var verifier = createCodeVerifier();
+      createCodeChallenge(verifier).then(function (challenge) {
+        var state = ssoRandomState();
+        try {
+          sessionStorage.setItem(SSO_POPUP_KEY, JSON.stringify({
+            verifier: verifier, state: state, origin: location.origin
+          }));
+        } catch (e) { /* private mode */ }
+        var params = new URLSearchParams({
+          response_type: "code",
+          client_id: ssoConfig.client_id,
+          redirect_uri: ssoRedirectUri(),
+          scope: ssoConfig.scope,
+          state: state,
+          code_challenge: challenge,
+          code_challenge_method: "S256"
+        });
+        var authUrl = EVE_AUTH + "?" + params.toString();
+        var w = null;
+        try { w = window.open(authUrl, "eve_sso", "width=520,height=720"); } catch (e) {}
+        if (!w) location.assign(authUrl); // popup blocked: same-window fallback
+      }).catch(function (err) {
+        applySsoUi(err && err.message ? err.message : "EVE login could not start");
+      });
+    }
+
+    // The two views are a radio group, so one "change" listener covers both.
+    if (flyctl) flyctl.addEventListener("change", function (e) {
+      if (e.target && e.target.name === "fly-mode") setFlyMode(e.target.value);
+    });
+    // Clicking elsewhere dismisses the SSO message popup.
+    document.addEventListener("click", function (e) {
+      if (menu && !menu.hidden && !(e.target.closest && e.target.closest("#sso"))) menu.hidden = true;
+    });
+  }
+
+  /* Turn a returned authorization code into a session and load the skills. */
+  function exchangeAndFinish(code) {
+    var stored = readPkceState();
+    if (!stored || !stored.verifier) {
+      applySsoUi("EVE login could not be completed — please try again");
+      return;
+    }
+    exchangeCodeForToken(code, stored.verifier).then(function (data) {
+      clearPkceState();
+      completeLogin(sessionFromToken(data.access_token, data.refresh_token));
+    }).catch(function (err) {
+      console.error("[EVE SSO] token exchange failed", err);
+      applySsoUi(err && err.message ? err.message : "EVE login failed");
+    });
+  }
+
+  /* Relay messages sent by the EVE SSO popup once EVE redirects back to this
+     page inside it. The popup closes itself; here we take the code and finish
+     the login in this (the opener) window. */
+  function listenForPopup() {
+    window.addEventListener("message", function (event) {
+      var data = event.data;
+      if (!data || data.type !== "eve_sso") return;
+      if (event.origin !== location.origin) return; // only trust our own origin
+      var stored = readPkceState();
+      if (!stored || stored.state !== data.state) return; // stale / wrong popup
+      if (data.error) {
+        console.error("[EVE SSO] authorize error", data.error, data.error_description);
+        clearPkceState();
+        applySsoUi("EVE login failed: " + (data.error_description || data.error));
+        return;
+      }
+      exchangeAndFinish(data.code);
+    });
+  }
+
+  /* Handle the same-window redirect fallback (popup blocked). EVE returns the
+     app to `?code=...&state=...` in the query string. */
+  function handleCodeLogin() {
+    var q = new URLSearchParams(location.search);
+    if (!q.has("code") && !q.has("error")) return false;
+    var stored = readPkceState();
+    var state = q.get("state");
+    // Drop the OAuth params from the address bar but keep anything else.
+    ["code", "state", "error", "error_description"].forEach(function (k) { q.delete(k); });
+    var rest = q.toString();
+    history.replaceState(null, "", location.pathname + (rest ? "?" + rest : ""));
+    if (q.get("error")) {
+      console.error("[EVE SSO] authorize error", q.get("error"), q.get("error_description"));
+      clearPkceState();
+      applySsoUi("EVE login failed: " + (q.get("error_description") || q.get("error")));
+      return true;
+    }
+    if (!stored || stored.state !== state) {
+      applySsoUi("EVE login could not be verified — please try again");
+      return true;
+    }
+    exchangeAndFinish(q.get("code"));
+    return true;
+  }
+
+  /* Run only inside the popup that EVE redirects to after a login attempt:
+     hand the code (or the error) back to the window that opened us, close up. */
+  function handlePopupReturn() {
+    if (!window.opener || window.opener === window) return false;
+    var q = new URLSearchParams(location.search);
+    if (!q.has("code") && !q.has("error")) return false;
+    var stored = readPkceState();
+    var payload = {
+      type: "eve_sso",
+      state: q.get("state"),
+      code: q.get("code"),
+      error: q.get("error"),
+      error_description: q.get("error_description")
+    };
+    try { window.opener.postMessage(payload, (stored && stored.origin) || "*"); } catch (e) {}
+    clearPkceState();
+    window.close();
+    return true;
+  }
+
+  /* Restore a saved session from localStorage at boot. */
+  function restoreSsoSession(cb) {
+    var raw = null;
+    try { raw = localStorage.getItem(SSO_STORAGE_KEY); } catch (e) {}
+    if (!raw) { cb(false); return; }
+    var session = null;
+    try { session = JSON.parse(raw); } catch (e) {}
+    if (!session || !session.accessToken || !session.charId) { cb(false); return; }
+    // Access token still valid: use it as-is.
+    if (!session.exp || session.exp > Date.now() + 30000) {
+      saveSsoSession(session);
+      cb(true);
+      return;
+    }
+    // Expired: silently refresh using the stored refresh token, if we have one.
+    if (!session.refreshToken) { clearSsoSession(); cb(false); return; }
+    refreshAccessToken(session.refreshToken).then(function (fresh) {
+      fresh.skills = session.skills || null; // keep last known skills until re-fetched
+      saveSsoSession(fresh);
+      cb(true);
+    }).catch(function () { clearSsoSession(); cb(false); });
+  }
+
   /* Brighten one rendered edge's line and label. */
   function paintEdgeHighlight(id) {
     if (!domIndex || !id) return;
@@ -943,6 +1435,7 @@
     addEdgeHitAreas();
     markSelected();
     markOmegaShips();
+    markFlyability();
     // Let the new layer take layout before initialising pan/zoom on it.
     svg.getBoundingClientRect();
     initPanZoom(svg);
@@ -1645,6 +2138,10 @@
       // drop the isolated ship and frame the default group on the full chart.
       savedFullView = null;
       highlightedEdgeId = null;
+      if (sso.filterFlyable) {
+        setFlyMode("highlight");
+        return;
+      }
       if (selectedId || selectedEdge || selectedType) {
         selectedId = null;
         selectedEdge = null;
@@ -1682,6 +2179,13 @@
   }
 
   function boot(code) {
+    // Inside the EVE SSO popup this page only relays the token back to the
+    // tab that started the login, then closes; it never draws the chart.
+    if (handlePopupReturn()) {
+      host.innerHTML = '<div class="loading">Signing in…</div>';
+      return;
+    }
+
     baseCode = code;
     graph = parseGraph(code);
     graph.labelAdj = buildLabelAdjacency(parseRawEdges(code));
@@ -1720,7 +2224,19 @@
     wireEdgeTooltip();
     wireComboboxes();
     wireMinimap();
+    wireSso();
+    listenForPopup();
     requestView({ code: baseCode, full: true, selectedId: null });
+
+    // A saved session restores immediately; a hash login (same-window SSO
+    // fallback) takes precedence over it and fetches fresh skills.
+    if (!handleCodeLogin()) {
+      restoreSsoSession(function (ok) {
+        applySsoUi(null);
+      });
+    } else {
+      applySsoUi(null);
+    }
   }
 
   ensureGlobal("mermaid", MERMAID_CDN)

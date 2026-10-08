@@ -11,8 +11,12 @@
 <!-- Vendored locally so the page does not depend on a CDN being reachable. -->
 <script src="assets/vendor/mermaid.min.js"></script>
 <script src="assets/vendor/svg-pan-zoom.min.js"></script>
-<!-- Omega-only ships, classified offline from the EVE SDE. -->
+<!-- EVE SSO app settings (edit assets/config.js). -->
+<script src="assets/config.js"></script>
+<!-- Omega-only ships and per-ship skill requirements, classified offline
+     from the EVE SDE (see tools/generate_omega_ships.py). -->
 <script src="assets/omega-ships.js"></script>
+<script src="assets/ship-skills.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -40,6 +44,21 @@
         <span>Highlight</span>
       </label>
     </div>
+    <div class="sso" id="sso">
+      <span id="sso-name" class="sso-name" hidden></span>
+      <button id="sso-login" type="button" hidden>Sign in with EVE</button>
+      <ul id="sso-menu" hidden></ul>
+    </div>
+    <div class="flyctl" id="flyctl" role="radiogroup" aria-label="Flyability view" hidden>
+      <label class="fly-check" title="Highlight the ships this character can and cannot fly on the full chart">
+        <input id="fly-highlight" type="radio" name="fly-mode" value="highlight" checked>
+        <span>Highlight flyability</span>
+      </label>
+      <label class="fly-check" title="Narrow the chart to only the ships this character can fly">
+        <input id="fly-filter" type="radio" name="fly-mode" value="filter">
+        <span>Only flyable</span>
+      </label>
+    </div>
     <div class="buttons">
       <button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
       <button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
@@ -63,7 +82,12 @@
 
 <footer class="statusbar">
   <span>Drag to pan · Scroll to zoom · Drag the minimap to jump around · Pick a ship to isolate its line or a connection type to filter the chart · Click an edge to highlight or filter by it</span>
-  <span class="legend"><span class="legend-badge">Ω</span> requires an Omega clone</span>
+  <span class="legend">
+  <span class="legend-badge">Ω</span> requires an Omega clone
+  <span class="legend-sep">·</span>
+  <span class="legend-badge fly-badge">✔</span> can fly
+  <span class="legend-badge locked-badge">⬛</span> cannot fly
+</span>
 </footer>
 
 <script src="assets/app.js"></script>

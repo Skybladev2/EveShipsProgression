@@ -68,7 +68,6 @@ window.OMEGA_SHIP_IDS = [
   "n_Kitsune",
   "n_Sentinel",
   "n_Squall",
-  "n_Visitant",
   "n_Noctis",
   "n_Pacifier",
   "n_Eris",
