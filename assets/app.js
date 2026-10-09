@@ -1672,6 +1672,28 @@
     return diagramBounds();
   }
 
+  /* Size the minimap box to the diagram's aspect ratio so the overview is
+     never squashed. The box is clamped to a comfortable range, so a very tall
+     or very wide chart leaves a border instead of distorting the picture. */
+  function sizeMinimap(box) {
+    if (!minimap || !box || !box.width || !box.height) return;
+    var small = window.matchMedia
+      ? window.matchMedia("(max-width: 760px), (max-height: 560px)").matches
+      : false;
+    var maxW = small ? 156 : 224;
+    var maxH = small ? 112 : 160;
+    var minW = small ? 72 : 96;
+    var minH = small ? 56 : 72;
+    var aspect = box.width / box.height;
+    var w = maxW;
+    var h = maxW / aspect;
+    if (h > maxH) { h = maxH; w = maxH * aspect; }
+    w = Math.max(minW, Math.min(maxW, Math.round(w)));
+    h = Math.max(minH, Math.min(maxH, Math.round(h)));
+    minimap.style.width = w + "px";
+    minimap.style.height = h + "px";
+  }
+
   /* Rebuild the minimap picture from the current SVG layer and fit the whole
      diagram into it. The minimap's viewBox is the diagram bounds, so the
      viewport rectangle is drawn directly in diagram units. */
@@ -1681,6 +1703,7 @@
     var box = movementBounds();
     if (!box) { minimap.hidden = true; return; }
     minimap.hidden = false;
+    sizeMinimap(box);
     minimapSvg.setAttribute("viewBox", box.x + " " + box.y + " " + box.width + " " + box.height);
 
     while (minimapSvg.firstChild) minimapSvg.removeChild(minimapSvg.firstChild);
@@ -2258,6 +2281,7 @@
     window.addEventListener("resize", function () {
       if (!panZoom) return;
       panZoom.resize(); panZoom.fit(); panZoom.center();
+      sizeMinimap(movementBounds());
       if (!selectedId && focusDefaultGroup()) { updateMinimapView(); return; }
       scheduleHitWidth();
       updateMinimapView();
