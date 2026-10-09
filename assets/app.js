@@ -2098,6 +2098,22 @@
      threshold, so a plain click still reaches nodes and edges normally. */
   var panDrag = null;
 
+  /* A right-button drag pans the diagram, but the browser context menu fires
+     on the element under the pointer on release. If that is the toolbar, the
+     viewport's own contextmenu handler never sees it, so remember a finished
+     right-drag and swallow the menu window-wide for a moment. */
+  var suppressContextMenu = false;
+  var suppressContextMenuTimer = null;
+
+  function suppressNextContextMenu() {
+    suppressContextMenu = true;
+    if (suppressContextMenuTimer) clearTimeout(suppressContextMenuTimer);
+    suppressContextMenuTimer = setTimeout(function () {
+      suppressContextMenu = false;
+      suppressContextMenuTimer = null;
+    }, 350);
+  }
+
   function wirePan() {
     viewport.addEventListener("pointerdown", function (e) {
       if (!panZoom || panDrag) return;
@@ -2107,6 +2123,7 @@
       if (e.target && e.target.closest && e.target.closest("#minimap")) return;
       panDrag = {
         pointerId: e.pointerId,
+        button: e.button,
         startX: e.clientX,
         startY: e.clientY,
         startPan: panZoom.getPan(),
@@ -2131,10 +2148,12 @@
 
     function endPan(e) {
       if (!panDrag || (e && e.pointerId !== panDrag.pointerId)) return;
+      var wasRightDrag = panDrag.button === 2 && panDrag.captured;
       if (panDrag.captured && viewport.releasePointerCapture) {
         try { viewport.releasePointerCapture(panDrag.pointerId); } catch (err) { /* ignore */ }
       }
       panDrag = null;
+      if (wasRightDrag) suppressNextContextMenu();
     }
     // The window listeners catch a release outside the viewport even when the
     // pointer was never captured (it left before passing the drag threshold).
@@ -2142,6 +2161,19 @@
     viewport.addEventListener("pointercancel", endPan);
     window.addEventListener("pointerup", endPan);
     window.addEventListener("pointercancel", endPan);
+
+    // Swallow the context menu for a right-button pan, wherever the release
+    // lands (the drag can end over the toolbar, outside the viewport).
+    window.addEventListener("contextmenu", function (e) {
+      if (suppressContextMenu || (panDrag && panDrag.button === 2)) {
+        e.preventDefault();
+        suppressContextMenu = false;
+        if (suppressContextMenuTimer) {
+          clearTimeout(suppressContextMenuTimer);
+          suppressContextMenuTimer = null;
+        }
+      }
+    }, true);
   }
 
   function wireSelection() {
