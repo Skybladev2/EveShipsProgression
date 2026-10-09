@@ -591,12 +591,21 @@
       if (label) labelByEdgeId[label.getAttribute("data-id")] = el;
     });
 
+    // Rendered subgraphs, keyed by source cluster id. Mermaid ids them
+    // "<renderId>-<clusterId>", so the trailing segment is the source id.
+    var clusterByCid = Object.create(null);
+    collect(svgEl, "g.cluster").forEach(function (el) {
+      var m = el.id && el.id.match(/-([A-Za-z_]\w*)$/);
+      if (m && graph.clusters[m[1]]) clusterByCid[m[1]] = el;
+    });
+
     domIndex = {
       nodes: nodeItems,
       byId: byId,
       edges: edgeItems,
       pathByEdgeId: pathByEdgeId,
-      labelByEdgeId: labelByEdgeId
+      labelByEdgeId: labelByEdgeId,
+      clusterByCid: clusterByCid
     };
   }
 
@@ -1104,23 +1113,48 @@
     }).catch(function () { clearSsoSession(); cb(false); });
   }
 
-  /* Brighten one rendered edge's line and label. */
+  /* The subgraph an edge leads into: the destination endpoint when it is a
+     group, otherwise every group the destination ship sits in, so a ship
+     target still lights up its group. */
+  function edgeTargetClusters(edgeId) {
+    var ends = edgeEndpoints(edgeId);
+    if (!ends) return [];
+    var dst = ends[1];
+    if (graph.clusters[dst] !== undefined) return [dst];
+    return graph.nodeClusters[dst] || [];
+  }
+
+  /* Mark the group a highlighted edge points at. */
+  function paintTargetGroup(id) {
+    if (!domIndex || !id) return;
+    edgeTargetClusters(id).forEach(function (cid) {
+      var el = domIndex.clusterByCid[cid];
+      if (el) el.classList.add("group-target");
+    });
+  }
+
+  /* Brighten one rendered edge's line and label, and the group it targets. */
   function paintEdgeHighlight(id) {
     if (!domIndex || !id) return;
     var path = domIndex.pathByEdgeId[id];
     var label = domIndex.labelByEdgeId[id];
     if (path) path.classList.add("edge-selected");
     if (label) label.classList.add("edge-selected");
+    paintTargetGroup(id);
   }
 
   /* Recompute the in-place edge highlight on the layer that is already shown,
      without rebuilding the diagram (highlight mode). */
   function refreshEdgeHighlight() {
     if (!domIndex || !svgEl) return;
-    collect(svgEl, "path.edge-selected, g.edgeLabel.edge-selected").forEach(function (el) {
+    collect(svgEl, "path.edge-selected, g.edgeLabel.edge-selected, g.cluster.group-target").forEach(function (el) {
       el.classList.remove("edge-selected");
+      el.classList.remove("group-target");
     });
     paintEdgeHighlight(highlightedEdgeId);
+    // The minimap is a copy of this layer, so rebuild it to mirror which
+    // connection is currently the bright one.
+    setupMinimap();
   }
 
   /* Find the rendered edge joining two source endpoints, so the highlight can

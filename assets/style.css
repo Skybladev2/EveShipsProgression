@@ -7,6 +7,11 @@
   --accent: #ffd54a;
   --node-border: #c8d2e2;
   --cluster-border: #46566e;
+  --edge-line: #9aa8bf;      /* unselected connection colour (mermaid lineColor) */
+  --edge-selected: #eef3fb;  /* brighter variant of --edge-line */
+  --edge-dim: .28;           /* opacity of a connection that is not selected */
+  --edge-dim-map: .14;       /* unselected connections read even fainter in the minimap */
+  --group-target: #8fd4ff;   /* outline of the group a highlighted edge targets */
   --omega: #f0a63c;
 }
 * { box-sizing: border-box; }
@@ -206,6 +211,21 @@ button:active { transform: translateY(1px); }
 .minimap-svg .node.ship-omega ellipse {
   stroke: var(--omega) !important;
 }
+/* The minimap mirrors the main chart's connection brightness: dim by default,
+   full brightness for the selected edge. The base stroke comes from Mermaid's
+   embedded style, so only opacity and the selected colour are overridden. */
+.minimap-svg path.flowchart-link,
+.minimap-svg .edgePaths .path,
+.minimap-svg g.edgeLabel {
+  opacity: var(--edge-dim-map);
+}
+.minimap-svg path.edge-selected {
+  stroke: var(--edge-selected) !important;
+  opacity: 1;
+}
+.minimap-svg g.edgeLabel.edge-selected {
+  opacity: 1;
+}
 .minimap-view {
   fill: rgba(255, 213, 74, .12);
   stroke: var(--accent);
@@ -255,6 +275,15 @@ button:active { transform: translateY(1px); }
      pixels; sizing it with non-scaling-stroke would also rescale the
      screen-pixel dash pattern set on weak links and blow it up. */
   stroke-width: var(--edge-w, 5px) !important;
+}
+/* Connections sit dim by default, so the whole chart reads as a quiet
+   backdrop; a selected edge overrides this with full brightness below. */
+#graph svg path[data-et="edge"] {
+  stroke: var(--edge-line) !important;
+  opacity: var(--edge-dim);
+}
+#graph svg g.edgeLabel {
+  opacity: var(--edge-dim);
 }
 
 .statusbar {
@@ -354,15 +383,19 @@ button:active { transform: translateY(1px); }
 /* selected ship: invert the rectangle and its label */
 #graph svg .node.ship-selected { filter: invert(1); }
 
-/* selected edge: brighten the line and its label */
+/* selected edge: a brighter variant of the normal connection colour */
 #graph svg path.edge-selected {
-  stroke: var(--accent) !important;
+  stroke: var(--edge-selected) !important;
   stroke-width: 3px !important;
-  filter: drop-shadow(0 0 5px rgba(255, 213, 74, .9));
+  opacity: 1;
+  filter: drop-shadow(0 0 5px rgba(238, 243, 251, .9));
+}
+#graph svg g.edgeLabel.edge-selected {
+  opacity: 1;
 }
 #graph svg g.edgeLabel.edge-selected .background,
 #graph svg g.edgeLabel.edge-selected rect {
-  fill: var(--accent) !important;
+  fill: var(--edge-selected) !important;
   opacity: 1 !important;
 }
 #graph svg g.edgeLabel.edge-selected text,
@@ -370,6 +403,17 @@ button:active { transform: translateY(1px); }
 #graph svg g.edgeLabel.edge-selected span {
   fill: #1b2432 !important;
   color: #1b2432 !important;
+}
+
+/* a highlighted edge also lights up the group it points at */
+#graph svg g.cluster.group-target > rect,
+#graph svg g.cluster.group-target > polygon,
+#graph svg g.cluster.group-target > path {
+  stroke: var(--group-target) !important;
+  stroke-width: 3px !important;
+}
+#graph svg g.cluster.group-target > g.cluster-label text {
+  fill: var(--group-target) !important;
 }
 
 /* arrowheads follow the stroke of the edge that references them */

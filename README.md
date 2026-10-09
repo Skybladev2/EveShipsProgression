@@ -268,7 +268,7 @@ flowchart
 		n_Dagon["Dagon"]
 		n_Loggerhead["Loggerhead"]
 	end
-	subgraph s31["Logistics Frigate"]
+	subgraph s31["Logistics Frigates"]
 		subgraph s32["Remote shield boost"]
 			n_Kirin["Kirin"]
 			n_Scalpel["Scalpel"]
