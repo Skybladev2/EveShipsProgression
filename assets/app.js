@@ -442,11 +442,13 @@
     }
 
     /* Ships whose connection is expressed at group level: several ship-to-ship
-       edges that all run between the same two subgraphs collapse into a single
-       group edge, so every isolated view stays readable however it is filtered.
-       The label is the source subgroup's name when the edges agree on it, and
-       otherwise the most common edge label. */
-    var shipGroups = Object.create(null); // "srcGroup\tdstGroup" -> { src, dst, labels, count }
+       edges of the same type that all run between the same two subgraphs
+       collapse into a single group edge, so every isolated view stays readable
+       however it is filtered. Grouping by label as well as by the two groups
+       keeps every distinct connection type visible: a pair of subgraphs joined
+       by both "Missiles" and "Target paint" links emits one group edge per
+       type instead of dropping all but the most common one. */
+    var shipGroups = Object.create(null); // "srcGroup\tdstGroup\tlabel" -> { src, dst, label, count }
     code.split(/\r?\n/).forEach(function (line) {
       var m = line.trim().match(/^([A-Za-z_]\w*)\s*(?:==>|-->|-\.->)\s*(?:\|"([^"]*)"\|\s*)?([A-Za-z_]\w*)/);
       if (!m) return;
@@ -458,23 +460,16 @@
       var src = deepestCluster(a), dst = deepestCluster(b);
       if (!src || !dst || src === dst) return;
       if (clusterContains(src, dst) || clusterContains(dst, src)) return;
-      var key = src + "\t" + dst;
-      var g = shipGroups[key] || (shipGroups[key] = { src: src, dst: dst, labels: Object.create(null), count: 0 });
+      var key = src + "\t" + dst + "\t" + label;
+      var g = shipGroups[key] || (shipGroups[key] = { src: src, dst: dst, label: label, count: 0 });
       g.count++;
-      g.labels[label] = (g.labels[label] || 0) + 1;
     });
 
-    var mergedGroups = Object.create(null); // "srcGroup\tdstGroup" -> { src, dst, label }
+    var mergedGroups = Object.create(null); // "srcGroup\tdstGroup\tlabel" -> { src, dst, label }
     Object.keys(shipGroups).forEach(function (key) {
       var g = shipGroups[key];
       if (g.count < 2) return;
-      var name = displayNames[g.src] || "";
-      var labels = Object.keys(g.labels).sort(function (x, y) {
-        var xn = x === name ? 1 : 0, yn = y === name ? 1 : 0;
-        if (xn !== yn) return yn - xn;
-        return g.labels[y] - g.labels[x];
-      });
-      mergedGroups[key] = { src: g.src, dst: g.dst, label: labels[0] || "" };
+      mergedGroups[key] = { src: g.src, dst: g.dst, label: g.label };
     });
 
     var out = [];
@@ -511,7 +506,7 @@
           keep = !!visible[a] && !!visible[b] && !coveredByGroup(a, b);
           if (keep) {
             var src = deepestCluster(a), dst = deepestCluster(b);
-            if (src && dst && mergedGroups[src + "\t" + dst]) keep = false;
+            if (src && dst && mergedGroups[src + "\t" + dst + "\t" + label]) keep = false;
           }
         }
         if (keep && exactType && label !== labelFilter) keep = false;

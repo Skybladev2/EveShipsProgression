@@ -724,13 +724,13 @@ flowchart
 	n_Slasher -->|"Projectile turrets"| n_Thrasher_Fleet_Issue
 	n_Tormentor -->|"Energy turrets"| n_Dragoon
 	n_Tristan -->|"Drones"| n_Nemesis
-	n_Vigil -->|"Target paint"| n_Vigil_Fleet_Issue
 	n_Vigil -->|"Target paint"| n_Hyena
 	n_Vigil -->|"Target paint"| n_Bellicose
 	n_Republic_Fleet_Firetail -->|"Projectile turrets, tackle"| n_Dramiel
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Cruor
 	n_Vigil_Fleet_Issue -.->|"Missiles"| n_Garmur
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Huginn
+	n_Vigil_Fleet_Issue -->|"Web range"| n_Hyena
 	n_Astero -->|"Cloak, scan"| n_Cheetah
 	n_Astero -->|"Scan"| n_Stratios
 	n_Cruor -->|"Energy turrets"| n_Ashimmu
@@ -774,6 +774,7 @@ flowchart
 	n_Bellicose -->|"Missiles"| n_Muninn
 	n_Bellicose -->|"Target paint"| n_Huginn
 	n_Bellicose -->|"Missiles"| n_Rapier
+	n_Bellicose -->|"Target paint"| n_Rapier
 	n_Blackbird -->|"ECM"| n_Falcon
 	n_Blackbird -->|"ECM"| n_Rook
 	n_Caracal -->|"Missiles"| n_Cerberus
