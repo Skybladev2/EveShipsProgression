@@ -364,7 +364,16 @@ button:active { transform: translateY(1px); }
   transition: opacity .12s ease;
   pointer-events: none;
 }
-#graph svg path.edge-hit:hover + path.edge-hover-line { opacity: .45; }
+#graph svg path.edge-hit:hover + path.edge-hover-line,
+#graph svg path.edge-hover-line.edge-hover { opacity: .45; }
+
+/* the edge and its label ("title") light up together; the class is applied
+   from JS because the label sits in a separate SVG layer, so hovering either
+   the line or its title brightens the other too */
+#graph svg g.edgeLabel.edge-hover {
+  opacity: 1;
+  filter: brightness(1.35);
+}
 
 /* stacked layers cross-fade when the diagram is rebuilt */
 #graph svg.graph-layer {

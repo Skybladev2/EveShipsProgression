@@ -48,8 +48,9 @@ before filtering. In **Highlight** mode clicking an edge only highlights that si
 in place and leaves the diagram as it is; click the edge again, or the background, to clear the
 highlight.
 
-Hover an edge to see what it connects, in the form `edge label → connecting ship`; group
-targets use their full path, e.g. `Missiles → Cruisers/Missiles`.
+Hover an edge, or its label, to see what it connects in the form `edge label → connecting ship`;
+group targets use their full path, e.g. `Missiles → Cruisers/Missiles`. The edge and its label
+brighten together whichever of the two the pointer is over.
 
 ```mermaid
 flowchart

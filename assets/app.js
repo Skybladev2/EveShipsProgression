@@ -91,6 +91,7 @@
 
   var tooltipEl = null;   // floating tooltip for the edge under the cursor
   var tooltipEdgeId = null; // edge the tooltip currently describes
+  var hoveredEdgeId = null; // edge whose line and label are brightened on hover
 
   var renderSeq = 0;      // unique Mermaid render ids
   var viewToken = 0;      // guards against stale async renders
@@ -559,6 +560,7 @@
      the currently displayed layer. */
   function buildDomIndex() {
     var nodes = graph.nodes;
+    hoveredEdgeId = null; // labels are rebuilt; re-tag on the next hover
 
     var nodeItems = [];
     var byId = Object.create(null);
@@ -1168,6 +1170,7 @@
      but much thicker copy of each edge on top of it (inside the same layer, so
      it stays below the node and label layers) purely as a hit target. */
   function addEdgeHitAreas() {
+    var glowByEdgeId = Object.create(null);
     collect(svgEl, 'path[data-et="edge"]').forEach(function (path) {
       var hit = path.cloneNode(false);
       hit.removeAttribute("id");
@@ -1195,7 +1198,11 @@
       glow.setAttribute("fill", "none");
       glow.style.pointerEvents = "none";
       path.parentNode.insertBefore(glow, hit.nextSibling);
+
+      var id = path.getAttribute("data-id");
+      if (id) glowByEdgeId[id] = glow;
     });
+    if (domIndex) domIndex.glowByEdgeId = glowByEdgeId;
     updateHitWidth();
   }
 
@@ -1416,12 +1423,36 @@
   function hideEdgeTooltip() {
     if (tooltipEl) tooltipEl.hidden = true;
     tooltipEdgeId = null;
+    paintHoverEdge(null);
+  }
+
+  /* Brighten both the edge and its label ("title") under the cursor. The
+     label sits in its own SVG layer, above the edge paths, so a CSS sibling
+     selector cannot connect a hovered line to its label (nor a hovered label
+     back to its line); mirror the hover in JS instead by tagging the matching
+     label and sheen elements. This makes the pair light up together whether
+     the pointer is over the edge or over its title. */
+  function paintHoverEdge(edgeId) {
+    if (edgeId === hoveredEdgeId) return;
+    if (hoveredEdgeId && domIndex) {
+      var prev = domIndex.labelByEdgeId[hoveredEdgeId];
+      if (prev) prev.classList.remove("edge-hover");
+      var prevGlow = domIndex.glowByEdgeId && domIndex.glowByEdgeId[hoveredEdgeId];
+      if (prevGlow) prevGlow.classList.remove("edge-hover");
+    }
+    hoveredEdgeId = edgeId || null;
+    if (hoveredEdgeId && domIndex) {
+      var next = domIndex.labelByEdgeId[hoveredEdgeId];
+      if (next) next.classList.add("edge-hover");
+      var nextGlow = domIndex.glowByEdgeId && domIndex.glowByEdgeId[hoveredEdgeId];
+      if (nextGlow) nextGlow.classList.add("edge-hover");
+    }
   }
 
   function wireEdgeTooltip() {
     viewport.addEventListener("mousemove", function (e) {
       var edgeId = edgeIdFromTarget(e.target);
-      if (edgeId) showEdgeTooltip(e, edgeId);
+      if (edgeId) { paintHoverEdge(edgeId); showEdgeTooltip(e, edgeId); }
       else hideEdgeTooltip();
     });
     viewport.addEventListener("mouseleave", hideEdgeTooltip);
