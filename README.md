@@ -332,7 +332,6 @@ flowchart
 		n_Daredevil["Daredevil"]
 		n_Dramiel["Dramiel"]
 		n_Garmur["Garmur"]
-		n_Medusa["Medusa"]
 		n_Succubus["Succubus"]
 		n_Worm["Worm"]
 	end
@@ -738,7 +737,6 @@ flowchart
 	n_Daredevil -->|"Hybrid turrets"| n_Vigilant
 	n_Dramiel -->|"Projectile turrets"| n_Cynabal
 	n_Garmur -->|"Missiles"| n_Orthrus
-	n_Medusa -->|"Projectile turrets"| n_Ixion
 	n_Succubus -->|"Energy turrets"| n_Phantasm
 	n_Worm -->|"Missiles"| n_Mamba
 	n_Skybreaker -->|"Vorton projector"| n_Stormbringer

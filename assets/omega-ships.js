@@ -44,7 +44,6 @@ window.OMEGA_SHIP_IDS = [
   "n_Taranis",
   "n_Raptor",
   "n_Crusader",
-  "n_Medusa",
   "n_Hawk",
   "n_Jaguar",
   "n_Vengeance",

@@ -50,7 +50,6 @@ ALIASES = {
 SPECIAL_EDITION_OMEGA = {
     "Phantom",
     "Eidolon",
-    "Medusa",
     "Herald",
     "Visitant",
     "Penitence",
