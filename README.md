@@ -789,7 +789,6 @@ flowchart
 	n_Omen -->|"Energy turrets"| n_Zealot
 	n_Osprey -->|"Remote shield boost"| n_Basilisk
 	n_Phantom -->|"Missiles"| n_Eidolon
-	n_Rupture -->|"Projectile turrets"| n_Muninn
 	n_Scythe -->|"Remote shield boost, Logistic drones"| n_Scimitar
 	n_Federation_Navy_Comet -->|"Hybrid turrets"| n_Daredevil
 	n_Vexor_Navy_Issue -->|"Hybrid turrets"| n_Vigilant
@@ -878,7 +877,7 @@ flowchart
 	n_Caiman -->|"Capital missiles"| n_Loggerhead
 	n_Chemosh -->|"Capital energy turrets"| n_Molok
 	n_Chemosh -->|"Capital energy turrets"| n_Dagon
-	n_Sarathiel -->|"Projectile turrets"| n_Azariel
+	n_Ragnarok -->|"Capital projectile turrets"| n_Azariel
 	n_Vehement -->|"Capital hybrid turrets"| n_Vanquisher
 	n_Archon -->|"Fighters, Command bursts"| n_Salvation
 	n_Archon -->|"Fighters"| n_Aeon
