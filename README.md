@@ -835,6 +835,9 @@ flowchart
 	n_Khizriel -->|"Projectile turrets"| n_Machariel
 	n_Drekavac -->|"Entropic disintegrator"| n_Leshak
 	n_Claymore -->|"Command bursts"| n_Nidhoggur
+	n_Damnation -->|"Command bursts"| n_Archon
+	n_Vulture -->|"Command bursts"| n_Chimera
+	n_Eos -->|"Command bursts"| n_Thanatos
 	n_Apocalypse -->|"Energy turrets"| n_Paladin
 	n_Apocalypse -->|"Energy turrets"| n_Revelation
 	n_Armageddon -->|"Drones"| n_Redeemer
@@ -852,7 +855,6 @@ flowchart
 	n_Bhaalgorn -->|"Energy turrets"| n_Chemosh
 	n_Machariel -->|"Projectile turrets"| n_Sarathiel
 	n_Nestor -->|"Drones"| n_Odysseus
-	n_Nightmare -->|"Energy turrets"| n_Revenant
 	n_Rattlesnake -->|"Missiles"| n_Caiman
 	n_Vindicator -->|"Hybrid turrets"| n_Vehement
 	n_Leshak -->|"Entropic disintegrator"| n_Babaroga
@@ -873,12 +875,12 @@ flowchart
 	n_Revelation_Navy_Issue -->|"Capital energy turrets"| n_Chemosh
 	n_Revelation -->|"Capital energy turrets"| n_Avatar
 	n_Naglfar_Fleet_Issue -->|"Projectile turrets"| n_Sarathiel
-	n_Caiman -->|"Capital missiles"| n_Komodo
+	n_Leviathan -->|"Capital missiles"| n_Komodo
 	n_Caiman -->|"Capital missiles"| n_Loggerhead
-	n_Chemosh -->|"Capital energy turrets"| n_Molok
+	n_Avatar -->|"Capital energy turrets"| n_Molok
 	n_Chemosh -->|"Capital energy turrets"| n_Dagon
 	n_Ragnarok -->|"Capital projectile turrets"| n_Azariel
-	n_Vehement -->|"Capital hybrid turrets"| n_Vanquisher
+	n_Erebus -->|"Capital hybrid turrets"| n_Vanquisher
 	n_Archon -->|"Fighters, Command bursts"| n_Salvation
 	n_Archon -->|"Fighters"| n_Aeon
 	n_Archon -->|"Capital remote repair"| n_Apostle
@@ -983,7 +985,8 @@ flowchart
 	c_proj ==>|"Projectile turrets"| n_Huginn
 	c_proj ==>|"Projectile turrets"| n_Scythe_Fleet_Issue
 	c_proj ==>|"Projectile turrets"| n_Vagabond
-	n_Hel -->|"Fighters, Command bursts"| s80
+	s79 -->|"Fighters"| s80
+	s79 -->|"Command bursts"| s80
 	nbs_energy ==>|"Energy turrets"| n_Bhaalgorn
 	s11 ==>|"Mining"| s14
 	s11 ==>|"Mining"| s86
