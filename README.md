@@ -965,40 +965,40 @@ flowchart
 	n_Vindicator -->|"Hybrid turrets"| n_Vehement
 	n_Leshak -->|"Entropic disintegrator"| n_Babaroga
 	n_Leshak -->|"Entropic disintegrator"| n_Zirnitra
-	n_Moros -->|"Capital hybrid turrets"| n_Moros_Navy_Issue
-	n_Moros -->|"Capital hybrid turrets"| n_Hubris
-	n_Moros_Navy_Issue -->|"Capital hybrid turrets"| n_Vehement
-	n_Moros -->|"Capital hybrid turrets"| n_Erebus
+	n_Moros -->|"Hybrid turrets"| n_Moros_Navy_Issue
+	n_Moros -->|"Hybrid turrets"| n_Hubris
+	n_Moros_Navy_Issue -->|"Hybrid turrets"| n_Vehement
+	n_Moros -->|"Hybrid turrets"| n_Erebus
 	n_Naglfar -->|"Projectile turrets"| n_Naglfar_Fleet_Issue
 	n_Naglfar -->|"Projectile turrets"| n_Valravn
-	n_Naglfar -->|"Projectile Turret damage"| n_Ragnarok
-	n_Phoenix -->|"Capital missiles"| n_Phoenix_Navy_Issue
-	n_Phoenix -->|"Capital missiles"| n_Karura
-	n_Phoenix_Navy_Issue -->|"Capital missiles"| n_Caiman
-	n_Phoenix -->|"Capital missiles"| n_Leviathan
-	n_Revelation -->|"Capital energy turrets"| n_Revelation_Navy_Issue
-	n_Revelation -->|"Capital energy turrets"| n_Bane
-	n_Revelation_Navy_Issue -->|"Capital energy turrets"| n_Chemosh
-	n_Revelation -->|"Capital energy turrets"| n_Avatar
+	n_Naglfar -->|"Projectile turrets"| n_Ragnarok
+	n_Phoenix -->|"Missiles"| n_Phoenix_Navy_Issue
+	n_Phoenix -->|"Missiles"| n_Karura
+	n_Phoenix_Navy_Issue -->|"Missiles"| n_Caiman
+	n_Phoenix -->|"Missiles"| n_Leviathan
+	n_Revelation -->|"Energy turrets"| n_Revelation_Navy_Issue
+	n_Revelation -->|"Energy turrets"| n_Bane
+	n_Revelation_Navy_Issue -->|"Energy turrets"| n_Chemosh
+	n_Revelation -->|"Energy turrets"| n_Avatar
 	n_Naglfar_Fleet_Issue -->|"Projectile turrets"| n_Sarathiel
-	n_Leviathan -->|"Capital missiles"| n_Komodo
-	n_Caiman -->|"Capital missiles"| n_Loggerhead
-	n_Avatar -->|"Capital energy turrets"| n_Molok
-	n_Chemosh -->|"Capital energy turrets"| n_Dagon
-	n_Ragnarok -->|"Capital projectile turrets"| n_Azariel
-	n_Erebus -->|"Capital hybrid turrets"| n_Vanquisher
+	n_Leviathan -->|"Missiles"| n_Komodo
+	n_Caiman -->|"Missiles"| n_Loggerhead
+	n_Avatar -->|"Energy turrets"| n_Molok
+	n_Chemosh -->|"Energy turrets"| n_Dagon
+	n_Ragnarok -->|"Projectile turrets"| n_Azariel
+	n_Erebus -->|"Hybrid turrets"| n_Vanquisher
 	n_Archon -->|"Fighters, Command bursts"| n_Salvation
 	n_Archon -->|"Fighters"| n_Aeon
-	n_Archon -->|"Capital remote repair"| n_Apostle
+	n_Archon -->|"Remote repair"| n_Apostle
 	n_Chimera -->|"Fighters, Command bursts"| n_Simurgh
 	n_Chimera -->|"Fighters"| n_Wyvern
-	n_Chimera -->|"Capital remote repair"| n_Minokawa
+	n_Chimera -->|"Remote repair"| n_Minokawa
 	n_Nidhoggur -->|"Fighters, Command bursts"| n_Ymir
 	n_Nidhoggur -->|"Fighters, Command bursts"| n_Hel
-	n_Nidhoggur -->|"Capital remote repair"| n_Lif
+	n_Nidhoggur -->|"Remote repair"| n_Lif
 	n_Thanatos -->|"Fighters, Command bursts"| n_Gaia
 	n_Thanatos -->|"Fighters"| n_Nyx
-	n_Thanatos -->|"Capital remote repair"| n_Ninazu
+	n_Thanatos -->|"Remote repair"| n_Ninazu
 	n_Deluge -->|"Cargo"| n_Avalanche
 	n_Noctis -->|"Salvage"| n_Porpoise
 	n_Torrent -->|"Cargo"| n_Avalanche
