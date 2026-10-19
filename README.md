@@ -132,11 +132,11 @@ flowchart
 			n_Arbitrator["Arbitrator"]
 			n_Vexor["Vexor"]
 		end
-		subgraph c_shield["Shield logistics"]
+		subgraph c_shield["Remote shield boost"]
 			n_Osprey["Osprey"]
 			n_Scythe["Scythe"]
 		end
-		subgraph c_armor["Armor logistics"]
+		subgraph c_armor["Remote armor repair"]
 			n_Augoror["Augoror"]
 			n_Exequror["Exequror"]
 		end
@@ -525,10 +525,10 @@ flowchart
 		subgraph nc_drones["Drones"]
 			n_Vexor_Navy_Issue["Vexor Navy Issue"]
 		end
-		subgraph nc_shield["Shield logistics"]
+		subgraph nc_shield["Remote shield boost"]
 			n_Osprey_Navy_Issue["Osprey Navy Issue"]
 		end
-		subgraph nc_armor["Armor logistics"]
+		subgraph nc_armor["Remote armor repair"]
 			n_Augoror_Navy_Issue["Augoror Navy Issue"]
 			n_Exequror_Navy_Issue["Exeqor Navy Issue"]
 		end
@@ -580,7 +580,7 @@ flowchart
 		subgraph s61_drones["Drones"]
 			n_Stratios["Stratios"]
 		end
-		subgraph s61_shield["Shield logistics"]
+		subgraph s61_shield["Remote shield boost"]
 			n_Ixion["Ixion"]
 		end
 	end
@@ -1047,8 +1047,8 @@ flowchart
 	c_proj ==>|"Projectile turrets"| nc_proj
 	c_energy ==>|"Energy turrets"| nc_energy
 	c_drones ==>|"Drones"| nc_drones
-	c_shield ==>|"Shield logistics"| nc_shield
-	c_armor ==>|"Armor logistics"| nc_armor
+	c_shield ==>|"Remote shield boost"| nc_shield
+	c_armor ==>|"Remote armor repair"| nc_armor
 	bc_missiles ==>|"Missiles"| nbc_missiles
 	bc_proj ==>|"Projectile turrets"| nbc_proj
 	bc_proj ==>|"Projectile turrets"| bs_proj
