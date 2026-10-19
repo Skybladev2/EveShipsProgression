@@ -759,15 +759,17 @@ flowchart
 	end
 	subgraph s81["Transport ships"]
 		n_Bustard["Bustard"]
-		n_Crane["Crane"]
-		n_Deluge["Deluge"]
 		n_Impel["Impel"]
 		n_Mastodon["Mastodon"]
 		n_Occator["Occator"]
-		n_Prorator["Prorator"]
-		n_Prowler["Prowler"]
 		n_Torrent["Torrent"]
-		n_Viator["Viator"]
+		subgraph s81_blockade["Blockade runners"]
+			n_Crane["Crane"]
+			n_Deluge["Deluge"]
+			n_Prorator["Prorator"]
+			n_Prowler["Prowler"]
+			n_Viator["Viator"]
+		end
 	end
 	subgraph s82["Freighters"]
 		n_Avalanche["Avalanche"]
@@ -847,7 +849,7 @@ flowchart
 	n_Worm -->|"Missiles"| n_Mamba
 	n_Skybreaker -->|"Vorton projector"| n_Stormbringer
 	n_Damavik -->|"Entropic disintegrator"| n_Kikimora
-	n_Cheetah -->|"Cloak"| n_Prowler
+	s45_scan ==>|"Cloak"| s81_blockade
 	n_Algos -->|"Drones"| n_Magus
 	n_Catalyst -->|"Hybrid turrets"| n_Eris
 	n_Catalyst -->|"Hybrid turrets"| n_Hecate
