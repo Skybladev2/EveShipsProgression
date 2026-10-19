@@ -989,16 +989,16 @@ flowchart
 	n_Erebus -->|"Hybrid turrets"| n_Vanquisher
 	n_Archon -->|"Fighters, Command bursts"| n_Salvation
 	n_Archon -->|"Fighters"| n_Aeon
-	n_Archon -->|"Remote repair"| n_Apostle
+	n_Archon -->|"Fighters"| n_Apostle
 	n_Chimera -->|"Fighters, Command bursts"| n_Simurgh
 	n_Chimera -->|"Fighters"| n_Wyvern
-	n_Chimera -->|"Remote repair"| n_Minokawa
+	n_Chimera -->|"Fighters"| n_Minokawa
 	n_Nidhoggur -->|"Fighters, Command bursts"| n_Ymir
 	n_Nidhoggur -->|"Fighters, Command bursts"| n_Hel
-	n_Nidhoggur -->|"Remote repair"| n_Lif
+	n_Nidhoggur -->|"Fighters"| n_Lif
 	n_Thanatos -->|"Fighters, Command bursts"| n_Gaia
 	n_Thanatos -->|"Fighters"| n_Nyx
-	n_Thanatos -->|"Remote repair"| n_Ninazu
+	n_Thanatos -->|"Fighters"| n_Ninazu
 	n_Deluge -->|"Cargo"| n_Avalanche
 	n_Noctis -->|"Salvage"| n_Porpoise
 	n_Torrent -->|"Cargo"| n_Avalanche
