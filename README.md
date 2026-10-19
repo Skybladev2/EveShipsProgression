@@ -260,10 +260,14 @@ flowchart
 		n_Ragnarok["Ragnarok"]
 	end
 	subgraph s29["Force Auxiliary"]
-		n_Apostle["Apostle"]
-		n_Lif["Lif"]
-		n_Minokawa["Minokawa"]
-		n_Ninazu["Ninazu"]
+		subgraph s29_shield["Remote shield boost"]
+			n_Lif["Lif"]
+			n_Minokawa["Minokawa"]
+		end
+		subgraph s29_armor["Remote armor repair"]
+			n_Apostle["Apostle"]
+			n_Ninazu["Ninazu"]
+		end
 	end
 	subgraph s30["Pirate Faction Force Auxiliaries"]
 		n_Dagon["Dagon"]
@@ -327,13 +331,23 @@ flowchart
 		end
 	end
 	subgraph s43["Pirate Faction Frigates"]
-		n_Astero["Astero"]
-		n_Cruor["Cruor"]
-		n_Daredevil["Daredevil"]
-		n_Dramiel["Dramiel"]
-		n_Garmur["Garmur"]
-		n_Succubus["Succubus"]
-		n_Worm["Worm"]
+		subgraph s43_missiles["Missiles"]
+			n_Garmur["Garmur"]
+			n_Worm["Worm"]
+		end
+		subgraph s43_proj["Projectile turrets"]
+			n_Dramiel["Dramiel"]
+		end
+		subgraph s43_hybrid["Hybrid turrets"]
+			n_Daredevil["Daredevil"]
+		end
+		subgraph s43_energy["Energy turrets"]
+			n_Cruor["Cruor"]
+			n_Succubus["Succubus"]
+		end
+		subgraph s43_scan["Scan"]
+			n_Astero["Astero"]
+		end
 	end
 	subgraph s44["Assault Frigates"]
 		subgraph s44_missiles["Missiles"]
@@ -357,21 +371,33 @@ flowchart
 		end
 	end
 	subgraph s45["Covert Ops"]
-		n_Anathema["Anathema"]
-		n_Buzzard["Buzzard"]
-		n_Cheetah["Cheetah"]
-		n_Helios["Helios"]
-		n_Hound["Hound"]
-		n_Manticore["Manticore"]
-		n_Nemesis["Nemesis"]
-		n_Purifier["Purifier"]
+		subgraph s45_missiles["Missiles"]
+			n_Hound["Hound"]
+			n_Manticore["Manticore"]
+			n_Nemesis["Nemesis"]
+			n_Purifier["Purifier"]
+		end
+		subgraph s45_scan["Scan"]
+			n_Anathema["Anathema"]
+			n_Buzzard["Buzzard"]
+			n_Cheetah["Cheetah"]
+			n_Helios["Helios"]
+		end
 	end
 	subgraph s46["Electronic Attack Frigates"]
-		n_Herald["Herald"]
-		n_Hyena["Hyena"]
-		n_Keres["Keres"]
-		n_Kitsune["Kitsune"]
-		n_Sentinel["Sentinel"]
+		subgraph s46_weapon["Weapon disruption"]
+			n_Herald["Herald"]
+			n_Sentinel["Sentinel"]
+		end
+		subgraph s46_ecm["ECM"]
+			n_Kitsune["Kitsune"]
+		end
+		subgraph s46_damp["Sensor dampening"]
+			n_Keres["Keres"]
+		end
+		subgraph s46_paint["Target paint"]
+			n_Hyena["Hyena"]
+		end
 	end
 	subgraph s47["Haulers"]
 		subgraph s48["Cargo"]
@@ -421,10 +447,16 @@ flowchart
 		end
 	end
 	subgraph s52["Interdictors"]
-		n_Eris["Eris"]
-		n_Flycatcher["Flycatcher"]
-		n_Heretic["Heretic"]
-		n_Sabre["Sabre"]
+		subgraph s52_missiles["Missiles"]
+			n_Flycatcher["Flycatcher"]
+			n_Heretic["Heretic"]
+		end
+		subgraph s52_proj["Projectile turrets"]
+			n_Sabre["Sabre"]
+		end
+		subgraph s52_hybrid["Hybrid turrets"]
+			n_Eris["Eris"]
+		end
 	end
 	subgraph s53["Tactical Destroyers"]
 		n_Confessor["Confessor"]
@@ -433,31 +465,51 @@ flowchart
 		n_Svipul["Svipul"]
 	end
 	subgraph s54["Pirate Faction Destroyers"]
-		n_Mamba["Mamba"]
-		n_Mekubal["Mekubal"]
-		n_Tholos["Tholos"]
+		subgraph s54_missiles["Missiles"]
+			n_Mamba["Mamba"]
+		end
+		subgraph s54_proj["Projectile turrets"]
+			n_Mekubal["Mekubal"]
+			n_Tholos["Tholos"]
+		end
 	end
 	subgraph s55["Other Faction Destroyers"]
 		n_Sunesis["Sunesis"]
 	end
 	subgraph s56["Command Destroyers"]
-		n_Bifrost["Bifrost"]
-		n_Draugur["Draugur"]
-		n_Magus["Magus"]
-		n_Outrider["Outrider"]
-		n_Pontifex["Pontifex"]
-		n_Stork["Stork"]
+		subgraph s56_missiles["Missiles"]
+			n_Bifrost["Bifrost"]
+			n_Stork["Stork"]
+		end
+		subgraph s56_drones["Drones"]
+			n_Magus["Magus"]
+			n_Pontifex["Pontifex"]
+		end
+		subgraph s56_entropic["Entropic disintegrator"]
+			n_Draugur["Draugur"]
+		end
+		subgraph s56_mining["Mining"]
+			n_Outrider["Outrider"]
+		end
 	end
 	subgraph s57["Recon Ships"]
-		n_Arazu["Arazu"]
-		n_Curse["Curse"]
-		n_Falcon["Falcon"]
-		n_Huginn["Huginn"]
-		n_Lachesis["Lachesis"]
-		n_Penitence["Penitence"]
-		n_Pilgrim["Pilgrim"]
-		n_Rapier["Rapier"]
-		n_Rook["Rook"]
+		subgraph s57_missiles["Missiles"]
+			n_Rook["Rook"]
+			n_Rapier["Rapier"]
+		end
+		subgraph s57_proj["Projectile turrets"]
+			n_Huginn["Huginn"]
+		end
+		subgraph s57_hybrid["Hybrid turrets"]
+			n_Arazu["Arazu"]
+			n_Lachesis["Lachesis"]
+			n_Falcon["Falcon"]
+		end
+		subgraph s57_drones["Drones"]
+			n_Curse["Curse"]
+			n_Pilgrim["Pilgrim"]
+			n_Penitence["Penitence"]
+		end
 	end
 	subgraph s58["Navy Faction Cruisers"]
 		n_Scythe_Fleet_Issue["Scythe Fleet Issue"]
@@ -482,15 +534,27 @@ flowchart
 		end
 	end
 	subgraph s59["Heavy Assault Cruisers"]
-		n_Cerberus["Cerberus"]
-		n_Deimos["Deimos"]
-		n_Eagle["Eagle"]
-		n_Ikitursa["Ikitursa"]
-		n_Ishtar["Ishtar"]
-		n_Muninn["Muninn"]
-		n_Sacrilege["Sacrilege"]
-		n_Vagabond["Vagabond"]
-		n_Zealot["Zealot"]
+		subgraph s59_missiles["Missiles"]
+			n_Cerberus["Cerberus"]
+			n_Sacrilege["Sacrilege"]
+		end
+		subgraph s59_proj["Projectile turrets"]
+			n_Muninn["Muninn"]
+			n_Vagabond["Vagabond"]
+		end
+		subgraph s59_hybrid["Hybrid turrets"]
+			n_Deimos["Deimos"]
+			n_Eagle["Eagle"]
+		end
+		subgraph s59_energy["Energy turrets"]
+			n_Zealot["Zealot"]
+		end
+		subgraph s59_drones["Drones"]
+			n_Ishtar["Ishtar"]
+		end
+		subgraph s59_entropic["Entropic disintegrator"]
+			n_Ikitursa["Ikitursa"]
+		end
 	end
 	subgraph s60["Strategic Cruisers"]
 		n_Legion["Legion"]
@@ -499,14 +563,26 @@ flowchart
 		n_Tengu["Tengu"]
 	end
 	subgraph s61["Pirate Faction Cruisers"]
-		n_Ashimmu["Ashimmu"]
-		n_Cynabal["Cynabal"]
-		n_Gila["Gila"]
-		n_Ixion["Ixion"]
-		n_Orthrus["Orthrus"]
-		n_Phantasm["Phantasm"]
-		n_Stratios["Stratios"]
-		n_Vigilant["Vigilant"]
+		subgraph s61_missiles["Missiles"]
+			n_Gila["Gila"]
+			n_Orthrus["Orthrus"]
+		end
+		subgraph s61_proj["Projectile turrets"]
+			n_Cynabal["Cynabal"]
+		end
+		subgraph s61_hybrid["Hybrid turrets"]
+			n_Vigilant["Vigilant"]
+		end
+		subgraph s61_energy["Energy turrets"]
+			n_Ashimmu["Ashimmu"]
+			n_Phantasm["Phantasm"]
+		end
+		subgraph s61_drones["Drones"]
+			n_Stratios["Stratios"]
+		end
+		subgraph s61_shield["Shield logistics"]
+			n_Ixion["Ixion"]
+		end
 	end
 	subgraph s62["Heavy Interdiction Cruisers"]
 		n_Broadsword["Broadsword"]
@@ -515,11 +591,15 @@ flowchart
 		n_Phobos["Phobos"]
 	end
 	subgraph s63["Logistics Cruisers"]
-		n_Basilisk["Basilisk"]
-		n_Guardian["Guardian"]
-		n_Oneiros["Oneiros"]
-		n_Scimitar["Scimitar"]
-		n_Zarmazd["Zarmazd"]
+		subgraph s63_shield["Remote shield boost"]
+			n_Basilisk["Basilisk"]
+			n_Scimitar["Scimitar"]
+		end
+		subgraph s63_armor["Remote armor repair"]
+			n_Guardian["Guardian"]
+			n_Oneiros["Oneiros"]
+			n_Zarmazd["Zarmazd"]
+		end
 	end
 	subgraph s64["Navy Faction Battlecruisers"]
 		subgraph nbc_missiles["Missiles"]
@@ -542,23 +622,39 @@ flowchart
 		end
 	end
 	subgraph s65["Command ships"]
-		n_Absolution["Absolution"]
-		n_Astarte["Astarte"]
-		n_Claymore["Claymore"]
-		n_Damnation["Damnation"]
-		n_Eos["Eos"]
-		n_Nighthawk["Nighthawk"]
-		n_Sleipnir["Sleipnir"]
-		n_Vulture["Vulture"]
+		subgraph s65_missiles["Missiles"]
+			n_Claymore["Claymore"]
+			n_Damnation["Damnation"]
+			n_Nighthawk["Nighthawk"]
+		end
+		subgraph s65_proj["Projectile turrets"]
+			n_Sleipnir["Sleipnir"]
+		end
+		subgraph s65_hybrid["Hybrid turrets"]
+			n_Astarte["Astarte"]
+			n_Vulture["Vulture"]
+		end
+		subgraph s65_energy["Energy turrets"]
+			n_Absolution["Absolution"]
+		end
+		subgraph s65_drones["Drones"]
+			n_Eos["Eos"]
+		end
 	end
 	subgraph s66["Other Faction Battlecruisers"]
 		n_Gnosis["Gnosis"]
 	end
 	subgraph s67["Pirate Faction Battlecruisers"]
-		n_Akoman["Akoman"]
-		n_Alligator["Alligator"]
-		n_Cenotaph["Cenotaph"]
-		n_Khizriel["Khizriel"]
+		subgraph s67_missiles["Missiles"]
+			n_Alligator["Alligator"]
+		end
+		subgraph s67_proj["Projectile turrets"]
+			n_Cenotaph["Cenotaph"]
+			n_Khizriel["Khizriel"]
+		end
+		subgraph s67_energy["Energy turrets"]
+			n_Akoman["Akoman"]
+		end
 	end
 	subgraph s68["Navy Faction Battleships"]
 		n_Typhoon_Fleet_Issue["Typhoon Fleet Issue"]
@@ -594,13 +690,23 @@ flowchart
 		n_Vargur["Vargur"]
 	end
 	subgraph s71["Pirate Faction Battleships"]
-		n_Barghest["Barghest"]
-		n_Bhaalgorn["Bhaalgorn"]
-		n_Machariel["Machariel"]
-		n_Nestor["Nestor"]
-		n_Nightmare["Nightmare"]
-		n_Rattlesnake["Rattlesnake"]
-		n_Vindicator["Vindicator"]
+		subgraph s71_missiles["Missiles"]
+			n_Barghest["Barghest"]
+			n_Rattlesnake["Rattlesnake"]
+		end
+		subgraph s71_proj["Projectile turrets"]
+			n_Machariel["Machariel"]
+		end
+		subgraph s71_hybrid["Hybrid turrets"]
+			n_Vindicator["Vindicator"]
+		end
+		subgraph s71_energy["Energy turrets"]
+			n_Bhaalgorn["Bhaalgorn"]
+			n_Nightmare["Nightmare"]
+		end
+		subgraph s71_drones["Drones"]
+			n_Nestor["Nestor"]
+		end
 	end
 	subgraph s72["Other Faction Battleships"]
 		n_Praxis["Praxis"]
