@@ -834,12 +834,14 @@ flowchart
 	n_Tristan -->|"Drones"| n_Nemesis
 	n_Vigil -->|"Target paint"| n_Hyena
 	n_Vigil -->|"Target paint"| n_Bellicose
-	n_Republic_Fleet_Firetail -->|"Projectile turrets, tackle"| n_Dramiel
+	n_Republic_Fleet_Firetail -->|"Projectile turrets"| n_Dramiel
+	n_Republic_Fleet_Firetail -->|"Tackle"| n_Dramiel
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Cruor
 	n_Vigil_Fleet_Issue -.->|"Missiles"| n_Garmur
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Huginn
 	n_Vigil_Fleet_Issue -->|"Web range"| n_Hyena
-	n_Astero -->|"Cloak, scan"| n_Cheetah
+	n_Astero -->|"Cloak"| n_Cheetah
+	n_Astero -->|"Scan"| n_Cheetah
 	n_Astero -->|"Scan"| n_Stratios
 	n_Cruor -->|"Energy turrets"| n_Ashimmu
 	n_Daredevil -->|"Hybrid turrets"| n_Vigilant
@@ -897,7 +899,8 @@ flowchart
 	n_Omen -->|"Energy turrets"| n_Zealot
 	n_Osprey -->|"Remote shield boost"| n_Basilisk
 	n_Phantom -->|"Missiles"| n_Eidolon
-	n_Scythe -->|"Remote shield boost, Logistic drones"| n_Scimitar
+	n_Scythe -->|"Remote shield boost"| n_Scimitar
+	n_Scythe -->|"Logistic drones"| n_Scimitar
 	n_Federation_Navy_Comet -->|"Hybrid turrets"| n_Daredevil
 	n_Vexor_Navy_Issue -->|"Hybrid turrets"| n_Vigilant
 	n_Thorax -->|"Hybrid turrets"| n_Deimos
@@ -928,7 +931,8 @@ flowchart
 	n_Vagabond -->|"Projectile turrets"| n_Loki
 	n_Zealot -->|"Energy turrets"| n_Legion
 	n_Broadsword -->|"Projectile turrets"| n_Loki
-	n_Scimitar -->|"Remote shield boost, Logistic drones"| n_Lif
+	n_Scimitar -->|"Remote shield boost"| n_Lif
+	n_Scimitar -->|"Logistic drones"| n_Lif
 	n_Brutix -->|"Hybrid turrets"| n_Astarte
 	n_Cyclone -->|"Missiles"| n_Claymore
 	n_Drake_Navy_Issue -->|"Missiles"| n_Alligator
@@ -989,16 +993,21 @@ flowchart
 	n_Chemosh -->|"Energy turrets"| n_Dagon
 	n_Ragnarok -->|"Projectile turrets"| n_Azariel
 	n_Erebus -->|"Hybrid turrets"| n_Vanquisher
-	n_Archon -->|"Fighters, Command bursts"| n_Salvation
+	n_Archon -->|"Fighters"| n_Salvation
+	n_Archon -->|"Command bursts"| n_Salvation
 	n_Archon -->|"Fighters"| n_Aeon
 	n_Archon -->|"Fighters"| n_Apostle
-	n_Chimera -->|"Fighters, Command bursts"| n_Simurgh
+	n_Chimera -->|"Fighters"| n_Simurgh
+	n_Chimera -->|"Command bursts"| n_Simurgh
 	n_Chimera -->|"Fighters"| n_Wyvern
 	n_Chimera -->|"Fighters"| n_Minokawa
-	n_Nidhoggur -->|"Fighters, Command bursts"| n_Ymir
-	n_Nidhoggur -->|"Fighters, Command bursts"| n_Hel
+	n_Nidhoggur -->|"Fighters"| n_Ymir
+	n_Nidhoggur -->|"Command bursts"| n_Ymir
+	n_Nidhoggur -->|"Fighters"| n_Hel
+	n_Nidhoggur -->|"Command bursts"| n_Hel
 	n_Nidhoggur -->|"Fighters"| n_Lif
-	n_Thanatos -->|"Fighters, Command bursts"| n_Gaia
+	n_Thanatos -->|"Fighters"| n_Gaia
+	n_Thanatos -->|"Command bursts"| n_Gaia
 	n_Thanatos -->|"Fighters"| n_Nyx
 	n_Thanatos -->|"Fighters"| n_Ninazu
 	n_Deluge -->|"Cargo"| n_Avalanche
@@ -1014,15 +1023,18 @@ flowchart
 	n_Retriever -->|"Mining"| n_Mackinaw
 	n_Metamorphosis -->|"Scan"| n_Probe
 	n_Probe -->|"Scan"| n_Metamorphosis
-	n_Metamorphosis -->|"Cloak, scan"| n_Astero
-	n_Cheetah -->|"Cloak, scan"| n_Pacifier
+	n_Metamorphosis -->|"Cloak"| n_Astero
+	n_Metamorphosis -->|"Scan"| n_Astero
+	n_Cheetah -->|"Cloak"| n_Pacifier
+	n_Cheetah -->|"Scan"| n_Pacifier
 	n_Probe -->|"Cargo"| n_Sunesis
 	n_Sunesis -->|"Missiles"| n_Talwar
 	n_Sunesis -->|"Projectile turrets"| n_Thrasher
 	n_Gnosis -->|"Missiles"| n_Cyclone
 	n_Gnosis -->|"Projectile turrets"| n_Hurricane
 	n_Praxis -->|"Missiles"| n_Typhoon
-	n_Probe_Fleet_Issue -->|"Missiles, scan"| n_Pacifier
+	n_Probe_Fleet_Issue -->|"Missiles"| n_Pacifier
+	n_Probe_Fleet_Issue -->|"Scan"| n_Pacifier
 	s2 ==>|"Missiles"| s35
 	s3 ==>|"Projectile turrets"| s40
 	s4 ==>|"Hybrid turrets"| s37
