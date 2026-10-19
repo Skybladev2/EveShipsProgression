@@ -2018,13 +2018,24 @@
       config.onPick(id);
     }
 
+    function openFromFocus() {
+      render(options);
+      openList();
+      setActive(-1);
+    }
+
     // Focusing opens the full list and selects the current value, so a new
     // query can be typed straight away.
     input.addEventListener("focus", function () {
       input.select();
-      render(options);
-      openList();
-      setActive(-1);
+      openFromFocus();
+    });
+    // Focusing is not enough to reopen the list: clicking away hides it through
+    // the document handler below while the input can keep focus (the click
+    // landed on something unfocusable), so a later click on the input fires no
+    // new focus event. Reopen the list from the click itself when it is shut.
+    input.addEventListener("click", function () {
+      if (!open) openFromFocus();
     });
     input.addEventListener("input", refresh);
     input.addEventListener("keydown", function (e) {
